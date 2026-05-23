@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>測量士 ○×テスト</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f1117; --surface:#1a1d27; --surface2:#22263a;
+  --border:rgba(255,255,255,0.08); --text:#e8eaf0; --text2:#8b90a8; --text3:#555a72;
+  --green:#4ade80; --gdim:rgba(74,222,128,0.12);
+  --red:#f87171;   --rdim:rgba(248,113,113,0.12);
+  --accent:#818cf8; --adim:rgba(129,140,248,0.12);
+  --r:14px; --rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+/* header */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.85);backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
+  padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:.02em}
+.hdr-title span{color:var(--accent)}
+.hdr-score{font-family:'DM Mono',monospace;font-size:13px;color:var(--text2);display:none}
+.hdr-score.on{display:block}
+.hdr-score b{color:var(--green)}
+/* screens */
+.scr{display:none;padding:24px 20px 60px;max-width:600px;margin:0 auto}
+.scr.on{display:block}
+/* hero */
+.hero{text-align:center;padding:28px 0 24px}
+.hero-icon{width:72px;height:72px;border-radius:22px;background:var(--adim);
+  border:1px solid rgba(129,140,248,.3);display:flex;align-items:center;
+  justify-content:center;margin:0 auto 18px;font-size:32px}
+.hero h1{font-size:22px;font-weight:700;margin-bottom:8px}
+.hero p{font-size:14px;color:var(--text2);line-height:1.6}
+/* prev result */
+.prev{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);
+  padding:12px 16px;margin-bottom:16px;display:none;justify-content:space-between;align-items:center}
+.prev.on{display:flex}
+.prev-lbl{font-size:12px;color:var(--text2)}
+.prev-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:500}
+/* category */
+.cat-grid{display:grid;gap:10px;margin:16px 0}
+.cat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px 18px;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;transition:border-color .15s,background .15s}
+.cat-card.sel{border-color:var(--accent);background:var(--adim)}
+.cat-card:active{transform:scale(.98)}
+.cat-l{display:flex;align-items:center;gap:12px}
+.cat-icon{font-size:20px;width:36px;text-align:center}
+.cat-name{font-size:15px;font-weight:500}
+.cat-cnt{font-size:12px;color:var(--text2);margin-top:2px}
+.cat-chk{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--text3);
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+  color:transparent;transition:all .15s;flex-shrink:0}
+.cat-card.sel .cat-chk{background:var(--accent);border-color:var(--accent);color:#fff}
+/* mode pills */
+.mode-row{display:flex;gap:8px;margin:16px 0}
+.mode-pill{flex:1;padding:10px 8px;font-size:13px;font-family:'Noto Sans JP',sans-serif;
+  border-radius:99px;border:1px solid var(--border);background:var(--surface);
+  color:var(--text2);cursor:pointer;transition:all .15s;text-align:center}
+.mode-pill.active{background:var(--adim);border-color:var(--accent);color:var(--accent);font-weight:500}
+.wbadge{display:inline-block;background:rgba(248,113,113,.15);color:var(--red);
+  font-size:10px;padding:1px 7px;border-radius:99px;margin-left:5px}
+/* buttons */
+.btn-primary{width:100%;padding:15px;font-size:16px;font-weight:700;
+  font-family:'Noto Sans JP',sans-serif;background:var(--accent);color:#fff;
+  border:none;border-radius:var(--r);cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.03em}
+.btn-primary:active{transform:scale(.98);opacity:.9}
+.btn-primary:disabled{opacity:.3;cursor:not-allowed}
+.btn-ghost{width:100%;padding:13px;font-size:14px;font-family:'Noto Sans JP',sans-serif;
+  background:var(--surface);color:var(--text2);border:1px solid var(--border);
+  border-radius:var(--r);cursor:pointer;transition:background .15s;margin-top:10px}
+.btn-ghost:active{background:var(--surface2)}
+.btn-dashed{width:100%;padding:13px;font-size:14px;font-weight:500;
+  font-family:'Noto Sans JP',sans-serif;background:transparent;color:var(--text2);
+  border:1px dashed rgba(255,255,255,.15);border-radius:var(--r);
+  cursor:pointer;margin-top:12px;transition:all .15s}
+.btn-dashed:hover{border-color:var(--accent);color:var(--accent)}
+/* progress */
+.prog-wrap{margin-bottom:20px}
+.prog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.q-ctr{font-family:'DM Mono',monospace;font-size:13px;color:var(--text2)}
+.live{font-size:13px}
+.live .c{color:var(--green);font-weight:700}
+.live .w{color:var(--red);font-weight:700}
+.prog-track{height:4px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .35s ease}
+/* question */
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px 18px;margin-bottom:20px;min-height:120px}
+.q-lbl{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);
+  letter-spacing:.08em;margin-bottom:10px;text-transform:uppercase}
+.q-txt{font-size:15px;line-height:1.8}
+/* answer buttons */
+.ans-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.ans-btn{padding:20px 12px;font-size:36px;border-radius:var(--r);
+  border:1.5px solid var(--border);background:var(--surface);cursor:pointer;
+  transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.ans-lbl{font-size:13px;font-weight:500;color:var(--text2)}
+.ans-btn:active:not(:disabled){transform:scale(.96)}
+.ans-btn.ok{background:var(--gdim);border-color:var(--green)}
+.ans-btn.ng{background:var(--rdim);border-color:var(--red)}
+/* feedback */
+.fb{border-radius:var(--rs);padding:14px 16px;font-size:13px;line-height:1.75;
+  display:none;margin-bottom:16px}
+.fb.ok{display:block;background:var(--gdim);border:1px solid rgba(74,222,128,.2);color:#86efac}
+.fb.ng{display:block;background:var(--rdim);border:1px solid rgba(248,113,113,.2);color:#fca5a5}
+.fb strong{display:block;font-size:14px;margin-bottom:6px}
+.btn-next{width:100%;padding:15px;font-size:15px;font-weight:700;
+  font-family:'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);
+  border:1px solid var(--border);border-radius:var(--r);cursor:pointer;
+  display:none;transition:background .15s,transform .1s}
+.btn-next.on{display:block}
+.btn-next:active{transform:scale(.98);background:var(--surface)}
+.btn-home-quiz{width:100%;padding:10px;font-size:13px;font-family:'Noto Sans JP',sans-serif;background:transparent;color:var(--text3);border:none;cursor:pointer;margin-top:4px;transition:color .15s}
+.btn-home-quiz:active{color:var(--text2)}
+.home-confirm{position:fixed;bottom:0;left:0;right:0;background:var(--surface);
+  border-top:1px solid var(--border);padding:16px 20px;z-index:200;display:none;
+  max-width:600px;margin:0 auto}
+.home-confirm.on{display:block}
+.home-confirm p{font-size:14px;color:var(--text);margin-bottom:12px;text-align:center}
+.home-confirm-btns{display:flex;gap:10px}
+.hc-yes{flex:1;padding:12px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;
+  background:var(--rdim);color:var(--red);border:1px solid rgba(248,113,113,.3);
+  border-radius:var(--rs);cursor:pointer}
+.hc-no{flex:1;padding:12px;font-size:14px;font-family:'Noto Sans JP',sans-serif;
+  background:var(--surface2);color:var(--text2);border:1px solid var(--border);
+  border-radius:var(--rs);cursor:pointer}
+.check-btn{width:100%;padding:10px 14px;font-size:13px;font-family:'Noto Sans JP',sans-serif;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;margin-top:8px;transition:all .15s;display:none}
+.check-btn.on{display:block}
+.check-btn.checked{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4);color:#fbbf24}
+.qty-row{display:flex;gap:8px;margin:16px 0}
+.qty-btn{flex:1;padding:9px 6px;font-size:13px;font-family:'Noto Sans JP',sans-serif;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;text-align:center}
+.qty-btn.active{background:var(--adim);border-color:var(--accent);color:var(--accent);font-weight:500}
+.skip-badge{display:inline-block;background:rgba(251,191,36,.12);color:#fbbf24;font-size:10px;padding:1px 7px;border-radius:99px;margin-left:5px}
+.memo-badge{display:inline-block;background:rgba(129,140,248,.15);color:var(--accent);font-size:10px;padding:1px 7px;border-radius:99px;margin-left:5px}
+.memo-wrap{display:none;margin-top:10px}
+.memo-wrap.on{display:block}
+.memo-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:13px;padding:10px 12px;resize:vertical;transition:border-color .15s;min-height:70px}
+.memo-input:focus{outline:none;border-color:var(--accent)}
+.memo-save-btn{margin-top:6px;padding:7px 16px;font-size:12px;font-family:'Noto Sans JP',sans-serif;background:var(--adim);color:var(--accent);border:1px solid rgba(129,140,248,.3);border-radius:var(--rs);cursor:pointer}
+.memo-saved{font-size:11px;color:var(--text3);margin-left:8px;display:none}
+.memo-saved.on{display:inline}
+.comment-wrap{display:none;margin-top:8px}
+.comment-wrap.on{display:block}
+.comment-area{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);
+  color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:13px;
+  padding:10px 12px;resize:none;transition:border-color .15s;line-height:1.6}
+.comment-area:focus{outline:none;border-color:var(--accent)}
+.comment-area::placeholder{color:var(--text3)}
+.comment-save{padding:8px 16px;font-size:13px;font-family:'Noto Sans JP',sans-serif;
+  background:var(--adim);color:var(--accent);border:1px solid rgba(129,140,248,.3);
+  border-radius:var(--rs);cursor:pointer;margin-top:6px;transition:opacity .15s}
+.comment-save:active{opacity:.7}
+.comment-saved{font-size:12px;color:var(--text3);margin-left:8px;display:none}
+.comment-badge{display:inline-block;background:rgba(129,140,248,.15);color:var(--accent);
+  font-size:10px;padding:1px 7px;border-radius:99px;margin-left:5px}
+.existing-comment{background:var(--surface2);border-radius:var(--rs);padding:8px 12px;
+  font-size:13px;color:var(--text2);line-height:1.65;margin-top:8px;display:none;
+  border-left:2px solid var(--accent)}
+/* result */
+.res-hero{text-align:center;padding:28px 0 24px}
+.res-ring{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;margin:0 auto 20px;position:relative}
+.res-inner{width:88px;height:88px;border-radius:50%;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center}
+.res-pct{font-family:'DM Mono',monospace;font-size:26px;font-weight:500}
+.res-msg{font-size:16px;font-weight:700;margin-bottom:6px}
+.res-sub{font-size:13px;color:var(--text2)}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);
+  padding:14px 10px;text-align:center}
+.stat-v{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;margin-bottom:4px}
+.stat-v.g{color:var(--green)}
+.stat-v.r{color:var(--red)}
+.stat-l{font-size:11px;color:var(--text2)}
+.wrong-sec{margin:8px 0 20px}
+.wrong-sec h3{font-size:13px;color:var(--text2);margin-bottom:10px;font-weight:500}
+.wrong-item{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:12px 14px;margin-bottom:8px}
+.wrong-item-q{font-size:13px;line-height:1.7;margin-bottom:6px}
+.wrong-item-a{font-size:12px;color:var(--green)}
+.btn-retry{width:100%;padding:14px;font-size:14px;font-weight:700;
+  font-family:'Noto Sans JP',sans-serif;background:var(--rdim);color:var(--red);
+  border:1px solid rgba(248,113,113,.3);border-radius:var(--r);
+  cursor:pointer;display:none;transition:opacity .15s;margin-bottom:10px}
+.btn-retry.on{display:block}
+.btn-retry:active{opacity:.7}
+/* import screen */
+.imp-label{font-size:13px;color:var(--text2);margin-bottom:8px;display:block}
+.imp-input{width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);color:var(--text);font-family:'Noto Sans JP',sans-serif;
+  font-size:13px;padding:12px 14px;resize:vertical;transition:border-color .15s}
+.imp-input:focus{outline:none;border-color:var(--accent)}
+.imp-catname{width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);color:var(--text);font-family:'Noto Sans JP',sans-serif;
+  font-size:14px;padding:12px 14px;margin-bottom:6px}
+.imp-catname:focus{outline:none;border-color:var(--accent)}
+.imp-catname::placeholder,.imp-input::placeholder{color:var(--text3)}
+.fmt-hint{background:var(--surface2);border-radius:var(--rs);padding:12px 14px;
+  margin:16px 0;font-size:12px;color:var(--text2);line-height:2}
+.fmt-hint code{color:var(--accent);font-family:'DM Mono',monospace}
+.imp-result{border-radius:var(--rs);padding:12px 14px;font-size:13px;
+  line-height:1.6;display:none;margin-bottom:12px}
+.imp-result.ok{display:block;background:var(--gdim);border:1px solid rgba(74,222,128,.2);color:#86efac}
+.imp-result.ng{display:block;background:var(--rdim);border:1px solid rgba(248,113,113,.2);color:#fca5a5}
+.tab-row{display:flex;gap:8px;margin-bottom:20px}
+.tab-btn{flex:1;padding:10px;font-size:13px;font-family:'Noto Sans JP',sans-serif;
+  border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);
+  color:var(--text2);cursor:pointer;transition:all .15s}
+.tab-btn.active{background:var(--adim);border-color:var(--accent);color:var(--accent);font-weight:500}
+.cat-mi{display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:11px 14px;margin-bottom:8px}
+.cat-mi-cnt{font-size:12px;color:var(--text2);margin-top:2px}
+.btn-del{padding:5px 12px;font-size:12px;font-family:'Noto Sans JP',sans-serif;
+  background:var(--rdim);color:var(--red);border:1px solid rgba(248,113,113,.2);
+  border-radius:6px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-title">測量士<span>○×</span>テスト</div>
+  <div class="hdr-score" id="hdrScore"></div>
+</header>
+
+<!-- ホーム -->
+<div class="scr on" id="scrHome">
+  <div class="hero">
+    <div class="hero-icon">📐</div>
+    <h1>測量士 ○×テスト</h1>
+    <p>問題文を読んで○か×を選ぼう<br>解説付きで知識を確実に定着させる</p>
+  </div>
+  <div class="prev" id="prevResult">
+    <div><div class="prev-lbl">前回のスコア</div><div class="prev-val" id="prevPct">-</div></div>
+    <div style="text-align:right"><div class="prev-lbl">間違えた問題</div><div class="prev-val" id="prevWrong" style="color:var(--red)">-</div></div>
+  </div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:10px">出題数</p>
+  <div class="qty-row">
+    <button class="qty-btn active" id="qty10">10問</button>
+    <button class="qty-btn" id="qty20">20問</button>
+    <button class="qty-btn" id="qty30">30問</button>
+    <button class="qty-btn" id="qtyAll">全問</button>
+  </div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:10px">科目を選ぶ</p>
+  <div class="cat-grid" id="catGrid"></div>
+  <div class="mode-row">
+    <button class="mode-pill active" id="modeAll">全問出題</button>
+    <button class="mode-pill" id="modeWrong">間違えた問題のみ<span class="wbadge" id="wBadge" style="display:none">0問</span></button>
+    <button class="mode-pill" id="modeCheck">チェックした問題<span class="skip-badge" id="checkBadge" style="display:none">0問</span></button>
+    <button class="mode-pill" id="modeMemo">メモした問題<span class="memo-badge" id="memoBadge" style="display:none">0問</span></button>
+  </div>
+  <button class="btn-primary" id="btnStart">テスト開始</button>
+  <button class="btn-dashed" id="btnGoImport">＋ 問題データを追加・管理</button>
+</div>
+
+<!-- クイズ -->
+<div class="scr" id="scrQuiz">
+  <div class="prog-wrap">
+    <div class="prog-meta">
+      <span class="q-ctr" id="qCtr">1 / 1</span>
+      <span class="live">正解 <span class="c" id="liveC">0</span>　不正解 <span class="w" id="liveW">0</span></span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+  <div class="q-card">
+    <div class="q-lbl" id="qLbl">QUESTION 1</div>
+    <div class="q-txt" id="qTxt"></div>
+  </div>
+  <div class="ans-row">
+    <button class="ans-btn" id="btnMaru"><span>〇</span><span class="ans-lbl">正しい</span></button>
+    <button class="ans-btn" id="btnBatsu"><span>×</span><span class="ans-lbl">間違い</span></button>
+  </div>
+  <div class="fb" id="fb"></div>
+  <button class="check-btn" id="checkBtn">⭐ あとでチェック</button>
+  <div class="memo-wrap" id="memoWrap">
+    <textarea class="memo-input" id="memoInput" placeholder="メモを残す（例：計算式、覚え方など）"></textarea>
+    <button class="memo-save-btn" id="memoSaveBtn">保存</button>
+    <span class="memo-saved" id="memoSaved">✓ 保存しました</span>
+  </div>
+  <div class="existing-comment" id="existingComment"></div>
+  <div class="comment-wrap" id="commentWrap">
+    <textarea class="comment-area" id="commentArea" rows="3" placeholder="メモや補足をここに書く..."></textarea>
+    <div style="display:flex;align-items:center">
+      <button class="comment-save" id="commentSave">保存</button>
+      <span class="comment-saved" id="commentSaved">✓ 保存しました</span>
+    </div>
+  </div>
+  <button class="btn-next" id="btnNext">次の問題へ →</button>
+  <button class="btn-home-quiz" id="btnHomeQuiz">ホームへ戻る</button>
+</div>
+
+<!-- 結果 -->
+<div class="scr" id="scrResult">
+  <div class="res-hero">
+    <div class="res-ring" id="resRing">
+      <div class="res-inner"><div class="res-pct" id="resPct">0%</div></div>
+    </div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-sub" id="resSub"></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-v g" id="rC">0</div><div class="stat-l">正解</div></div>
+    <div class="stat-box"><div class="stat-v r" id="rW">0</div><div class="stat-l">不正解</div></div>
+    <div class="stat-box"><div class="stat-v" id="rT">0</div><div class="stat-l">問題数</div></div>
+  </div>
+  <div class="wrong-sec" id="wrongSec" style="display:none">
+    <h3>間違えた問題</h3>
+    <div id="wrongList"></div>
+  </div>
+  <button class="btn-retry" id="btnRetry">間違えた問題だけ再挑戦</button>
+  <button class="btn-ghost" id="btnHome">ホームに戻る</button>
+</div>
+
+<!-- データ追加 -->
+<div class="scr" id="scrImport">
+  <h2 style="font-size:17px;font-weight:700;margin-bottom:4px">問題データを追加</h2>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:20px">コピペするだけで新しい科目・問題を追加できます</p>
+  <div class="tab-row">
+    <button class="tab-btn active" id="tabAdd">問題を追加</button>
+    <button class="tab-btn" id="tabManage">科目を管理</button>
+  </div>
+  <!-- 追加パネル -->
+  <div id="paneAdd">
+    <label class="imp-label">科目名</label>
+    <input class="imp-catname" id="impCatName" type="text" placeholder="例：基準点測量">
+    <p style="font-size:11px;color:var(--text3);margin-bottom:0">既存の科目名を入力すると問題を追記します</p>
+    <div class="fmt-hint">
+      <b style="color:var(--text)">貼り付けフォーマット（1問ずつ --- で区切る）</b><br>
+      <code>問題文</code><br>
+      <code>〇 または ×</code><br>
+      <code>解説文（省略可）</code><br>
+      <code>---</code><br>
+      <code>次の問題文...</code>
+    </div>
+    <label class="imp-label">問題データを貼り付け</label>
+    <textarea class="imp-input" id="impText" rows="12" placeholder="問題文&#10;〇&#10;解説&#10;---&#10;次の問題文&#10;×&#10;解説"></textarea>
+    <div class="imp-result" id="impResult"></div>
+    <button class="btn-primary" id="btnImport" style="margin-top:14px">追加する</button>
+    <button class="btn-ghost" id="btnCancelImport">キャンセル</button>
+  </div>
+  <!-- 管理パネル -->
+  <div id="paneManage" style="display:none">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">登録済み科目</p>
+    <div id="catManageList"></div>
+    <button class="btn-ghost" id="btnResetSeen" style="margin-bottom:8px;color:var(--red);border-color:rgba(248,113,113,.3)">出題履歴をリセット（全問を未出題に戻す）</button>
+    <button class="btn-ghost" id="btnCancelManage">ホームに戻る</button>
+  </div>
+</div>
+
+<script>
+// ===== BUILT-IN DATA =====
+const BASE_DATA = [
+  {
+    name:"応用測量", icon:"🗺️",
+    questions:[
+      {q:"用地測量の平地における境界点間測量において、境界点間の距離が30ｍであったため、計算値と測定値の較差の許容範囲を30㎜以内とした。",a:"×",e:"較差の許容値は20ｍ未満で10㎜（平地）。20ｍ以上でS/2,000。30ｍの場合は30/2,000＝15㎜となる。"},
+      {q:"ネットワーク型RTK法による境界測量では，1セット目の観測終了後に再初期化を行い，2セット目の観測を行う。境界点の座標値は両セットの観測から求めた平均値とする。",a:"〇",e:"正しい。１セット目終了後、再初期化を行い２セット目を観測。座標値は２セットの平均値とする。"},
+      {q:"用地測量における境界測量において、家屋の密集により基準点からの視通を確保できなかったため，補助基準点を設置して作業を行った。",a:"〇",e:"正しい。やむを得ない場合は補助基準点を設置できる。100ｍ範囲・節点1点以内の開放多角測量による。"},
+      {q:"用地平面図データファイルを作成するため，現地において建物などの主要地物を測定した。",a:"〇",e:"正しい。境界点の座標値等を抽出するとともに、建物等及び工作物の主要地物を測定し作成する。"},
+      {q:"用地測量において，境界確認を実施するに当たっては，関係権利者に立会いを求める日を定め，事前に通知する。",a:"〇",e:"正しい。境界確認は利害を伴う全ての権利者によって行われる。"},
+      {q:"河川測量の深浅測量において、アナログ測深では一定時間毎に記録紙に測位マークを入れ、デジタル測深では時刻をGNSS測量機の観測時刻と合わせ測深位置を決定する。",a:"〇",e:"正しい。デジタル測深はGNSSからの位置データと音響測深機からの測深データを同期させて処理・記録する（準則 第382条8）。"},
+      {q:"用地測量において権利者確認調査のため，測量計画機関から貸与された資料などを基に権利者調査表を作成する。",a:"〇",e:"正しい（作業規程の準則第598条）。"},
+      {q:"距離標設置測量をネットワーク型RTK法によって行う場合は、干渉測位方式により１セット行うものとし、間接観測法又は単点観測法を用いるものとする。",a:"×",e:"干渉測位方式では２セット行う。１セットではない（準則 第374条3）。"},
+      {q:"定期縦断測量において、観測の基準とする点は、原則として水準基標とする。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"用地測量の境界測量において、基準点から直接測定できない境界点があったため、基準点から辺長100ｍ、節点１点の開放多角測量により補助基準点を設置した。",a:"〇",e:"正しい。やむを得ない場合は補助基準点を設置できる（準則 第404条3）。"},
+      {q:"河川測量において水準基標を水位標の近傍に設置し、位置を示すため、点の記を作成した。",a:"〇",e:"正しい。水準基標は水位標に近接した位置に設置し、設置間隔は5㎞～20㎞を標準とする。"},
+      {q:"境界点に既設の標識が設置されていたため、関係権利者の同意を得てそれを境界点とした。",a:"〇",e:"正しい。既設の標識が設置されている場合、関係権利者の同意を得てそれを境界点とすることができる。"},
+      {q:"境界点間測量は，境界点の精度確認のために行う作業であり，隣接する境界点間の距離について，全辺の距離を測定する必要がある。",a:"〇",e:"正しい。全辺において現地で測定するもの。"},
+      {q:"河川測量における定期横断測量において，陸部の地盤高の測定をネットワーク型RTK法によって行う場合は，観測回数は1セット行うものとする。",a:"〇",e:"正しい（準則第580条2）。キネマティック法・RTK法・ネットワーク型RTK法による観測は１セット。"},
+      {q:"路線測量において、縦断測量は，地形，地物等の状況により，直接水準測量に代えて間接水準測量によることができる。",a:"〇",e:"正しい。間接水準測量ではTSを用いた単観測昇降式による往復観測とする。"},
+      {q:"用地測量において，平地における境界点間測量で，隣接する境界点間の距離が30ｍの場合，較差の許容範囲は15㎜を標準とする。",a:"〇",e:"正しい。20ｍ以上：平地S/2,000。30ｍの場合、30/2,000＝15㎜。"},
+      {q:"河川測量において，水準基標の標高を定める水準基標測量で使用する観測機器は，1級レベル又は2級レベル及び2級標尺である。",a:"×",e:"2級標尺ではなく、1級標尺である。"},
+      {q:"用地測量の成果として，用地実測図データファイルと用地平面図データファイルを作成した。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"河川測量において，山地を流れる河川で定期横断測量を実施し，距離標から水際杭までの距離がL（m）の左岸について，距離の較差の許容範囲はL/500とすることが標準である。",a:"×",e:"定期横断測量の較差の許容範囲は、平地でL/500、山地でL/300である。"},
+      {q:"路線測量において，密な樹木に覆われた山地でUAVを利用して撮影した写真から三次元点群データを取得し，横断測量の断面図作成に使用することとした。",a:"×",e:"UAV写真点群測量では樹木に覆われた地表面の取得が困難。裸地等の対象物の認識が可能な区域への適用を標準としている。"},
+      {q:"用地測量において，面積計算は，境界測量の成果に基づき各筆等の取得用地及び残地の面積を算出し，原則として三斜法により行うものとする。",a:"×",e:"原則として三斜法ではなく、座標法で行う。"},
+      {q:"路線測量において、線形決定では，路線選定の結果に基づき，地形図上の交点（IP）の位置を座標として定め，線形図データファイルを作成する。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"河川測量における定期横断測量は，左右距離標の視通線上の地形の変化点などについて，距離標からの距離及び標高を定期的に測定し，横断面図データファイルを作成するものである。",a:"〇",e:"正しい。水際杭を境に陸部は横断測量、水部は深浅測量で行う。"},
+      {q:"河川測量の定期縦断測量では、河川の統一的な維持管理のため、同じ河川水系内で統一した精度により水準測量を行う必要がある。",a:"×",e:"同じ精度で行う必要はない。平地部は３級、山地部は４級である。"},
+      {q:"面積計算は、境界測量の成果に基づき面積を算出して面積計算書を作成する作業であり、原則として座標法により行うものとする。",a:"〇",e:"正しい。面積計算は原則として座標法による。"}
+    ,
+      {q:"用地測量の境界点間測量は，用地境界仮杭を設置したあとに行う。",a:"〇",e:"正しい。用地測量の作業順序は、復元測量 → 境界確認 → 境界測量 → 境界点間測量 → 面積計算の順である。"},
+      {q:"用地測量における，ネットワーク型RTK 法による境界測量で， 1 セット目の観測終了後に再初期化を行い，2 セット目の観測を行った。境界点の座標値には1 セット目の観測値を採用し， 2 セット目の観測は点検値とした。",a:"×",e:"間違い。2セットの観測から求めた平均値が境界点の座標値となる。境界測量の方法は、路線測量の線形決定に準じるが、線形決定では問題文のように1セット目の観測結果を採用値とする。しかし用地測量における境界測量では、上記にあるように2セット観測の平均値が採用されている。"},
+      {q:"境界杭が亡失していたことから、復元測量による復元杭の設置を行った。その際に関係権利者に対して事前説明を実施したが、現地での立会いは行わなかった。",a:"〇",e:"正しい。復元測量において、復元杭の設置を行う場合は、権利関係者の事前説明を実施するが、原則として関係権利者の立会いは行わない。"},
+      {q:"路線測量において、詳細測量では，主要な構造物の設計に必要な詳細平面図データファイル，縦断面図データファイル及び横断面図データファイルを作成する。",a:"〇",e:"正しい。路線測量の詳細測量に関する文章である。問題文の通り。"},
+      {q:"路線測量において、横断測量では中心杭等を基準にして，中心点における中心線の接線に対して直角方向の線上にある地形の変化点及び地物について測定する。",a:"〇",e:"正しい。路線測量の横断測量に関する文章である。問題文の通り。"},
+      {q:"深浅測量における水深測定は、指定されたピッチ位置において３回行い、その平均値を採用する。",a:"×",e:"間違い。２回行う。ただし、河口部などが広大な水域において測定を２回行うことが困難な場合はこの限りではない。"},
+      {q:"用地測量において，境界確認が完了したときは，土地境界確認書を作成し，関係権利者全員に確認したことの署名等を求める。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"用地測量において公図等の転写は，管轄法務局などに備える公図等に基づき公図等転写図を作成する。また，調査する区域が広範な場合は，公図等転写連続図を作成する。",a:"〇",e:"正しい。問題文の通りである（作業規程の準則第595条）。"},
+      {q:"深浅測量においては、水深や測深位置などを測定し、横断面図データファイルを作成する。",a:"〇",e:"正しい。深浅測量は水底部の地形を明らかにするため行われる。"},
+      {q:"河川測量において，水深の測定は，電波式水位計を用いて行う。ただし，水深が浅い場合は，ロッド又はレッドを用い直接測定により行う。また，航空レーザ測深機による水底の測定は，緑波長のレーザ光により行う。   ○",a:"×",e:"間違い。電波式水位計ではなく、音響測深機である。"},
+      {q:"公図等転写連続図の作成において，隣接する公図間で境界の線形に相違があったが，公図に記載されている境界をそのまま転写し，接合部を合致させるための調整は行わなかった。",a:"〇",e:"正しい。転写連続図を作成するために無理な接合の合致は行わず、その間に余白を取って記載されているままに転写して作成する必要がある。"},
+      {q:"河川測量において，定期横断測量は，水際杭を境にして，陸部及び水部に分け，陸部については路線測量の横断測量の規定に準じて行い，水部については深浅測量の規定に準じて行う。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"河川測量において，水準基標測量は，２級水準測量により行うものとする。また，水準基標の位置を示すため，点の記を作成する。",a:"〇",e:"正しい。問題文の通り。水準基標の設置間隔は５㎞～20㎞を標準とし、水位標に近接した位置に設置する。"},
+      {q:"河川測量において，距離標設置測量の観測には，トータルステーションを用いる放射法，RTK 法，ネットワー ク型 RTK 法などを用いることができる。",a:"〇",e:"正しい。問題文の通り。その他キネマティック法がある。"},
+      {q:"河川測量において，水準基標の標高を定める測量機器として，２級レベル及び２級標尺を使用した。",a:"×",e:"間違い。水準基標測量は２級水準測量により行われる。２級水準測量に用いられる機器は、１・２級レベルと１級標尺である。"},
+      {q:"河川測量における定期縦断測量は，平地においては3 級水準測量，山地においては原則として4 級水準測量により行うものとする。",a:"〇",e:"正しい。問題文の通り（作業規程の準則第578条3）。ただし、地形、地物等の状況によっては、４級水準測量に代えて間接水準測量により行うことができる。"},
+      {q:"河川測量の深浅測量における水深の測定で、音響測深機を使用し、水深の浅い場所はロッドで測定した。",a:"〇",e:"正しい。水深の測定は、音響測深機を用いて行う。ただし水深の浅い場所は、ロッド又はレッドを用いて、直接測定により行う。"},
+      {q:"用地測量において用地境界仮杭は、交点計算などで求めた用地境界仮杭の座標値に基づいて、４級基準点以上の基準点から放射法又は用地幅杭線及び境界線の交点に視通法を用いて設置した。",a:"〇",e:"正しい。問題文の通り。（作業規程の準則 第406条1）"},
+      {q:"用地測量において、トータルステーションによる境界測量において、基準点から直接測定できない境界点があったため、補助基準点を設置した。",a:"〇",e:"正しい。境界測量は近傍の４級基準点以上の基準点に基づき放射法等により行う。やむを得ない場合は問題文のように補助基準点を設置することができる。"},
+      {q:"用地平面図データファイルを作成するため、現地において建物などの主要地物を測定した。",a:"〇",e:"正しい。用地平面図データファイルを作成するには、用地実測図データの境界点の座標値等の必要項目を抽出するとともに、現地において建物等の主要地物を測定し作成する。"},
+      {q:"公図等転写連続図の作成において，隣接する公図間で字界の線形に相違がある場合も，接合部を合致させるための調整はせず，公図に記載されている字界をそのまま転写する。",a:"〇",e:"正しい。問題文の通り。公図等の転写において転写連続図は、無理な調整はせず、公図等に記載されているままに転写し作成する。作業者の判断で勝手に接合部を合致させる調整はしてはならない。"},
+      {q:"河川測量の定期縦断測量において、平地部は３級水準測量で、山地部は簡易水準測量で行った。",a:"×",e:"間違い。定期縦断測量では、平地は３級。山地部は４級水準測量で行われる。"},
+      {q:"用地測量において境界確認が完了したときに、土地境界確認書を作成し、関係権利者全員に境界を確認したことの署名押印を求めた。",a:"〇",e:"正しい。問題文の通り。（作業規程の準則 第402条5）"},
+      {q:"三次元点群データは，地形や地物を表現するための，位置や高さなどの情報を持つ点の集まりである。",a:"〇",e:"正しい。三次元点群データを利用して平面図や立面図など様々な図面の全てを描くことができる。"},
+      {q:"路線測量において，三次元点群データから TIN（不整三角網）構造の地形モデルを作成し，その地形モデルから横断面図データファイルを作成した。",a:"〇",e:"正しい。傾斜変換点をブレークラインで補ったTINを地形モデルをTINを地形モデルとして、断面図の作成に使用することができる。"},
+      {q:"三次元点群データは，測量計画機関が指定する形式で作成する。",a:"〇",e:"正しい。問題文の通り。国土交通省では「LandXML1.2 に準じた３次元設計データ交換標準（案）」において、三次元設計データをLandXML に準拠した形式で表記することとしている。"},
+      {q:"河川測量における距離標設置測量では，距離標を設置するために，近傍の３級基準点からネットワーク型RTK 法を用いることができる。",a:"〇",e:"正しい。距離標設置測量では、近傍の３級基準点から設置され、TSによる放射法、キネマティック法、RTK法、ネットワーク型RTK法により観測することができる。"},
+      {q:"境界点間測量は、境界点の精度確認のために行う作業であり、隣接する境界点間の距離について、一定の割合で抽出した辺の距離を測定し、境界測量で求めた座標値から計算した距離との比較を行うものである。",a:"×",e:"間違い。「一定の割合で抽出した辺」ではなく、「全辺」について現地で測定しなければならない。"},
+      {q:"距離標は、河心線の接線に対して直角方向の両岸の堤防法肩又は法面などに設置する。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"河川測量における定期縦断測量では，左岸又は右岸いずれかの距離標の標高並びに堤防の変化点の地盤及び主要な構造物について，距離標からの距離及び標高を測定する。",a:"×",e:"間違い。定期縦断測量では、左右両岸の距離標の標高並びに堤防の変化点の地盤及び主要な構造物について、距離標からの距離及び標高を測定するものである。問題文のように、「左岸又は右岸いずれか」ではない。"},
+      {q:"用地測量において，面積計算は，境界測量の成果に基づき，各筆などの取得用地及び残地の面積を算出し面積計算書を作成する作業であり，原則として倍横距法により行う。",a:"×",e:"間違い。面積計算は原則、座標法により行われる。"},
+      {q:"距離標設置測量においては、距離標の位置を示すために点の記を作成する。",a:"〇",e:"正しい。距離標設置測量とは、河心線の接線に対して直角方向の両岸の堤防法肩又は法面等に距離標を設置する作業であり、設置後は問題文のように点の記を作成する。"},
+      {q:"平地における境界点間測量において、境界点間の距離が20ｍ未満の場合、計算値と測定値の較差の許容範囲は10㎜とする。",a:"〇",e:"正しい。問題文の通り。境界点間の距離が20ｍ未満の場合、その格差の許容範囲は、平地で10㎜、山地で20㎜となる。（作業規程の準則 第409条2）"},
+      {q:"河川測量における距離標設置測量とは，河心線の接線に対して直角方向の両岸の堤防法肩又は法面などに距離標を設置する作業である。",a:"〇",e:"正しい。河川測量の作業計画に関する問題である。作業計画は、河川測量の細分ごとに作成される。"},
+      {q:"公図等転写連続図の作成において、隣接する公図間で字界の線形に相違がある場合は、接合部を合致させるための調整はせず、公図に記載されている字界をそのまま転写する。",a:"〇",e:"正しい。公図等の転写において転写連続図は、無理な調整はせず、公図等に記載されているままに転写し作成する。（作業規程の準則 第396条）"},
+      {q:"用地測量において境界確認は，復元測量の結果，公図等転写図，土地調査表などに基づき，現地において関係権利者立会いの上，境界点を確認し，標杭を設置することにより行う。",a:"〇",e:"正しい。問題文の通り（作業規程の準則第602条）。"},
+      {q:"定期横断測量とは、左右両岸に設置された距離標の視通線上の地形の変化点などについて、距離標からの距離及び標高を定期的に測定して縦断面図データファイルを作成する作業である。",a:"×",e:"間違い。横断測量により描かれるのは、横断面図である。"},
+      {q:"河川測量の水準墓標測量は、定期縦断測量の基準となる水準墓標の標高を定める作業であり、２級水準測量により実施する。",a:"〇",e:"正しい。水準基標設置に関する問題である。問題文の通り。"},
+      {q:"用地測量における，権利者確認調査において，測量計画機関から貸与された資料などに基づき権利者調査表を作成した。",a:"〇",e:"正しい。問題文の通り。用地測量における資料調査の作業の一つである。"},
+      {q:"河川測量において，距離標はあらかじめ地形図上で位置を選定し，その座標値に基づいて，近傍の水準基標等から放射法等により設置するものとする。",a:"×",e:"間違い。水準基標ではなく、３級基準点である"},
+      {q:"河川測量において，定期縦断測量を実施していたが，急傾斜地があったため，４級水準測量に代えて間接水準測量により実施し，簡易水準測量の閉合差により許容範囲内であることを確認した。",a:"〇",e:"正しい。定期縦断測量は、平地で３級水準測量、山地で４級水準測量によって行われる。ただし、地形、地物等の状況によっては、４級水準測量に代えて間接水準測量で行うことができる。この場合の閉合差は簡易水準測量の閉合差が準用される。"},
+      {q:"路線測量において、仮BM設置測量は，平地においては４級水準測量，山地においては簡易水準測量により行う。",a:"×",e:"間違い。仮BM設置測量では，平地で３級水準測量，山地では４級水準測量により行う。"},
+      {q:"河川測量における深浅測量の水深の測定は，音響測深機を用いて行う。ただし，水深が浅い場合は，ロッド又はレッドを用いて行う。",a:"〇",e:"正しい。問題文の通り。水深位置又は船位の測定は、ワイヤーロープ、TS、GNSS測量機のいずれかを用いて行われる。"},
+      {q:"境界点に既設の標識が設置されている場合は、関係権利者の同意を得ずにそれを境界点とすることができる。",a:"×",e:"間違い。境界確認において、境界点に既設の標識が設置されている場合は、関係権利者の同意を得てそれを境界点とすることができる。（作業規程の準則 第402条4）"},
+      {q:"用地境界仮杭設置において，視通が確保できる場合，視通法により道路計画中心線と境界線の交点に用地境界仮杭を設置することができる。",a:"×",e:"間違い。用地境界仮杭設置は、交点計算等で求めた用地境界仮杭の座標値に基づいて、４級基準点以上の基準点から放射法又は用地幅杭線及び境界線の交点を視通法により行う。道路中心線と境界線の交点に設置はできない。"},
+      {q:"公図等転写連続図の作成において，字界の線形が隣接する公図間で相違し，そのままでは接合が困難な部分があったため，接合部が合致するように字界を調整した。",a:"×",e:"間違い。公図等の転写において転写連続図は、無理な調整はせず、公図等に記載されているままに転写し作成する。"},
+      {q:"定期縦断測量において、間接水準測量により行う場合の閉合差の許容範囲は、簡易水準測量の閉合差を準用する。",a:"〇",e:"正しい。問題文の通り。間接水準測量は、ＴＳを用いた単観測昇降式による往復観測である。（作業規程の準則 第378条3、第359条8 準用）"},
+      {q:"境界測量は、近傍の４級基準点以上の基準点に基づき、放射法等により行うものとするが、やむを得ない場合は、補助基準点を設置し、それに基づいて行うことができる。",a:"〇",e:"正しい。問題文の通り。境界測量の方法に関する問題である。（作業規程の準則 第404条）"},
+      {q:"路線測量において，既設道路の線形改良において，別の測量計画機関が直前に公共測量として実施した車載写真レーザ測量成果があることが分かり，その精度を確認したところ，十分な精度を有していたため，当該測量計画機関に使用承認申請を行った。",a:"〇",e:"正しい。十分な精度を有していれば、測量法にある重複投資を防ぐため、作業時間の短縮も図られるため、柔軟な利用が可能である。"},
+      {q:"面積計算では，境界測量の成果に基づき，各筆等の取得用地及び残地の面積を算出し面積計算書を作成する。この計算は，原則として座標法により行う。",a:"〇",e:"正しい。問題文の通り。面積計算は、原則座標法により行われる。"},
+      {q:"用地測量の公図等転写連続図の作成において，字界の線形が隣接する公図間で相違し，そのままでは接合が困難な部分があるため，接合部が合致するように字界を編集した。",a:"×",e:"間違い。転写連続図を作成するためには、無理な接合の合致は行わず、その間に余白を取って記載されているままに転写して作成する必要がある。"},
+      {q:"河川測量成果の品質評価は、製品仕様書が規定するデータ品質を満足しているか評価する。",a:"〇",e:"正しい。品質評価は測量成果について、製品仕様書が規定するデータ品質を満足しているか評価する作業であり、作業機関は、品質評価手順に基づき品質評価を実施するものとする。"},
+      {q:"用地測量において、境界測量において境界点間の距離を計算する際に、0.001 ｍの次の位を四捨五入した。",a:"×",e:"間違い。座標値等の距離は0.001ｍの次の位において四捨五入し、点間距離は0.001ｍの次の位以下を切り捨てる。"},
+      {q:"権利者確認調査のため，測量計画機関から貸与された資料を基に権利者調査表を作成した。",a:"〇",e:"正しい。権利者確認調査に関する文章である。問題文の通り。"},
+      {q:"用地測量の復元測量において，復元すべき位置に復元杭を設置する場合は，関係権利者への事前説明を実施するが，原則として関係権利者による立会いは行わなくてよい。",a:"〇",e:"正しい。問題文の通り。復元測量では、復元杭（仮杭）が設置される。その後境界確認が行われるため、事前説明があれば、関係権利者の立ち合いは行なわない。"},
+      {q:"用地測量の公図等転写連続図の作成において，字界の線形が隣接する公図間で相違し，そのままでは接合が困難な部分があるため，接合部が合致するように字界を編集した。",a:"×",e:"間違い。転写連続図を作成するためには、無理な接合の合致は行わず、その間に余白を取って記載されているままに転写して作成する必要がある。"},
+      {q:"水準墓標測量は、３級水準測量により行い、水準墓標の位置を示すため、点の記を作成する。",a:"×",e:"間違い。２級水準測量と３級基準点測量で測定する。"},
+      {q:"河川測量成果の品質評価は、製品仕様書が規定するデータ品質を満足しているか評価する。",a:"〇",e:"正しい。品質評価は測量成果について、製品仕様書が規定するデータ品質を満足しているか評価する作業であり、作業機関は、品質評価手順に基づき品質評価を実施するものとする。"},
+      {q:"河川測量における，定期縦断測量において，縦断面図データを図紙に出力する場合は，横の縮尺は1,000 分の1から10,000分の1まで，縦の縮尺は100 分の1 から200 分の1 までを標準とする。",a:"×",e:"間違い。10,000分の1ではなく、100,000分の1である"},
+      {q:"用地測量における，境界測量において，境界点間の距離を計算した際に，0.001 m の次の位を切り捨てた。",a:"〇",e:"正しい。問題文の通り。座標値及び方向角は四捨五入、距離及び面積はそれぞれ、0.001、0.000001の次の位が切り捨てられる。"},
+      {q:"用地測量の復元測量において，復元杭の設置等を行う場合は，関係権利者への事前説明を実施するものとし，原則として関係権利者による立会いは行わないものとする。",a:"〇",e:"正しい。復元測量では、着手前に関係権利者に立ち入りについての日程等の通知、復元杭の設置などを行う場合は、関係権利者の事前説明の実施を行う必要がある。事前説明を行った場合は、原則として関係権利者の立ち合いは行わない。"},
+      {q:"河川測量において，新しい橋梁ができたため，左右両岸の橋台に１点ずつ水準基標を２級水準測量により新設する。その際の観測路線は，１級水準点から出発し，水準基標に取り付けた後，別の１級水準点に結合するよう計画した。",a:"〇",e:"正しい。水準基標測量は、２級水準測量により行われる。２級水準測量は、１～２等水準点、１～２級水準点を既知点とし、水準路線も２点以上の既知点を結合させているため問題はない。"},
+      {q:"境界測量のため現地において境界点を測定し、その座標値を求める作業を行うこととしたが、近くに基準点がなかったことから、新たに補助基準点を設置し、それに基づき放射法により実施した。",a:"〇",e:"正しい。境界測量は、近傍の４級基準点以上の基準点に基づき放射法等により行われる。ただし、問題文のようにやむを得ない場合は、補助基準点を設置する事ができる。"},
+      {q:"境界杭の亡失があり，復元すべき位置に仮杭を設置した。その際，関係権利者への事前説明は実施したが，現地での関係権利者の立会いは行わなかった。",a:"〇",e:"正しい。関係権利者に立入りについての日程を通知し，復元杭設置に関する事前説明を実施するが，原則として関係権利者による立会いは行われない。"},
+      {q:"水準基標は、２級水準測量により設置するものとし、設置間隔は5㎞から20㎞までを標準とする。",a:"〇",e:"正しい。問題文の通り。（作業規程の準則 第376条1～2）"},
+      {q:"用地測量においてネットワーク型RTK法の単点観測法による境界測量実施時に、作業地域の周辺を囲む既知点においても観測を行い、整合を確認した。",a:"〇",e:"正しい。単点観測法では問題文のように整合を確認する必要がある。また整合の確認において既知点数は３点以上とする。"},
+      {q:"権利者確認調査のため，測量計画機関から貸与された資料を基に権利者調査表を作成した。",a:"〇",e:"正しい。権利者確認調査に関する文章である。問題文の通り。"},
+      {q:"路線測量において，三次元点群データを用いて横断面図データファイルを作成しようとしたところ，地面の傾斜が急に変わる部分について，三次元点群データの密度が粗く精度を確保できていないことが判明したため，トータルステーションを用いて補備測量を行った。",a:"〇",e:"正しい。三次元点群データ編集では、オリジナルデータが必要な密度を満たさない場合は、必要に応じてTS等を用いて現地補測を行い、三次元点群データを補間する必要がある。"},
+      {q:"用地測量において、境界測量において境界点間の距離を計算する際に、0.001 ｍの次の位を四捨五入した。",a:"×",e:"間違い。座標値等の距離は0.001ｍの次の位において四捨五入し、点間距離は0.001ｍの次の位以下を切り捨てる。"},
+      {q:"三次元点群データを利用して，断面図作成や土量計算などを行うことができる。",a:"〇",e:"正しい。点群データを結ぶことによって、各種図面やこれを利用した問題文のようなことが行える。"},
+      {q:"河川測量における距離標の設置は、地形及び地物の状況により、河心線の接線に対して直角方向の左岸又は右岸のどちらか一方に設置する。",a:"×",e:"間違い。距離標は、河心線の接線に対して直角に両岸に設置される。どちらか一方ではない。"},
+      {q:"河川測量において，深浅測量における水深の測定は，電波式水位計を用いて行うものとする。ただし，水深が浅い場合は，ロッド又はレッドを用い直接測定により行うものとする。",a:"×",e:"間違い。電波式水位計ではなく音響測深機である。電波式水位計と音響測深機は互いに異なる測定原理を持つ。"},
+      {q:"用地測量の復元測量において，復元すべき位置に復元杭を設置する場合は，関係権利者への事前説明を実施するが，原則として関係権利者による立会いは行わなくてよい。",a:"〇",e:"正しい。問題文の通り。復元測量では、復元杭（仮杭）が設置される。その後境界確認が行われるため、事前説明があれば、関係権利者の立ち合いは行なわない。"},
+      {q:"用地測量の平地における境界点間測量において，隣接する境界点間の距離が20ｍ未満であるため，較差の許容範囲を10mm して，境界測量で求めた座標値から計算した距離とトータルステーションなどを用いて測定した距離の比較を行った。",a:"〇",e:"正しい。問題文の通り。較差の許容範囲は、境界点間の距離が20ｍ未満の場合、平地で10㎜、山地で20㎜である。"},
+      {q:"面積計算では，境界測量の成果に基づき，各筆等の取得用地及び残地の面積を算出し面積計算書を作成する。この計算は，原則として座標法により行う。",a:"〇",e:"正しい。問題文の通り。面積計算は、原則座標法により行われる。"},
+      {q:"無人航空機（UAV）による空中写真を用いる測量であれば，どのような場所でも地形の三次元点群データが作成できる。",a:"×",e:"間違い。空中写真で撮影できる場所ならば問題はないが、森林の中やトンネル部の内壁など、空中写真で撮影できない場所は点群データを得ることはできない"},
+      {q:"海浜測量とは，海岸線に沿って陸部に基準線を設けて，適切な間隔に測点を設置し，測点ごとに基準線に対し直角の方向に横断測量を実施し，前浜と後浜を含む範囲の横断面図データファイルを作成する作業である。",a:"×",e:"間違い。海浜測量は前浜と後浜を含む範囲の「等高・等深線図データファイル」を作成する作業である。横断面図データファイルではない（作業規程の準則第585条）。"},
+      {q:"定期縦断測量は、平地では３級水準測量により行い、山地においては４級水準測量により行うものとする。ただし、地形、地物等の状況によっては、４級水準測量に代えて間接水準測量により行う事ができる。",a:"〇",e:"正しい。問題文の通り。（作業規程の準則 第378条3）"},
+      {q:"用地測量における面積計算は，境界測量の成果に基づき，各筆などの取得用地及び残地の面積を算出し面積計算書を作成する作業であり，原則として座標法により行う。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"河川測量において，定期縦断測量は，山地においては3級水準測量により行うものとするが，地形，地物等の状況によっては，３級水準測量に代えて４級水準測量により行うことができる。",a:"×",e:"間違い。山地においては４級水準測量により行う。平地においては３級水準測量である。また、地形、地物等の状況においては、４級ではなく簡易水準測量となる。"},
+      {q:"境界点に既設の標識が設置されていたため，関係権利者の同意を得てそれを境界点とした。",a:"〇",e:"正しい。境界確認に関する文章である。問題文の通り。"},
+      {q:"河川測量において水準墓標の標高を観測する測量機器として、１級レベル及び２級標尺を使用した。",a:"×",e:"間違い。水準基標測量は、２級水準測量により行われる。２級水準測量で用いられる測量機器は、１～２級レベル及び１級標尺である。"},
+      {q:"用地測量において、境界点と考えられる場所に既設の標識が設置されていたので、関係権利者の同意を得ずにそれを境界点とした。",a:"×",e:"間違い。境界確認において、境界点に既設の標識が設置されている場合は、関係権利者の同意を得てそれを境界点とすることができる。"},
+      {q:"距離標は、あらかじめ地形図上で位置を選定し、その座標値に基づいて、近傍の３級基準点等から放射法等により設置するものとする。",a:"〇",e:"正しい。問題文の通り。（作業規程の準則 第350条1）"},
+      {q:"境界点間測量は、境界点の精度確認のため、隣接する境界点間又は境界点と用地境界杭を設置した点との全辺の距離について測定しなければならない。",a:"〇",e:"正しい。問題文の通り。境界点間測量では、境界測量の計算結果と比較を行う。（作業規程の準則 第409条2）"},
+      {q:"河川測量における定期縦断測量は，原則として，観測の基準とする点は水準基標とし，観測の路線は，水準基標から出発し，他の水準基標に結合するものとする。",a:"〇",e:"正しい。問題文の通り（作業規程の準則第578条2）。定期縦断測量は、平地においては３級水準測量により行い、山地においては４級水準測量により行う。"},
+      {q:"水準基標測量は、地形の状況などやむを得ない場合は、間接水準測量により行うことができる。",a:"×",e:"間違い。水準基標測量は、２級水準測量により行われる。河川測量において間接水準測量が用いられるのは、定期縦断測量である。"},
+      {q:"河川測量における，定期横断測量において，横断面図データを図紙に出力する場合は，横の縮尺は100 分の1 から10,000分の1まで，縦の縮尺は100 分の1 から200 分の1 までを標準とする。",a:"×",e:"間違い。10,000分の1ではなく、1,000分の1である"},
+      {q:"用地測量において，境界測量は，近傍の４級基準点以上の基準点に基づき，放射法等により行うものとする。ただし，やむを得ない場合は，補助基準点を設置し，それに基づいて行うことができる。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"用地測量の復元測量において，復元すべき位置に仮杭を設置する場合は，関係権利者への事前説明を実施するが，原則として関係権利者による立会いは行わない。",a:"〇",e:"正しい。復元測量では、着手前に関係権利者に立ち入りについての日程等の通知、復元杭の設置などを行う場合は、関係権利者の事前説明の実施を行う必要がある。事前説明を行った場合は、原則として関係権利者の立ち合いは行わない。"},
+      {q:"復元測量において，復元すべき位置に仮杭を設置する場合は，関係権利者への事前説明を実施する。この場合，原則として関係権利者による立会いは行わない。",a:"〇",e:"正しい。問題文の通り。仮杭の設置段階では、原則として立会いは行なわない。境界確認で正式な立会いを行う。"},
+      {q:"河川測量において，平地を流れる河川で定期横断測量を実施し，距離標から水際杭までの距離が L（m）の左岸について，距離及び標高の測定値と点検測量値との比較を行った。このとき距離の較差の許容範囲は L / 300 とすることが標準である。",a:"×",e:"間違い。定期横断測量の方法は、陸部では路線測量の横断測量の方法を準用する。この横断測量における点検測量は、中心杭から末端見通し杭の距離と標高の測定値を点検測量の値と比較することにより行われ、その較差の許容範囲は、平地で L/500、山地で L/300である。"},
+      {q:"用地測量における，公図等転写連続図の作成において，隣接する公図間の境界線が整合しない部分があったため，接合部が合致するように境界線を編集した。",a:"×",e:"間違い。公図間の境界線が整合しない場合は、無理に接合しようとせず公図等に記載されるそのままに転写し、計画機関の指示を受ける必要がある。"},
+      {q:"三次元点群データを取得する測量手法として，車載写真レーザ測量（移動計測車両による測量）や航空レーザ測量，無人航空機（UAV）による空中写真を用いる測量などがある。",a:"〇",e:"正しい。三次元点群データを取得するには、三次元レーザスキャナや写真解析データを利用する方法がある。"},
+      {q:"用地測量において，用地平面図データは，地図情報レベル 250 を標準として，用地実測図データの必要項目を抽出するとともに，現地において建物等の主要地物を測定し作成する。",a:"〇",e:"正しい。問題文の通り。用地実測図データの必要項目には、基準点、境界点、座標値、各筆の地番、借地境界、用地取得線などがある。"},
+      {q:"用地測量の復元測量において、境界杭の亡失があり復元すべき位置に仮杭を設置した。その際、関係権利者への事前説明は実施したが、現地での立会いは行わなかった。",a:"〇",e:"正しい。復元杭の設置等を行う場合は、関係権利者への事前説明が必要であるが、原則として関係権利者による立会いは行わない。（作業規程の準則 第400条5）"},
+      {q:"用地測量において，収集した資料に基づき復元した現地が現状と相違する場合は，復元杭を設置せずに原因を調査し，その結果を測量計画機関に報告して適切な措置を講じる。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"河川測量における水準基標測量は，水準基標の標高を定める作業であり，2 級水準測量により行う。",a:"〇",e:"正しい。問題文の通り。水準基標測量により水準基標が設置され、水準基標は水位標の位置に近い場所に設置される。水準基標の間隔は、5㎞～20㎞を標準とする。"},
+      {q:"河川測量の定期横断測量において、水際杭を境にして、水部について深浅測量を行った。",a:"〇",e:"正しい。定期横断測量は、水際杭を境にして陸部と水部に分けられる。水部は深浅測量、陸部は路線測量の横断測量を準用する。"},
+      {q:"汀線測量における最低水面は、原則として海上保安庁が公示する最低水面の高さから求める。",a:"〇",e:"正しい。汀線（最低水面と海浜との交線）測量とは汀線を定め、汀線図データファイルを作成する作業である。問題文のように最低水面は海上保安庁が公示する最低水面の高さから求める。"},
+      {q:"路線測量において，民家が点在する郊外で，新規道路建設のための路線測量の実施に当たり，当該地域は見通しがよいことから，地上レーザ点群測量により効率的に断面図作成を行うこととした。",a:"〇",e:"正しい。十分な精度が得られるのであれば問題はない。"},
+      {q:"用地境界仮杭設置は，交点計算などで求めた用地境界仮杭の座標値に基づいて， 4 級基準点以上の基準点から放射法又は道路計画中心線と境界線の交点を視通法により行う。",a:"×",e:"間違い。道路計画中心線と境界線の交点ではない。「用地幅杭線及び境界線の交点」である（作業規程の準則第606条）。"},
+      {q:"用地測量における権利者確認調査のため，測量計画機関から貸与された資料を基に権利者調査表を作成した。",a:"〇",e:"正しい。問題文の通り。貸与された権利者資料及び現地調査に基づき権利者の確認を行い、権利者に相続が発生しているときは、その経過を明らかにする系統図を作成する。"},
+      {q:"境界測量のため現地において境界点を測定し，その座標値を求める作業を行うこととしたが，近くに基準点がなかったことから，新たに補助基準点を設置した。",a:"〇",e:"正しい。境界測量は、近傍の４級基準点以上の基準点に基づき、放射法等により行うものとする。ただし、やむを得ない場合は、補助基準点を設置し、それに基づいて行うことができる。"},
+      {q:"境界と思われる箇所に既設の標識が設置されていたため，関係権利者の立会いは求めず，それを境界点とした。",a:"×",e:"間違い。境界確認においては、関係権利者立合いの上で境界点を確認する必要がある。また既設の標識が設置されている場合は、関係権利者の同意を得てそれを境界点とすることができる。"}
+    ]
+  },
+  {
+    name:"法規・国際条約", icon:"⚖️",
+    questions:[
+      {q:"「基本測量及び公共測量以外の測量」とは，基本測量又は公共測量の測量成果を使用して実施する基本測量及び公共測量以外の測量（建物に関する測量その他の局地的測量又は小縮尺図の調製その他の高度の精度を必要としない測量で政令で定めるものを除く。）をいう。",a:"〇",e:"正しい。測量法（第6条：基本測量及び公共測量以外の測量）に関する文章である。"},
+      {q:"面積は，ジオイド上の値で表示する。",a:"×",e:"面積はジオイド上の値ではなく、回転楕円体の表面上の値で表示される。（測量法 第11条2）"},
+      {q:"地球上での位置を表すための基準となる回転楕円体及び地心直交座標系は，国によってその組合せは異なる。日本では，GRS80楕円体とITRFを採用しており，GRS80楕円体の短軸は，ITRFのX軸と一致している。",a:"×",e:"Z軸である。楕円体の短軸は極半径（短半径）とも呼ばれ、Z軸の方向（北極方向）である。"},
+      {q:"ITRFで表す日本列島の位置のX，Y，ZのX符号は－，Yは＋，Zは＋である。",a:"〇",e:"正しい。日本列島はおおよそ東経122°～154°に位置しており、問題文の通りである。"},
+      {q:"測量業者は，その業務を誠実に行い，常に測量成果の正確さの確保に努めなければならない。",a:"〇",e:"正しい。測量法 第56条「業務処理の原則」に関する文章である。"},
+      {q:"JPGISに準拠した製品仕様書における品質要求は，地理空間データの使用目的に対する適合性の判定基準を示す。",a:"〇",e:"正しい。地理空間データの品質は使用目的に合致するか否かで決定される。"},
+      {q:"測量作業機関Ｅが，測量作業着手前に，測量作業の方法，使用する主要な機器，要員，日程などについて適切な作業計画を立案し，これを測量計画機関Ｆに提出して，その承認を得た。",a:"〇",e:"正しい。測量作業機関は着手前に方法・機器・要員・日程等の作業計画を立案し、計画機関に提出して承認を得なければならない。"},
+      {q:"測量の原点は，日本経緯度原点及び日本水準原点とする。ただし，離島の測量その他特別の事情がある場合において，国土地理院の長の承認を得たときは，この限りではない。",a:"〇",e:"正しい（測量法 第11条1-3）。"},
+      {q:"基本測量及び公共測量において，距離及び面積は，測量法で規定する回転楕円体の表面上の値で表示する。",a:"〇",e:"正しい（測量法 第11条2：測量の基準）。"},
+      {q:"ITRFのX軸は東経90度の子午線と赤道の交点を通る直線，Y軸は経度0度の子午線と赤道の交点を通る直線である。",a:"×",e:"Ｘ軸はグリニッジ子午線（経度0度）と赤道との交点方向、Ｙ軸は東経90度の方向である。"},
+      {q:"測量計画機関から貸与された個人情報を含むデータを保存したUSBメモリを紛失したが，会社にバックアップがあり作業に何ら影響がなかった。そのため，測量計画機関へは作業終了時にまとめて報告した。",a:"×",e:"個人情報を含むデータの紛失は重大なセキュリティ事故。バックアップがあっても、紛失発覚時点で直ちに報告が必要。"},
+      {q:"基本測量及び公共測量において，位置は，地理学的経緯度及び楕円体高で表示する。",a:"×",e:"位置は地理学的経緯度及び平均海面からの高さで表示する。楕円体高ではない。（測量法 第11条1-1）"},
+      {q:"ITRFは，GNSSやVLBIなどの宇宙測地技術の観測データに基づいてIERSが提供する地心直交座標系である。Y軸を西経90度の方向に定義されている。",a:"×",e:"東経90度である。Ｙ軸は東経90度の方向。"},
+      {q:"「測量作業機関」とは，測量計画機関の指示又は委託を受けて測量作業を実施する者をいう。",a:"〇",e:"正しい（測量法 第8条）。"},
+      {q:"「基本測量」とは，全ての測量の基礎となる測量で，国が計画する全ての測量が含まれる。",a:"×",e:"基本測量とは「国土地理院の行うもの」をいう。国が計画するすべての測量ではない（測量法 第4条）。"},
+      {q:"測量業とは，「基本測量」又は「公共測量」を請け負う営業をいう。",a:"×",e:"測量業とは「基本測量」「公共測量」「基本測量及び公共測量以外の測量」の3つを請け負う営業である（測量法第10条2）。"},
+      {q:"JPGISは，国際標準化機構（ISO）が定めた空間データに関する国際規格及び日本工業規格（JIS）の中から，実利用に必要な部分を取り出して体系化したものである。",a:"〇",e:"正しい。JPGISはISOとJISから必要最低限の要素を抽出して実用規格としてまとめたものである。"},
+      {q:"測量業を営もうとする者は，測量業者としての登録を受けなければならない。登録の有効期間は5年で，更新の登録を受けなければならない。",a:"〇",e:"正しい（測量法 第55条1,2,3）。"},
+      {q:"日本水準原点の数値は政令で定められており，東京湾平均海面の高さを基準としている。",a:"〇",e:"正しい。水準原点は東京湾海面上24.3900ｍ（測量法施行令 第2条2の2）。"},
+      {q:"作業計画に記載している技術者が病気により対応できなくなったため，別の技術者との交代について調整するとともに，作業計画の変更について測量計画機関の承認を得た。",a:"〇",e:"正しい。作業計画書の内容に変更があれば測量計画機関の承認が必要。"},
+      {q:"日本経緯度原点及び日本水準原点の原点数値は，測量法施行令で定められており，過去に改正されたことがある。",a:"〇",e:"正しい（測量法 第11条3，4）。"},
+      {q:"ITRFのＺ軸は，回転楕円体の短軸と一致し，回転楕円体の中心から北に向かう値は正である。",a:"〇",e:"正しい。ITRFのZ軸は地球の回転軸に沿った方向であり、北極の方向が正となる。"},
+      {q:"日本の測地成果は，ITRFが更新されると連動して更新される。",a:"×",e:"ITRFは常に更新されるが変化量は非常に小さく、実用上は日本の測地基準系を変更する必要はない。"},
+      {q:"基本測量及び公共測量における位置は，地理学的経緯度及び平均海面からの高さで表示する。ただし，場合により，地理学的経緯度及び楕円体からの高さで表示することができる。",a:"×",e:"ただし書きは地心直交座標で表示することができる、が正しい（測量法 第11条1-1）。"},
+      {q:"測量の原点は，日本国内では日本経緯度原点及び日本水準原点が唯一である。",a:"×",e:"離島の測量その他特別の事情がある場合において、国土地理院の長の承認を得たときはこの限りではない（測量法第11条3）。"},
+      {q:"基本測量及び公共測量以外の測量とは，基本測量及び公共測量の測量成果以外を使用して実施する測量をいう。",a:"×",e:"基本測量又は公共測量の測量成果を使用して実施するものである（測量法 第6条）。"}
+    ,
+      {q:"ITRF で表す日本列島の位置のX，Y，Z の符号は，X は－，Y は＋，Z は＋である。",a:"〇",e:"正しい。広義での日本列島はおおよそ東経122°～154°に位置している。これを考えると問題文の通りである。"},
+      {q:"JPGIS に準拠した製品仕様書における品質要求は，地理空間データの使用目的に対する適合性の判定基準を示す。",a:"〇",e:"正しい。地理空間データの品質は、あくまでその使用目的に合致するか否かで決定される。"},
+      {q:"測量計画機関Ｄが，「地理情報標準プロファイル Japan Profile for Geographic Information Standards (JPGIS)」に準拠して製品仕様書を定めた。",a:"〇",e:"正しい。地理情報データの互換性を確保するため、地理情報標準プロファイル（JPGIS）に準拠して製品仕様書を定めることが規定されている。（公共測量作業規程の準則：総則）"},
+      {q:"ITRF のX 軸は東経90 度の子午線と赤道の交点を通る直線，Y 軸は経度0 度の子午線と赤道の交点を通る直線である。",a:"×",e:"間違い。Ｘ軸をグリニッジ子午線（経度0度）と赤道との交点方向に、Ｙ軸を東経90度の方向に、Ｚ軸を北極の方向としている。"},
+      {q:"測量計画機関から貸与された個人情報を含むデータを保存した USBメモリを紛失したが， 会社にバックアップがあり作業に何ら影響がなかった。 そのため，測量計画機関へは作業終了時に紛失した話も含めてまとめて報告した。",a:"×",e:"間違い。個人情報を含むデータの紛失は、重大なセキュリティ事故にあたる。たとえバックアップがあり作業に支障がなくても、紛失が発覚した時点で直ちに測量計画機関（発注者）へ報告し、指示を仰ぐ必要がある。作業終了時にまとめて報告では、隠蔽や事態の過小評価にあたる可能性がある。"},
+      {q:"基本測量及び公共測量において，位置は，地理学的経緯度及び楕円体高で表示する。ただし，場合により直角座標及び平均海面からの高さ，極座標及び平均海面からの高さ又は地心直交座標で表示することができる。",a:"×",e:"間違い。位置は地理学的経緯度及び平均海面からの高さで表示する。楕円体高ではない。（測量法 第11条1-1）"},
+      {q:"ITRFは，GNSSやVLBIなどの宇宙測地技術の観測データに基づいて国際地球回転・基準座標系事業（IERS）が提供する地心直交座標系である。その座標系は，地球の重心を原点とし，X軸を経度 0 度の子午線と赤道との交点の方向に，Y軸を西経90度の方向に，Z軸を北極の方向に定義されている。",a:"×",e:"間違い。東経90度である。Ｘ軸をグリニッジ子午線（経度0度）と赤道との交点方向に、Ｙ軸を東経90度の方向に、Ｚ軸を北極の方向としている。"},
+      {q:"「基本測量」とは，全ての測量の基礎となる測量で， 国が計画する全ての測量が含まれる。",a:"×",e:"間違い。基本測量とは、すべての測量の基礎となる測量で、「国土地理院の行うもの」を言う。国が計画するすべての測量ではない。（測量法 第4条）"},
+      {q:"JPGIS は，国際標準化機構（ISO）が定めた空間データに関する国際規格及び日本工業規格（JIS）の中から，実利用に必要な部分を取り出して体系化したものである。",a:"〇",e:"正しい。JPGISは標準規格として地理情報標準に関する国際規格（ISO）と地理情報標準に関する国内規格（JIS）から必要最低限の要素を抽出して実用規格としてまとめたものである。"},
+      {q:"JPGIS は，国際標準化機構（ISO）が定めた空間データに関する国際規格及び日本工業規格（JIS）の中から，実利用に必要な部分を取り出して体系化したものである。",a:"〇",e:"正しい。JPGISは標準規格として地理情報標準に関する国際規格（ISO）と地理情報標準に関する国内規格（JIS）から必要最低限の要素を抽出して実用規格としてまとめたものである。"},
+      {q:"測量業を営もうとする者は，測量業者としての登録を受けなければならない。登録の有効期間は5年で，有効期間の満了後も引き続き測量業を営もうとする者は，更新の登録を受けなければならない。",a:"〇",e:"正しい。（測量法 第55条1,2,3）測量業者の登録及び登録の有効期間に関する文章である。問題文の通り。"},
+      {q:"JPGISは，様々な地理空間情報を電子化し，各種情報処理の高度化・効率化に適用される。",a:"〇",e:"正しい。地理情報標準プロファイルのまえがきの文章である。このプロファイルは，地球上の位置と直接的又は間接的に関連付けられたオブジェクト又は現象に関する情報処理技術のための実用標準であり，様々な地理空間情報を電子化し，各種情報処理の高度化・効率化に適用される。"},
+      {q:"日本経緯度原点及び日本水準原点の原点数値は，測量法施行令(昭和 24 年政令第 322号)で定められており，過去に改正されたことがある。",a:"〇",e:"正しい。問題文の通り。（測量法 第11条3，4：測量の基準）"},
+      {q:"基本測量及び公共測量における距離及び面積は，測量法（昭和 24 年法律第 188 号）で規定する回転楕円体の表面上の値で表示する。",a:"〇",e:"正しい。問題文の通り（測量法 第11条2）。"},
+      {q:"日本の測地成果は，ITRF が更新されると連動して更新される。",a:"×",e:"間違い。2020年現在、日本の測地成果は「測地成果2011」である。これは2011年の東北地方太平洋沖地震に伴い大きな地殻変動が観測されたため測地成果2000が改定されたものである。ITRF系は、常に最新の宇宙測地データを使って更新されていき、今後も精度を上げるような変更がなされるが、その変化量は非常に小さく、また、既に測量には十分な精度が得られているので実用上は我が国の測地基準系を変更する必要はない。"},
+      {q:"ITRF で表される三次元直交座標（X，Y，Z）のZ の値は，標高である。",a:"×",e:"間違い。ITRF座標系では地球の重心に原点を置き、Z軸を北極（地軸の北端）にとっている。ITRFで表されるZの値は地球重心からの値、いわゆる楕円体高となる。ここから標高を求めるには（楕円体高－ジオイド高）を行う必要がある。"},
+      {q:"日本の位置をITRFで表すと，X，Y，Z の値域は，X＜0，Y＞0，Z＜0である。また，九州から北海道に向かうベクトル（ΔX，ΔY，ΔZ ）の符号は， 　負，正，正となる。",a:"×",e:"間違い。負，負，正である。九州鹿児島県を例にとると、東経130度、北緯31度付近、北海道札幌市では北緯43度、東経147度付近である。これを図に描くと次のようになる。よって、九州から北海道に向かうベクトルは、Xが－、Yが－、Zが＋となる。"},
+      {q:"JPGIS に準拠した製品仕様書は，作成する地理空間データの詳細な設計書の役割を持つとともに，地理空間データを流通茜交換する際には，当該地理空間データの説明書として使用することができる。",a:"〇",e:"正しい。製品仕様書の定義である。これにより提供されたデータの内容、構造、データ形式及び品質などを知ることができる。"},
+      {q:"ITRF のX 軸は経度0 度の子午線と赤道の交点を通る直線である。",a:"〇",e:"正しい。Ｘ軸をグリニッジ子午線（経度0度）と赤道との交点方向に、Ｙ軸を東経90度の方向に、Ｚ軸を北極の方向としている。"},
+      {q:"地理学的経緯度は，世界測地系に従って測定しなければならない。",a:"〇",e:"正しい。問題文の通り。（測量法 第11条4-2：測量の基準）"},
+      {q:"ITRF は，GNSS などの宇宙測地技術を用いた国際協力による観測に基づき構築・維持されている。",a:"〇",e:"正しい。世界測地系は世界各国での共通利用を目的に、わが国を含む国際協力で構築されている。世界測地系は、VLBI、GNSS等の高精度な宇宙測地技術により構築維持されている。"},
+      {q:"測量計画機関が公共測量を実施するときは，得ようとする測量成果の種類，内容，構造，品質などを示す製品仕様書を，JPGIS に準拠して定めなければならない。",a:"〇",e:"正しい。作業規程の準則に「製品仕様書は得ようとする測量成果の種類、内容、構造、品質等を示す仕様書（製品仕様書）をJPGISに準拠するものとする。」とある。"},
+      {q:"JPGIS は，空間データを異なるシステム間で相互利用する際の互換性の確保を主な目的に，空間データの整備及び利用の際のルールを規定したものである。",a:"〇",e:"正しい。問題文の通り。GISの基盤となる空間データを、国際規格及び国内規格に準じて、データの設計、品質、記述方法、仕様の書き方等のルールを規定した実用標準である。"},
+      {q:"「測量標」とは，永久 標識，一時標識及び航路標識をいう。",a:"×",e:"間違い。（測量法 第10条）測量標に関する文章である。航路 標識ではなく、「仮設標識」である。航路標識は航路標識法により定めがある。"},
+      {q:"JPGISに基づき作成される地理空間データ製品仕様書のメタデータは，インターネット技術を利用し，地理情報の利用促進や重複投資回避によるコスト軽減を可能とするために整備されるものである。",a:"〇",e:"正しい。メタデータはデータ利用のためのデータである。JPGISにより共通の仕様を持たせてあるため、データ間の相互利用しやすい環境が整備され、異なる整備主体で整備されたデータの共用、システム依存性の低下、重複投資の排除等の効果を期待することができ、コスト削減や業務の効率化等が可能となる。"},
+      {q:"測量計画機関は，自ら測量作業機関となることはできない。",a:"×",e:"間違い。測量法（第7条：測量計画機関）に関する文章である。測量計画機関が自ら計画を実施する場合は、測量作業機関となることができる。"},
+      {q:"「公共測量」とは，基本測量以外の測量で，実施に要する費用の全部又は一部を国又は公共団体が負担し，又は補助して実施する測量をいい，広域的測量又は大縮尺図の調製を除く。",a:"×",e:"間違い。（測量法 第5条1）公共測量に関する文章である。広域的測量又は大縮尺図の調整ではなく、「局地的測量又は小縮尺図の調整」である。"},
+      {q:"ITRF における地球上の位置は，地球の重心を原点とした三次元直交座標で表される。",a:"〇",e:"正しい。ITRFは地球の重心を原点とし、X, Y, Zの3つの軸を用いた地心直交座標系で位置を表す。"},
+      {q:"日本経緯度原点の位置を ITRFで表すと，Ｘ，Ｙ，Ｚ の符号は， それぞれＸは―，Ｙは＋，Ｚは＋である。",a:"〇",e:"正しい。問題文の通り。日本経緯度原点は、おおよそ 北緯35度、東経139度であるため、X：－、Y：＋、Z：＋となる。"},
+      {q:"位置は，地理学的経緯度及び平均海面からの高さで表示する。ただし，場合により，直角座標及び平均海面からの高さ，極座標及び平均海面からの高さ又は地心直交座標で表示することができる。",a:"〇",e:"正しい。問題文の通り。地球上の位置は、原則、地理学的経緯度（緯度・経度）と平均海面からの高さ（標高）で表す。（測量法 第11条1）"},
+      {q:"距離及び面積は，測量法で規定する回転楕円体の表面上の値で表示する。",a:"〇",e:"正しい。問題文の通りである。（測量法 第11条1-2）。"},
+      {q:"測量法における世界測地系について，その長半径及び扁平率はWGS84楕円体の値が採用されている。",a:"×",e:"間違い。WGS84ではなくGRS80である。"},
+      {q:"回転楕円体の長半径及び扁平率の値は政令で定められており，過去にこれらの値が改正されたことがある。",a:"〇",e:"正しい。回転楕円体の長半径及び扁平率の値は、測量法施行令3条（長半径及び扁平率）により定められている。改正は2002年の測量法改正により準拠楕円体がベッセルの楕円体からGRS80楕円体になり、長半径を例に挙げるとベッセル（6,377,397.155ｍ）からGRS（6,378,137.000ｍ）となった。"},
+      {q:"「基本測量」とは，全ての測量の基礎となる測量で， 国が計画する全ての測量が含まれる。",a:"×",e:"間違い。基本測量とは、すべての測量の基礎となる測量で、「国土地理院の行うもの」を言う。国が計画するすべての測量ではない。（測量法 第4条）"},
+      {q:"ITRFのＸ軸は，回転楕円体の中心から経度 0°の子午線と赤道との交点に向かう方向を正とし，Ｙ軸は，回転楕円体の中心から西経 90°の子午線と赤道との交点に向かう方向を正とする。と赤道の交点方向を「正」とする。",a:"×",e:"間違い。X軸：経度0°（本初子午線）（正しい）Y軸：東経 90°の子午線と赤道の交点方向を「正」とする（西経ではない）。ITRFのY軸は、「東経90°」の子午線と赤道との交点方向を指し、X軸から見て赤道面内で東に向かう方向が正となる。"},
+      {q:"回転楕円体は，その中心が地球の重心と一致し，その短軸が地球の自転軸と一致するものである。",a:"〇",e:"正しい。問題文の通り。世界測地系は、地球を最もよく近似する回転楕円体と想定している。"},
+      {q:"基本測量及び公共測量における距離及び面積は，測量法で規定する回転楕円体の表面上の値で表示する。",a:"〇",e:"正しい。問題文の通りである。（測量法 第11条1-2）。"},
+      {q:"基本測量及び公共測量において，土地の距離及び面積は，回転楕円体の表面上の値で表示する。",a:"〇",e:"正しい。問題文の通り。（測量法 第11条2）"},
+      {q:"測量法において，測量標とは，永久 標識， 一時標識及び仮設標識をいう。",a:"〇",e:"正しい。（測量法 第7条：測量標）問題文の通り。"},
+      {q:"基本測量及び公共測量における位置は，地理学的経緯度及び平均海面からの高さで表示する。また，直角座標及び回転楕円体からの高さで表示してもよい。",a:"×",e:"間違い。位置は場合により直角座標及び平均海面からの高さ、極座標及び平均海面からの高さ又は地心直交座標で表される。回転楕円体からの高さではない。（測量法第11条1）"},
+      {q:"日本では，地球の形に近い回転楕円体の準拠楕円体として，GRS80 楕円体を採用している。",a:"〇",e:"正しい。わが国においてはITRF座標系GRS80楕円体を使用し、標高については東京湾平均海面を基準としている。"},
+      {q:"基本測量の測量成果は，国際地球基準座標系(ITRF)が更新されると，直ちに修正されなければならない。",a:"×",e:"間違い。測量成果は世界測地系に従っている（測量法 第11条4-2：測量の基準）。しかし、ITRFの更新に伴い、「ただちに修正」されることはない。ITRFの更新は、定期的に行われる。日本の測量成果はこれに伴い「定期的」に修正されている。国土地理院では、基準点、水準点の成果をR7（2025年）4月1日に測地成果2024（JGD2024）に改正する。"},
+      {q:"位置は，地理学的経緯度及び平均海面からの高さで表示する。ただし，場合により，直角座標及び平均海面からの高さ，極座標及び平均海面からの高さ又は地心直交座標で表示することができる。",a:"〇",e:"正しい。問題文の通り。地球上の位置は、原則、地理学的経緯度（緯度・経度）と平均海面からの高さ（標高）で表す。（測量法 第11条1）"},
+      {q:"測量業者は，その営業所ごとに測量士又は測量士補を一人以上置かなければならない。",a:"×",e:"間違い。測量法第55条13（測量士の設置）に関する文章である。営業所ごとに置くのは測量士である。測量士補ではない。"},
+      {q:"地球上での位置を表すための基準となる回転楕円体及び地心直交座標系は，国によってその組合せは異なる。日本では，WGS84楕円体とITRFを採用しており，WGS84楕円体の短軸は，ITRFのZ軸と一致している。",a:"×",e:"間違い。GRS80である。ITRF座標系は、GRS80楕円体と整合するように作成された座標系である。"},
+      {q:"JPGISは，地理情報に関する国際規格（ISO規格）及び日本産業規格（JIS規格）の中から，基本的な要素を抽出し，体系化したものである。",a:"〇",e:"正しい。JPGISとは、地理情報標準プロファイル（Japan Profile for Geographic Information Standards）の略称で、最新の地理情報に関する国際規格（ISO191**シリーズ）、日本産業規格（JISX71**シリーズ）に準拠し、これら規格の中から実利用に必要な内容を抽出・体系化した実用版の規格であるJPGISが作成された。"},
+      {q:"現地作業で伐採した枝葉と使用しなかった資材を作業地付近の草地で焼却し，灰などのゴミを残さないように清掃した。",a:"×",e:"間違い。現地での焼却（野焼き）は、廃棄物の処理及び清掃に関する法律（廃棄物処理法）で原則として禁止されている。"},
+      {q:"測量計画機関Ａが，公共測量を実施するに当たり，その内容について技術的に十分な実績があることから， 目的，精度，方法などを記載した計画書について国土地理院の長への提出を省略した。",a:"×",e:"間違い。測量計画機関は、公共測量を実施しようとするときは、あらかじめ、目的、地域及び期間、精度及び方法などを記載した計画書を提出して、国土地理院の長の技術的助言を求めなければならない。その計画書を変更しようとするときも、同様である。（測量法 第 36条1）実績等は関係がない。"},
+      {q:"ITRF のX 軸は東経90 度の子午線と赤道の交点を通る直線，Y 軸は経度0 度の子午線と赤道の交点を通る直線である。",a:"×",e:"間違い。Ｘ軸をグリニッジ子午線（経度0度）と赤道との交点方向に、Ｙ軸を東経90度の方向に、Ｚ軸を北極の方向としている。"},
+      {q:"基本測量及び公共測量において，位置は，地理学的経緯度及び平均海面からの高さで表示する。 ただし，場合により，直角座標及び平均海面からの高さ，極座標及び平均海面からの高さ又は地心直交座標で表示することができる。",a:"〇",e:"正しい。問題文の通り（測量法 第11条1：測量の基準）"},
+      {q:"基本測量の測量成果及び測量記録の謄本又は抄本の交付を受けようとする者は，国土交通省令で定めるところにより，国土交通大臣に申請をしなければならない。",a:"×",e:"間違い。測量法 第28条「測量成果の公開」に関する文章である。申請するのは、国土交通大臣ではなく、国土地理院の長である。"},
+      {q:"JPGISで定義する概念スキーマは，HTML（Hyper Text Markup Language）を使用して記述 する。",a:"×",e:"間違い。JPGISは地理空間情報の概念スキーマ（構造）を記述して符号化するための基本的な要素を抽出し体系化したものである。JPGISで定義するスキーマは統一モデル化言語（UML：Unified Modeling Language）が用いられている。"},
+      {q:"水準測量の準備作業中，駐車場にて標尺を接触させ，第三者の自動車を損傷させてしまった。そのため，警察に連絡するとともに，直ちに測量計画機関へも事故について報告した。",a:"〇",e:"正しい。対人・対物事故が発生した際、速やかに警察へ連絡し、かつ測量計画機関へ直ちに報告を行う必要がある。"},
+      {q:"ジオイドは，平均海面を陸地内部まで仮想的に延長してできる面で，地球の重力の影響により，凹凸を持ち複雑な形状となっている。",a:"〇",e:"正しい。地球には重力があり、この重量は一定ではなく場所により異なっている。海面を陸地内部まで延長すると、その海面は重力のバランスが取れる場所で留まるため、凹凸を持ち複雑な形状となる。"},
+      {q:"測量士又は測量士補となる資格を有する者は，測量士又は測量士補になろうとする場合においては，国土地理院の長に対してその資格を証する書類を添えて，測量士名簿又は測量士補名簿に登録の申請をしなければならない。",a:"〇",e:"正しい。（測量法 第49条）測量士及び測量士補に関する文章である。問題文の通り。"},
+      {q:"JPGIS は，地球上の位置と直接的に関連付けられたオブジェクトのみに関する情報処理技術のための実用標準である。",a:"×",e:"間違い。JPGISとは、日本国内における地理情報の標準規格であり、ISO9100シリーズ（国際規格）、JIS X 7100シリーズ（日本産業規格）に基づいている。JPGISは、地球上の位置と「直接的又は間接的」に関連付けられた「オブジェクト又は現象」に関する情報処理技術のための実用標準である。"},
+      {q:"日本水準原点の原点数値は政令で定められており，東京湾平均海面の高さを基準としている。",a:"〇",e:"正しい。測量法第11条4に日本経緯度原点及び日本水準原点の地点及び原点数値は、政令で定める。とある。測量法施行令第2条2-2により日本水準原点の原点数値は東京湾平均海面上24.3900ｍとある。"},
+      {q:"JPGISは，地理情報に関する国際規格（ISO規格）及び日本産業規格（JIS規格）の中から，基本的な要素を抽出し，体系化したものである。",a:"〇",e:"正しい。JPGISとは、地理情報標準プロファイル（Japan Profile for Geographic Information Standards）の略称で、最新の地理情報に関する国際規格（ISO191**シリーズ）、日本産業規格（JISX71**シリーズ）に準拠し、これら規格の中から実利用に必要な内容を抽出・体系化した実用版の規格であるJPGISが作成された。"},
+      {q:"ITRF における地球上の位置は，地球の重心を原点とした三次元直交座標で表される。",a:"〇",e:"正しい。ITRFは地球の重心を原点とし、X, Y, Zの3つの軸を用いた地心直交座標系で位置を表す。"},
+      {q:"測量計画機関Ａが，公共測量を実施するに当たり，その内容について技術的に十分な実績があることから， 目的，精度，方法などを記載した計画書について国土地理院の長への提出を省略した。",a:"×",e:"間違い。測量計画機関は、公共測量を実施しようとするときは、あらかじめ、目的、地域及び期間、精度及び方法などを記載した計画書を提出して、国土地理院の長の技術的助言を求めなければならない。その計画書を変更しようとするときも、同様である。（測量法 第 36条1）実績等は関係がない。"},
+      {q:"測量計画機関は，自ら測量作業機関となることはできない。",a:"×",e:"間違い。測量計画機関に測量技術者が在籍している場合、自ら作業機関となることができる。（測量法 第8条）"},
+      {q:"地心直交座標系は回転楕円体の中心で互いに直交する Ｘ軸，Ｙ軸及び Ｚ軸の三軸からなる。",a:"〇",e:"正しい。地心直交座標系の定義である。"},
+      {q:"測量標とは，永久 標識及び一時標識のことをいい，仮設標識は含まない。",a:"×",e:"間違い。測量法第10条（測量標）に関する文章である。測量標とは「永久 標識」「一時標識」「仮設標識」の３つをいう。"},
+      {q:"現地作業で伐採した枝葉と使用しなかった資材を作業地付近の草地で焼却し，灰などのゴミを残さないように清掃した。",a:"×",e:"間違い。現地での焼却（野焼き）は、廃棄物の処理及び清掃に関する法律（廃棄物処理法）で原則として禁止されている。"},
+      {q:"測量法では地球を回転楕円体であると想定して行う地理学的経緯度の測定に関する測量の基準として，その中心が地球の中心と一致するものであることとしている。",a:"×",e:"間違い。その中心が地球の重心と一致するものとしている。"},
+      {q:"測量士又は測量士補となる資格を有する者は，測量士又は測量士補になろうとする場合においては，国土地理院の長に対してその資格を証する書類を添えて，測量士名簿又は測量士補名簿に登録の申請をしなければならない。",a:"〇",e:"正しい。測量法（第49条1：測量士及び測量士補の登録）に関する文章である。"},
+      {q:"JPGIS「附属書 3（規定）品質」では，品質の要求，評価及び報告の方式について，日本版メタデータプロファイル（JMP2.0）仕様書に準拠しなければならないことを定めている。",a:"×",e:"間違い。品質の要求，評価及び報告の方式については，別に定める「品質の要求，評価及び報告のための規則」に準拠しなければならない。"},
+      {q:"JPGIS に定められているメタデータは，空間データに関する説明情報で，その記述方式として国際規格に準拠した日本版メタデータプロファイルであるJMP2.0 が定められている。",a:"〇",e:"正しい。JPGISでは、製品仕様書の作成について規定されている。国土地理院ではJPGISに準拠したメタデータ記述形式としてJMP2.0を定めている。JMPとは日本版メタデータプロファイル（ Japan Metadata Profile ）の略称で、そのバージョンが2.0であるものをJMP2.0と言う。"},
+      {q:"測量作業機関Ｂが，財産権，労働，安全，交通，土地利用規制，環境保全，個人情報の保護などに関する法令を遵守し，かつこれらに関する社会的慣行を尊重して作業を行った。",a:"〇",e:"正しい。作業規定の準則にある、関係法令等の尊寿にもある通り、測量作業機関は各種法令の遵守はもちろん、環境保全や個人情報の保護、安全管理を徹底する義務がある。（公共測量作業規程の準則：総則）"},
+      {q:"基本測量及び公共測量以外の測量を実施しようとする者は，あらかじめ，国土交通省令で定めるところにより，その旨を国土交通大臣に届け出なければならない。",a:"〇",e:"正しい。測量法 第46条「届出等」に関する文章である。"},
+      {q:"「公共測量」とは，基本測量以外の測量で，実施に要する費用の全部又は一部を国又は公共団体が負担し，又は補助して実施する測量をいい，広域的測量又は大縮尺図の調製を除く。",a:"×",e:"間違い。（測量法 第5条1）公共測量に関する文章である。広域的測量又は大縮尺図の調整ではなく、「局地的測量又は小縮尺図の調整」である。"},
+      {q:"日本の位置をITRFで表すと，X，Y，Z の値域は，X＜0，Y＜0，Z＜0 である。また，九州から北海道に向かうベクトル（ΔX，ΔY，ΔZ ）の符号は，負，負，正となる。",a:"×",e:"間違い。X＜0，Y＞0，Z＞0である。日本の位置はおおよそ東経122度から154度、北緯20度から46度の間である。このためITRFでは東経90度～180度未満まではXが－、Yは＋、Zは北半球にあるため＋となる。"},
+      {q:"JPGIS に準拠する応用スキーマで定義された空間データの符号化には，統一モデル化言語（UML：Unified Modeling Language）を使用する。",a:"×",e:"間違い。空間データの符号化とは空間データをコンピュータが扱えるようにデジタルデータ（プログラミング言語）化することである。この符号化方法としてオープン規格であるXML（Extensible Markup Language）が使用される。"},
+      {q:"「測量成果」とは，当該測量において最終の目的として得た結果をいい，「測量記録」とは，測量成果を得る過程において得た作業記録をいう。",a:"〇",e:"正しい。問題文の通り。最終結果が成果、その過程の手簿などの作業記録が記録となる。（測量法 第9条）"},
+      {q:"ITRF は，GNSS などの宇宙測地技術を用いた国際協力による観測に基づき構築・維持されている。",a:"〇",e:"正しい。世界測地系は世界各国での共通利用を目的に、わが国を含む国際協力で構築されている。世界測地系は、VLBI、GNSS等の高精度な宇宙測地技術により構築維持されている。"},
+      {q:"JPGISで定義するスキーマは，統一モデル化言語（UML）を使用して記述する。",a:"〇",e:"正しい。地理情報標準プロファイル（以下｢JPGIS｣という。）は，地理情報規格群の中から，地理空間情報の概念スキーマを記述し符号化するために必要となる基本的な要素を抽出し，体系化したものである。このプロファイルで定義するスキーマは，統一モデル化言語（UML：Unified Modeling Language）を使用して記述する。"},
+      {q:"測量業を営もうとする者は，測量業者としての登録を受けなければならず，登録の有効期間は３年である。",a:"×",e:"間違い。測量法第55条（測量業者の登録及び登録の有効期間）に関する文章である。登録の有効期間は３年ではなく５年である。"},
+      {q:"国土地理院が整備した基盤地図情報は，JPGISに準拠して作成されており，インターネットで無償で提供されている。",a:"〇",e:"正しい。基盤地図情報は、基盤地図情報25000（日本全国）基盤地図情報2500（日本全国の都市計画区域）基盤地図情報数値標高モデル（日本全国）などがある。公開方法は 各公開サイトからのダウンロードで、地図データ形式は基盤地図情報がJPGIS形式（XML形式）、国土数値情報はJPGIS形式、shape形式である。"},
+      {q:"JPGISでは，地理空間データを作成する場合においては，XML 形式や GML 形式で符号化することを推奨している。",a:"〇",e:"正しい。JPGISはGML（地理情報を記述するための言語）形式を基にしており、XML（データを記述するための言語の一種）で符号化する方法の一つ。JPGISは、国土地理院が奨励する地理情報の標準形式で地理情報の構造や符号化規則、品質評価手順などが定義されており、最終的にXML（データを記述するための言語の一種）データが提供される。"},
+      {q:"JPGISに準拠して整備されたデータがすべて同じXML形式で作成されているわけではない。",a:"〇",e:"正しい。JPGISはXML形式で符号化されているが、これには付属書8と付属書12の符号化規則がある。付属書8はISO19118附属書Aを参考に日本が独自に規定した符号化の方法で、付属書12はGML（Geography Markup Language：国際規格（ISO19136））と呼ばれる地理空間データをXMLを使用して符号化するための方法である。附属書8と附属書12は、UMLクラス図からXMLSchemaへのマッピング規則が異なるため、附属書8に基づく地理空間データと附属書12（GML）に基づく地理空間データは、異なるXML文書として表現される。"},
+      {q:"世界測地系では，回転楕円体の中心は地球の重心と一致し，短軸は地球の自転軸と一致している。",a:"〇",e:"正しい。問題文の通り。（測量法 第11条3）"},
+      {q:"公共測量の測量成果を使用して測量を実施しようとする者は，あらかじめ，当該測量成果を得た測量作業機関の承認を得なければならない。",a:"×",e:"間違い。測量法（第44条1：測量成果の使用）に関する文章である。測量作業機関ではなく、測量計画機関の承認が必要である。"},
+      {q:"測量法で規定する回転楕円体は，その中心が地球の重心と一致し，その長軸が地球の自転軸と一致するものである。",a:"×",e:"間違い。測量法で規定する回転楕円体は、次の通りである。長軸ではなく短軸が自転軸と一致する。"},
+      {q:"測量計画機関が公共測量を実施するときは，得ようとする測量成果の種類，内容，構造，品質などを示す製品仕様書を，JPGIS に準拠して定めなければならない。",a:"〇",e:"正しい。作業規程の準則に「製品仕様書は得ようとする測量成果の種類、内容、構造、品質等を示す仕様書（製品仕様書）をJPGISに準拠するものとする。」とある。"},
+      {q:"「測量業」とは，基本測量，公共測量又は基本測量及び公共測量以外の測量を請け負う営業をいう。",a:"〇",e:"正しい。問題文の通り。測量業の定義である。（測量法 第10条2）"},
+      {q:"測量計画機関から貸与された個人情報を含むデータを保存した USBメモリを紛失したが， 会社にバックアップがあり作業に何ら影響がなかった。 そのため，測量計画機関へは作業終了時に紛失した話も含めてまとめて報告した。",a:"×",e:"間違い。個人情報を含むデータの紛失は、重大なセキュリティ事故にあたる。たとえバックアップがあり作業に支障がなくても、紛失が発覚した時点で直ちに測量計画機関（発注者）へ報告し、指示を仰ぐ必要がある。作業終了時にまとめて報告では、隠蔽や事態の過小評価にあたる可能性がある。"},
+      {q:"測量の原点は，離島の測量等の場合で国土地理院の長の承認を得たときを除き，日本経緯度原点及び日本水準原点とする。",a:"〇",e:"正しい。問題文の通り（測量法 第11条3）。"},
+      {q:"測量計画機関Ｃが，公共測量を実施するに当たり，得ようとする測量成果の種類，?容，構造，品質などを示す製品仕様書を定めた。",a:"〇",e:"正しい。測量計画機関は、得ようとする測量成果の種類、内容、構造、品質等を示す仕様書「製品仕様書」を定めなくてはならない。（公共測量作業規程の準則：総則）"},
+      {q:"ITRF は，地球の重心を原点とした三次元直交座標系である。",a:"〇",e:"正しい。ITRF系は三次元直交座標系の測地基準系である。ITRF系による地球上の位置は、地球の重心を原点としたＸ,Ｙ,Ｚの三次元直交座標で表すことができる。"},
+      {q:"測量法において，測量作業機関とは，測量計画機関の指示又は委託を受けて測量作業を実施する者をいう。",a:"〇",e:"正しい。（測量法 第8条：測量作業機関）問題文の通り。測量計画機関が自ら計画を実施する場合には、測量作業機関となることができる。（測量法 第7条：測量計画機関）"},
+      {q:"測量計画機関が公共測量を実施しようとするときは，得ようとする測量成果の製品仕様書を， JPGISに準拠して作成しなければならない。",a:"〇",e:"正しい。測量計画機関は得ようとする測量成果の種類、内容、構造、品質等を示す仕様書（以下「製品仕様書」という。）を定めなければならない。製品仕様書は、「地理情報標準プロファイル（JPGIS）」に準拠しなければならない。"},
+      {q:"ITRFは，GNSSやVLBIなどの宇宙測地技術を用いた国際協力による観測に基づき構築・維持されている。",a:"〇",e:"正しい。ITRFは国際地球回転観測事業（IERS）によって管理され、地球の変形や地殻運動を測定するため安定した基準を提供している。ITRFは、GPS、VLBI、SLR（人工衛星レーザー測距）などを基にした国際的な基準が確立されている。"},
+      {q:"測量士又は測量士補となる資格を有する者は，測量士又は測量士補になろうとする場合においては，国土地理院の長に対してその資格を証する書類を添えて，測量士名簿又は測量士補名簿に登録の申請をしなければならない。",a:"〇",e:"正しい。測量法 第49条「測量士及び測量士補の登録」に関する文章である。"},
+      {q:"公共測量を実施する者は，当該測量において設置する測量標に，公共測量の測量標であること及び測量計画機関の名称を表示しなければならない。",a:"〇",e:"正しい。測量法 第37条「公共測量の表示等」に関する文章である。"},
+      {q:"測地成果2011は，この規定に基づく地心直交座標系として，国際天文基準座標系（ICRF）に準拠した国際VLBI 観測や電子基準点による GNSS 観測などの結果をもとに算出された。",a:"×",e:"間違い。国際地球基準座標系（ITRF）である。"},
+      {q:"この法律は，国若しくは公共団体が費用の全部若しくは一部を負担し，若しくは補助して実施する土地の測量又はこれらの測量の結果を利用する土地の測量について，その実施の基準及び実施に必要な権能を定め，測量の重複を除き，並びに測量の正確さを確保することを目的とする。",a:"〇",e:"正しい。測量法 第1条「目的」に関する文章である。"},
+      {q:"測量計画機関Ａが，公共測量を実施するに当たり，その内容について技術的に十分な実績があることから， 目的，精度，方法などを記載した計画書について国土地理院の長への提出を省略した。",a:"×",e:"間違い。測量計画機関は、公共測量を実施しようとするときは、あらかじめ、目的、地域及び期間、精度及び方法などを記載した計画書を提出して、国土地理院の長の技術的助言を求めなければならない。その計画書を変更しようとするときも、同様である。（測量法 第 36条1）実績等は関係がない。"},
+      {q:"JPGIS に基づき作成されるメタデータの仕様として，日本版メタデータプロファイル第２版（JMP2.0）を使用する。",a:"〇",e:"正しい。国土地理院では、JPGISに準拠したメタデータの記述形式として、JMP（日本版メタデータプロファイル）2.0を定めている。これにより、地理空間データの品質が確保されている。"},
+      {q:"JPGIS に準拠した製品仕様書は，「作業規程の準則」を準用した作業規程にしたがってデータを作成する場合には，省略することができる。",a:"×",e:"間違い。作業規程の準則では、測量計画機関が公共測量を実施しようとするときは、得ようとする測量成果の種類、内容、構造、品質等を示す製品仕様書は、JPGISに準拠しなければならず、省略することはできない。"},
+      {q:"測量士又は測量士補となる資格を有する者は，測量士又は測量士補になろうとする場合においては，国土地理院の長に対してその資格を証する書類を添えて，測量士名簿又は測量士補名簿に登録の申請をしなければならない。",a:"〇",e:"正しい。（測量法 第49条）測量士及び測量士補に関する文章である。問題文の通り。"},
+      {q:"JPGIS では， JMP2.0 仕様書 (日本版メタデータプロファイル)を使用してメタデータを作成することとしている。",a:"〇",e:"正しい。JPGISでは、JMP2.0（Japan Metadata Profile）仕様書を使用している。この仕様書は、国際標準化機構の地理情報に関する専門委員会（ISO/TC211）の基準に基づいて策定されており、地理情報に関するメタデータを作成するための国内標準として機能している。"},
+      {q:"ジオイドは，重力の大きさが常に等しい面である。",a:"×",e:"間違い。ジオイドは地球の重力による位置エネルギーの等しい面（重力の等ポテンシャル面）の一つであり地球全体の平均海面に最もよく整合するものである。わが国では東京湾平均海面に一致する面をジオイドと定めている。"},
+      {q:"「基本測量及び公共測量以外の測量」を実施しようとする者は，あらかじめ，その旨を国土交通大臣に届け出なければならない。",a:"〇",e:"正しい。問題文の通り。測量法第46条（届出等）に関する文章である。"},
+      {q:"JPGIS は，空間データを異なるシステム間で相互利用する際の互換性の確保を主な目的に，空間データの整備及び利用の際のルールを規定したものである。",a:"〇",e:"正しい。問題文の通り。GISの基盤となる空間データを、国際規格及び国内規格に準じて、データの設計、品質、記述方法、仕様の書き方等のルールを規定した実用標準である。"},
+      {q:"日本では，地球の形に近い回転楕円体の準拠楕円体として，GRS80 楕円体を採用している。",a:"〇",e:"正しい。わが国においてはITRF座標系GRS80楕円体を使用し、標高については東京湾平均海面を基準としている。"},
+      {q:"公共測量を実施する者は，関係市町村長に対して当該測量を実施するために必要な情報の提供を求めることができる。",a:"〇",e:"正しい。問題文の通り。測量の円滑な実施のために必要な情報の提供を求めることができる。（測量法 第37条2）"},
+      {q:"測量法で規定する世界測地系とは，地球を扁平な回転楕円体であると想定して行う地理学的経緯度の測定に関する測量の基準をいう。",a:"〇",e:"正しい。問題文の通り（測量法 第11条3）"},
+      {q:"測量法において，基本測量及び公共測量以外の測量とは，基本測量及び公共測量の測量成果を使用しないで実施す測量である。",a:"×",e:"間違い。（測量法 第6条：基本測量及び公共測量以外の測量）基本測量及び公共測量以外の測量は、基本測量及び公共測量以外の測量の成果を「使用して実施する」基本測量及び公共測量以外の測量をいう"},
+      {q:"測量法において，測量業者は，その営業所ごとに測量士又は測量士補を一人以上置かなければならない。",a:"×",e:"間違い。（測量法 第55条13：測量士の設置）測量業者は、その営業所ごとに「測量士」を１人以上置かなければならない。"},
+      {q:"ITRF は，GNSS などの宇宙測地技術を用いた観測に基づき構築・維持されている。",a:"〇",e:"正しい。世界測地系は世界各国での共通利用を目的に、わが国を含む国際協力で構築されている。世界測地系は、VLBI、GNSS等の高精度な宇宙測地技術により構築維持されている。"},
+      {q:"JPGIS は，異なる使用者， システム及び場所の間において地理空間データを取得，処理，解 析， アクセス， 表現及び転送するための手法， 手段及びサービスを実現するために最低限必要となる基本的な要素を整理したものである。",a:"〇",e:"正しい。問題文の通り。JPGISとは日本国内における地理情報の標準規格であり、ISO9100シリーズ（国際規格）及びJIS X 7100シリーズ（日本産業規格）に基づいている。JPGISは、異なるシステムでのデータ互換性を確保することを主な目的としており、データの設計、品質、記述方法、仕様書の作成に関するルールを定めている。JPGISは地理情報の標準化を進めるためのツールである。"},
+      {q:"日本では，地球上での位置を表すための基準となる回転楕円体としてGRS80を採用しており，その短軸は，ITRFのＺ軸と一致している。",a:"〇",e:"正しい。日本は測地成果2011（現在の基準）において、GRS80楕円体を採用している。この楕円体の短軸はITRFのZ軸（地軸方向）と一致する。"},
+      {q:"測量計画機関は，公共測量の測量成果を得たときは，遅滞なく，その写を国土交通大臣に送付しなければならない。",a:"×",e:"間違い。測量法（第40条1：測量成果の提出）に関する文章である。写しを送付するのは、国土地理院の長である。国土交通大臣ではない。"},
+      {q:"JPGISでは，画像データについて特定の形式を指定しておらず，一般的に使用されている形式を使用できる。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"ITRFのＸ軸は，回転楕円体の中心及び経度 0°の子午線と赤道との交点を通る直線であり， 回転楕円体の中心から経度 0°の子午線と赤道との交点に向かう値は正である。",a:"〇",e:"正しい。問題文の通り。ITRFは地球の重心を原点とする三次元直交座標である。X軸はグリニッジ子午線と赤道との交点方向（経度0度の子午線に沿った方向）を示し、その方向が正となる。"},
+      {q:"測量業を営もうとする者は，測量業者としての登録を受けなければならない。登録の有効期間は5年で，有効期間の満了後も引き続き測量業を営もうとする者は，更新の登録を受けなければならない。",a:"〇",e:"正しい。（測量法 第55条1,2,3）測量業者の登録及び登録の有効期間に関する文章である。問題文の通り。"},
+      {q:"地理学的経緯度は，世界測地系に従って測定しなければならない。",a:"〇",e:"正しい。問題文の通り。平成14年（2002年）の測量法改正以降、日本の測量基準は日本独自の旧測地系から、世界共通の世界測地系へと移行した。（測量法 第11条2）"},
+      {q:"日本国内の座標を ITRF で表すと，Ｘ座標の符号は常に負である。",a:"〇",e:"正しい。日本の地球上の位置（東経135°付近）を地心直交座標で見ると、東半球にあるためＸ座標の値は常にマイナスになる。"},
+      {q:"ITRF で表す日本列島の位置のX，Y，Z の符号は，X は－，Y は＋，Z は＋である。",a:"〇",e:"正しい。広義での日本列島はおおよそ東経122°～154°に位置している。これを考えると問題文の通りである。"},
+      {q:"基本測量若しくは公共測量に従事する者又はその他の者で，基本測量又は公共測量の測量成果をして，真実に反するものたらしめる行為をした者は，懲役又は罰金に処する。",a:"〇",e:"正しい。測量法 第62条1「罰則」に関する文章である。1年以下の懲役又は50万円以下の罰金に処せられる。"},
+      {q:"平成23 年（2011 年）東北地方太平洋沖地震による地殻変動に伴い，測量の原点の位置が移動したことから，原点数値を改正するとともに，日本全国の電子基準点の成果を改定した。",a:"×",e:"間違い。問題文のように、経緯度原点、水準原点の数値は改正されたが、電子基準点の成果は東日本地域のみで改正された。日本全国ではない。"},
+      {q:"「測量標」とは，永久 標識，一時標識及び航路標識をいう。",a:"×",e:"間違い。（測量法 第10条）測量標に関する文章である。航路 標識ではなく、「仮設標識」である。航路標識は航路標識法により定めがある。"},
+      {q:"日本の測地成果は，ITRF が更新されると連動して更新される。",a:"×",e:"間違い。ITRFは数年ごとに更新（ITRF2014、ITRF2020など）されるが、日本の測地成果は法令で定められているめ、ITRFの更新に連動して更新されることはない。現在は測地成果2024である。"},
+      {q:"JPGISは，地理情報に関する国際規格（ISO規格）及び日本工業規格（JIS規格）の中から，基本的な要素を抽出し，体系化したものである。",a:"〇",e:"正しい。JPGISとは、地理情報標準プロファイル（Japan Profile for Geographic Information Standards）の略称で、最新の地理情報に関する国際規格（ISO191**シリーズ）、日本産業規格（JISX71**シリーズ）に準拠し、これら規格の中から実利用に必要な内容を抽出・体系化した実用版の規格であるJPGISが作成された。"},
+      {q:"ITRF のY 軸は東経90 度の子午線と赤道の交点を通る直線である。",a:"〇",e:"正しい。Ｘ軸をグリニッジ子午線（経度0度）と赤道との交点方向に、Ｙ軸を東経90度の方向に、Ｚ軸を北極の方向としている。"},
+      {q:"ITRF は，地球の重心を原点とした三次元直交座標系である。",a:"〇",e:"正しい。ITRF系は三次元直交座標系の測地基準系である。ITRF系による地球上の位置は、地球の重心を原点としたＸ,Ｙ,Ｚの三次元直交座標で表すことができる。"},
+      {q:"JPGIS に定められているメタデータは，空間データに関する説明情報で，その記述方式として国際規格に準拠した日本版メタデータプロファイルであるJMP2.0 が定められている。",a:"〇",e:"正しい。JPGISでは、製品仕様書の作成について規定されている。国土地理院ではJPGISに準拠したメタデータ記述形式としてJMP2.0を定めている。JMPとは日本版メタデータプロファイル（ Japan Metadata Profile ）の略称で、そのバージョンが2.0であるものをJMP2.0と言う。"},
+      {q:"ITRFのＹ軸は，回転楕円体の中心及び西経 90°の子午線と赤道との交点を通る直線であり， 回転楕円体の中心から西経90°の子午線と赤道との交点に向かう値は正である。",a:"×",e:"間違い。ITRFのY軸は、「東経90°」の子午線と赤道との交点方向を指し、X軸から見て赤道面内で東に向かう方向が正となる。"},
+      {q:"現地作業の前に，その作業に伴う危険に関する情報を担当者で話し合って共有する危険の予知活動（KY 活動）を行い，安全に対する意識を高めた。",a:"〇",e:"正しい。危険予知活動（KY活動）は、現場の安全確保のために必要である。"},
+      {q:"測量法では地球を回転楕円体であると想定して行う地理学的経緯度の測定に関する測量の基準として，その短軸が地球の自転軸と一致するものであること。",a:"〇",e:"正しい。その短軸は、地球の自転軸と一致するものとしている。"},
+      {q:"JPGIS に準拠する応用スキーマで定義された地理空間データは，統一モデル化言語（UML）を用いて符号化される。",a:"×",e:"間違い。JPGISで準拠する応用スキーマ（データ構造）は、UMLのクラス図で表現される。符号化はXMLに基づいて行われる。この符号化は、地理空間情報データの互換が測れるように行われる。"},
+      {q:"測量計画機関は，自ら計画した測量を実施してはならない。",a:"×",e:"間違い。測量法 第7条「測量計画機関」に関する文章である。測量計画機関が、自ら計画を実施する場合には、測量作業機関となることができる。"},
+      {q:"公共測量を実施する者は，関係都道府県知事に対して当該測量を実施するために必要な情報の提供を求めることができる。",a:"×",e:"間違い。測量法 第37条「公共測量の表示等」に関する文章である。関係都道府県知事ではなく、関係市町村長である。"},
+      {q:"位置は，天文経緯度及び平均海面からの高さで表示する。",a:"×",e:"間違い。測量法第11条1により、位置は地理学的経緯度及び平均海面からの高さで表示する。ただし、場合により、直角座標及び平均海面からの高さ、極座標及び平均海面からの高さ又は地心直交座標で表示することができる。とある。天文的経緯度ではない。天文的経緯度は天文測量（ある時刻での天体の天球上での高度角，時角，方位を観測することによって，その観測地点の経度，緯度，方位角を求める測量）で決定される。"},
+      {q:"測量法において，測量業者は，その業務を誠実に行い，常に測量成果の正確さの確保に努めなければならない。",a:"〇",e:"正しい。（測量法 第56条：業務処理の原則）問題文の通り。"},
+      {q:"JPGIS に準拠する応用スキーマで定義された空間データの符号化には，統一モデル化言語（UML：Unified Modeling Language）を使用する。",a:"×",e:"間違い。空間データの符号化とは空間データをコンピュータが扱えるようにデジタルデータ（プログラミング言語）化することである。この符号化方法としてオープン規格であるXML（Extensible Markup Language）が使用される。"}
+    ]
+  }
+  ,{
+    name:"多角測量・GPS", icon:"📡",
+    questions:[
+      {q:"スタティック法では，複数の観測点にGNSS測量機を整置して，GNSS衛星からの信号を同時に受信し，整数値バイアスを決定することで，観測点間の基線ベクトルを求める。",a:"〇",e:"正しい。スタティック法では長時間の観測を行うため観測量が多く、マルチパスなど観測環境の影響が軽減され高精度の観測が期待できる（主に１～２級基準点測量に用いられる）。"},
+      {q:"既知点間の水平位置及び標高の閉合差を計算し観測の良否を判定する。",a:"〇",e:"正しい。選定されたすべての点検路線について、水平位置および標高の閉合差を計算し観測地の良否を判定する必要がある（作業規程の準則 第42条1）。"},
+      {q:"GNSS測量機を用いた基準点測量において、GPS，準天頂衛星システム，GLONASSの衛星を組み合わせて測量を行うことができる。",a:"〇",e:"正しい。スタティック法ではGPS・準天頂衛星を使用する場合は４衛星以上。GPS・準天頂衛星とGLONASS衛星を併用する場合は同時に５衛星の使用が必要。"},
+      {q:"高精度な衛星測位を行うため，電子基準点のデータを利用して補正情報を計算し，現在位置を求めるための情報を準天頂衛星から送信している。",a:"〇",e:"正しい。準天頂衛星から送信されている情報はセンチメータ級測位補強情報（L6信号）である。"},
+      {q:"基本測量及び公共測量における位置は、天文学的経緯度及び平均海面からの高さで表示する。また、地心直交座標で表示することもできる。",a:"×",e:"間違い。地理学的経緯度及び平均海面からの高さで表示する。天文学的経緯度ではなく地理学的経緯度である（測量法11条1）。"},
+      {q:"TSを用いた基準点測量において，距離測定の気象補正に使用する気温及び気圧の測定は，TSを整置した観測点で，距離測定の開始直前又は終了直後に行う。",a:"〇",e:"正しい。なお３・４級基準点測量では気圧の測定を行わず標準大気圧を用いて気象補正が行われる。"},
+      {q:"GNSS測量では、GPS、GLONASS、準天頂衛星システムが使用できる。なお、準天頂衛星システムは、GPSと同等のものとして扱うことができる。",a:"〇",e:"正しい（作業規程の準則 第21条4）。"},
+      {q:"気象補正前の測定距離は，気温が上がった場合は長くなり，気圧が下がった場合は短くなる。",a:"×",e:"間違い。気温が上がると短く、気圧が下がると短くなる。"},
+      {q:"測量の原点は、離島の測量等の場合で国土地理院の長の承認を得たときを除き、日本経緯度原点及び日本水準原点とする。",a:"〇",e:"正しい（測量法11条3）。"},
+      {q:"対流圏における電波の伝搬遅延に起因する誤差は，２周波の観測により軽減することができる。",a:"×",e:"間違い。電離層遅延誤差のことであり、２周波観測で軽減できる。対流圏誤差は大気遅延誤差とも呼ばれ補正には気象補正が行われる。"},
+      {q:"観測に使用する主要な機器は，作業前及び作業中に適宜点検を行い必要な調整をする。",a:"〇",e:"正しい（作業規程の準則 第14条3）。"},
+      {q:"準天頂衛星は，少なくとも1機の衛星が天頂方向に見えるため，他の衛星と組み合わせて良好な衛星配置を維持しやすくなり，測量精度の向上が期待できる。",a:"〇",e:"正しい。GPS衛星と組み合わせることにより常にGPS1機＋みちびき3機により観測精度を向上させる。"},
+      {q:"測量の原点である日本経緯度原点及び日本水準原点の原点数値は，政令で定められており，セミ・ダイナミック補正により定期的に改正されている。",a:"×",e:"間違い。セミ・ダイナミック補正により改正されるのは地殻変動補正パラメータである。原点数値の近年の改正は2011年の東北地方太平洋沖地震による（測量法11条4）。"},
+      {q:"ネットワーク型RTK法では、固定局の観測データなどにより算出された補正データ又は面補正パラメータと移動局で得られた観測データを用い、位置を即時に決定することができる。",a:"〇",e:"正しい（作業規程の準則 第37条2の二のヌ）。"},
+      {q:"GNSS測量機を用いた基準点測量では，GPS衛星2機，準天頂衛星2機及びGLONASS衛星1機の組合せで，スタティック法による10km以上の観測を行うことができる。",a:"×",e:"間違い。スタティック法による10㎞以上の観測でGPS・準天頂衛星とGLONASS衛星の組合せを用いる場合は6衛星以上が必要。問題文は10㎞未満の観測における衛星数。"},
+      {q:"TSの距離測定において，距離に比例する誤差には位相の変化による誤差がある。",a:"×",e:"間違い。観測距離に比例する誤差は気象に関する誤差と変調周波数の誤差である。"},
+      {q:"GPS衛星３機，準天頂衛星１機及びGLONASS衛星２機の組合せで，公共測量における基準点測量を行うことができる。",a:"〇",e:"正しい。GNSS測量でGLONASS衛星を用いる場合はGPS・準天頂衛星及びGLONASS衛星をそれぞれ２衛星以上使用が必要。準天頂衛星はGPS衛星と同等に扱えるため問題ない。"},
+      {q:"観測点における角観測の良否を判定するため，倍角差，観測差，高度定数の較差を点検する。",a:"〇",e:"正しい（作業規程の準則 第38条1）。水平角観測では倍角差・観測差、鉛直角観測では高度定数の較差を点検し、許容範囲を超えた場合は再測する。"},
+      {q:"TSを用いた基準点測量において，水平角観測，鉛直角観測及び距離測定を１視準で同時に行うことを原則とする。",a:"〇",e:"正しい。水平角観測・鉛直角観測は１視準１読定・正反１対回。距離測定は１視準２読定である。"},
+      {q:"GNSS測量において準天頂衛星は、GPS衛星と同等の衛星として使用することができる。",a:"〇",e:"正しい。作業規程の準則に「準天頂衛星はGPS衛星と同等の衛星として扱うことができる」とある。"},
+      {q:"準天頂衛星は、約12時間で軌道を1周する。",a:"×",e:"間違い。準天頂衛星は約3万3000～3万4000kmの高度を軌道傾斜角45度・23時間59分の周期で周回している。"},
+      {q:"スタティック法及び短縮スタティック法において1～4級基準点測量を実施する場合、網平均計算の際にアンテナ位相特性モデルを適用してPCV補正を行う。",a:"×",e:"間違い。網平均計算ではなく「基線解析」である。"},
+      {q:"GNSS衛星からの電波をGNSSアンテナにおいて受信する際，電波の入射角によって受信する位置（位相中心）が変化することをPCV（Phase Center Variation）という。",a:"〇",e:"正しい。PCV補正に関する説明である。"},
+      {q:"GNSS測量において，PCVの変化量はアンテナ機種によって異なっており，これをアンテナオフセットという。",a:"×",e:"間違い。アンテナオフセットではなく、アンテナ位相特性である。"}
+    ,
+      {q:"スタティック法では，複数の観測点にGNSS測量機を整置して，GNSS衛星からの信号を同時に受信し，GNSS衛星の位置の時間的変化を利用して整数値バイアスを決定することで，観測点間の基線ベクトルを求める。",a:"〇",e:"正しい。スタティック法では長時間の観測を行うため、観測量が多く、マルチパスなど観測環境が観測値に与える影響が軽減されるため他の方法に比べて高精度の観測が期待できる（主に１～２級基準点測量に用いられる）。"},
+      {q:"GNSS測量機を用いた基準点測量において、GPS，準天頂衛星システム，GLONASS の衛星を組み合わせて測量を行うことができる。",a:"〇",e:"正しい。スタティック法ではGPS・準天頂衛星を使用する場合は４衛星以上。GPS・準天頂衛星とGLONASS衛星を併用する場合は同時に５衛星の使用が必要である。"},
+      {q:"TSを用いた基準点測量において，距離測定の気象補正に使用する気温及び気圧の測定は，TSを整置した観測点で，距離測定の 開始直前又は終了直後に行う。",a:"〇",e:"正しい。問題文の通り。３・４級基準点測量では、気圧の測定を行わず、標準大気圧を用いて気象補正が行われる。"},
+      {q:"気象補正前の測定距離は，気温が上がった場合は長くなり，気圧が下がった場合は短くなるなど，気象条件の影響を受ける。",a:"×",e:"間違い。気温が上がると短く、気圧が下がると短くなる。"},
+      {q:"GNSS測量機を用いた基準点測量では，GPS 衛星2 機，準天頂衛星2 機及びGLONASS 衛星1 機の組合せを用いることで，スタティック法による10 km 以上の観測を行うことができる。",a:"×",e:"間違い。スタティック法による10㎞以上の観測で、GPS・準天頂衛星及びGLONASS衛星の組合せを用いる場合は6衛星以上を用いる必要がある。問題文は、10㎞未満の観測における衛星の組合せである。"},
+      {q:"GPS 衛星３機，準天頂衛星１機及びGLONASS 衛星２機の組合せで，公共測量における基準点測量を行うことができる。",a:"〇",e:"正しい。基準点測量においてGLONASS衛星を用いて観測する場合は、GPS・準天頂衛星及びGLONASS衛星を、それぞれ２衛星以上を用いる必要がある。準天頂衛星は、GPS衛星と同等の衛星として扱うことができるため問題はない。"},
+      {q:"TSを用いた基準点測量において観測においては，水平角観測，鉛直角観測及び距離測定を１視準で同時に行うことを原則とする。",a:"〇",e:"正しい。問題文の通り。水平角観測、鉛直角観測は１視準１読定、正反１対回。距離測定は、１視準２読定である。"},
+      {q:"スタティック法及び短縮スタティック法において 　1～4級基準点測量を実施する場合、原則としてPCV補正を行う必要があり、網平均計算の際に、　アンテナ位相特性　 モデルを適用して補正を行うことで、より高精度な解が得られる。",a:"×",e:"間違い。網平均計算ではなく「基線解析」である。"},
+      {q:"TSを用いた基準点測量において，観測点における角観測の良否を判定するため，倍角差，観測差，高度定数の較差を点検する。",a:"〇",e:"正しい。観測値の点検については、水平観測は倍較差、観測差。鉛直角観測は高度定数の較差。距離測定は１セット内の測定値の較差、各セットの平均値の較差について行い、許容範囲を超えた場合は再測となる。"},
+      {q:"GNSS測量において，電波の入射角によって受信する位置（位相中心）が変化することをPCV（Phase Center Variation）といい，その変化量は，アンテナ機種によって異なっており，これをアンテナオフセットという。",a:"×",e:"間違い。アンテナオフセットではなく，アンテナ位相特性である。"},
+      {q:"電子基準点や，電子基準点のみを既知点として設置された基準点を既知点とする4 級基準点測量では，2 級以上の性能を有するTS を使用する場合は，路線の辺数及び路線長の条件が緩和される。",a:"〇",e:"正しい。問題文の通り。条件の緩和については結合多角方式の場合、路線の辺数が10から15辺以下に、路線長は500ｍから700ｍ以下となる。"},
+      {q:"セミ・ダイナミック補正とは，現在公開している基準点の測量成果と，測量して得た観測結果との間に生じる定常的な地殻変動に起因するかい離を補正するものである。",a:"〇",e:"正しい。問題文の通り。セミ・ダイナミック補正の目的である。"},
+      {q:"GNSS測量において，PCV補正を適用することにより，同一セッションにおける同一機種間観測での精度を確保することが可能となる。",a:"×",e:"間違い。同一機種間観測ではなく，PCV補正は異機種間観測での精度を確保する。"},
+      {q:"TSにおける水平角の観測の良否は，倍角差及び観測差により判定するが，測量の精度が低下しないように対回内の観測方向数は5方向以下としている。",a:"〇",e:"正しい。観測方向数が多くなれば、観測時間が長くなり、観測機器の変動や大気の変化が大きくなり測量の精度が低下することを防ぐため、作業規程の準則では、１組の観測方向は５方向以下としている。"},
+      {q:"GNSS 測量において準天頂衛星は，GPS 衛星と同等の衛星として使用することができる。",a:"〇",e:"正しい。作業規程の準則に「準天頂衛星は、GPS衛星と同等の衛星として扱うことができるものとし、これらの衛星をGPS・準天頂衛星と表記する。」とある。"},
+      {q:"キネマティック法では，GNSS衛星からの信号を固定局と移動局で同時に受信し，整数値バイアスの決定に必要な観測を行ってから，移動局を複数の観測点に次々と移動して観測を行い，それに基づき固定局と移動局の間の基線ベクトルを求める。",a:"〇",e:"正しい。キネマティック法では１観測の時間が短いため、マルチパスやノイズの影響を受けやすい。このため、観測時間帯を変えた観測を行い観測地の点検を行うなどの配慮が必要である（３～４級基準点測量に用いられる）。"},
+      {q:"準天頂衛星システムは，日本における衛星測位の利用可能エリアや利用時間帯を広げる効果がある。",a:"〇",e:"正しい。準天頂衛星の目的はGPS衛星の補間や補強であり、日本における衛星測位の利用可能エリアや利用時間を広げる効果がある。"},
+      {q:"3機のGLONASS衛星からの測位信号と1機の準天頂衛星からの測位信号を同時に受信できれば、公共測量における基準点測量を行うことができる。",a:"×",e:"間違い。基準点測量においてGLONASS衛星を用いて観測する場合は、GPS・準天頂衛星及びGLONASS衛星を、それぞれ２衛星以上を用いる必要がある。また、使用衛星数はGLONASS衛星を用いる場合、スタティック法では5衛星以上必要である。"},
+      {q:"基準点測量において，スタティック法では，GNSS 衛星の軌道情報に精密暦を用いなければならない。",a:"×",e:"間違い。GNSS衛星の軌道情報は放送暦を標準とする。"},
+      {q:"PCV補正を適用する際の器械高は，測量標の上面からアンテナ位相中心までの高さとしなければならない。",a:"×",e:"間違い。アンテナ位相中心ではなく，アンテナ底面までの高さを器械高とする。"},
+      {q:"1級基準点測量， 2級基準点測量及び3級基準点測量においては，既知点を電子基準点のみとすることができる。",a:"〇",e:"正しい。問題文の通り。電子基準点のみを既知点とする１～３級基準点測量では、既知点間の距離の制限は無いが、既知点とする電子基準点は作業地域近傍のものを使用する。"},
+      {q:"測量における誤差には、測量機器が正常に機能していない場合や、観測者が注意しても避けることができない系統誤差がある。",a:"×",e:"間違い。問題文の誤差は偶然誤差と呼ばれる。偶然誤差とは観測に対してランダム（観測ごとにばらつきがある）に生じる誤差である。消去することは困難である。偶然誤差を表す指標として標準偏差などがある。"},
+      {q:"基準点測量において，GNSS 衛星及び GNSS受信機の時計のずれに起因する誤差は，二重位相差による解析処理で消去することができる。",a:"〇",e:"正しい。問題文の通り。2つの観測局と2つの衛星の観測データの差をとる二重位相差を用いることで、衛星と受信機それぞれの時計のずれを消去できる。"},
+      {q:"TSを用いた基準点測量において，距離測定の気象補正に使用する気温及び気圧の測定は，TS を整置した測点で，距離測定の開始直前又は終了直後に行う。",a:"〇",e:"正しい。問題文の通り。TSを整置した測点とは観測点のことである。"},
+      {q:"セミ・ダイナミック補正に使用する補正パラメータファイルは，適用期間が決められている。",a:"〇",e:"正しい。問題文の通り。国土地理院が提供する補正パラメータは、定期的に更新され、パラメータ毎に適用期間が設定されている。"},
+      {q:"GNSS測量機を用いた基準点測量において、GNSS 衛星の軌道情報は放送暦を使用する。",a:"〇",e:"正しい。放送暦とは個々の衛星の軌道情報でありこれを使用する必要がある。軌道情報とは大きく概略暦、放送暦、精密暦とあり、概略暦と放送暦はGNSS衛星から航法メッセージの一つとして送信されている。放送暦には、GNSS衛星の位置座標を決めるのに必要な軌道傾斜角、昇交点赤経、近地点引数、長半径、離心率、平均近点離角と呼ばれる軌道要素と楕円の形の時間変化を表す補正係数が含まれている。"},
+      {q:"アンテナの機種によってPCVによる影響が異なることから、位相中心をアンテナ 　底面　 で観測した状態に補正する必要がある。 　アンテナ定数　 モデルは、アンテナの機種によって異なるアンテナオフセットとPCVの値を、理想的な観測状態で算出し、定数の組合せとしてまとめたものである。",a:"×",e:"間違い。アンテナ定数モデルではなく、「アンテナ位相特性　 モデル」である。"},
+      {q:"測量法で規定する回転楕円体は，その中心が地球の重心と一致し，その短軸が地球の自転軸と一致する。",a:"〇",e:"正しい。測量法11条3-2,3の文章である。その他に「長半径及び扁平率が、地理学的経緯度の測定に関する国際的な決定に基づき政令で定める値であるものであること。」とある。"},
+      {q:"GNSS測量機を用いた基準点測量では，GLONASS 衛星の軌道傾斜角はGPS 衛星よりも大きい。",a:"〇",e:"正しい。問題文の通り。GPSの軌道傾斜角は約55°の6軌道×4衛星の合計24衛星。GLONASSの軌道傾斜角は約64.5°の3軌道×8衛星の合計24衛星での計画となっている。"},
+      {q:"基準点測量において，異なる機種のアンテナを組み合わせた測量では，原則としてPCV 補正を行うことが必要である。",a:"〇",e:"正しい。問題文の通り。異なる機種のアンテナを組合わせた場合は、アンテナの機種ごとに電波の受信中心位置（位相中心）が微妙に異なるため、PCV（アンテナ位相特性）補正を行う必要があります。"},
+      {q:"準天頂衛星から送信される情報は，日本と経度の近いアジアやオセアニア地域でも受信が可能である。",a:"〇",e:"正しい。準天頂衛星の軌道は傾斜静止衛星軌道と呼ばれる、日本～インドネシア～オーストラリア（アジア・オセアニア地域）のあたりを８の字を描く特殊な軌道である。"},
+      {q:"準天頂衛星は、GPS衛星と同じ軌道上を移動している。",a:"×",e:"間違い。測位衛星の軌道には３種類あり、みちびきは傾斜対地同期軌道（IGSO）を、GPS衛星は中高度軌道（MEO）と呼ばれる軌道（周期12時間、軌道高度2万200kmで周回）を採用している。最後の一つが気象衛星等で利用されている静止軌道（GEO）であり、これは赤道上空を1日で周回するため、地上からは常に同じ位置で見ることができる。"},
+      {q:"TSを用いた基準点測量において１級基準点測量及び２級基準点測量は，原則として，結合多角方式により行うものとする。",a:"〇",e:"正しい。問題文の通り。３級及び４級基準点測量は、結合多角方式又は単路線方式により行う。"},
+      {q:"スタティック法による観測距離が10㎞以上のGNSS観測において、GPS衛星及びGLONASS衛星を用いて観測する場合は６衛星以上を使用する。",a:"〇",e:"正しい。問題文の通り。(作業規程の準則 第37条2の二のイ、ロ)"},
+      {q:"準天頂衛星は，日本において高仰角に位置する時間が長い。このため，準天頂衛星は，衛星測位の利用可能なエリアや時間帯を広げる効果がある。",a:"〇",e:"正しい。問題文の通り。準天頂衛星は、アメリカのGPS衛星を補完・補強する役割がある。日本のほぼ真上（高仰角）に長時間滞在するように設計されており、ビル陰や山間部の影響を受けにくいため、測位可能なエリアが広がり、配置（DOP値）が良くなることで精度が向上する。"},
+      {q:"TSを用いた基準点測量において，TSで測定される斜距離には，反射鏡定数の誤差などの測定距離に比例しない誤差が含まれる。",a:"〇",e:"正しい。測定距離に比例しない誤差には、問題文の反射鏡定数をの他に器械定数誤差、位相差測定誤差、致心誤差が含まれる。"},
+      {q:"準天頂衛星は，GPS 衛星と同じ軌道上を周回している。",a:"×",e:"間違い。準天頂衛星は傾斜対地同期軌道（IGSO）と呼ばれる軌道である。日本のほぼ上空に滞留し、日本～インドネシア～オーストラリアのあたりを8の字の特殊な軌道を描いている。これに対して、GPS衛星は中高度軌道（MEO）と呼ばれる軌道（周期12時間、軌道高度2万200kmで周回）を採用している。"},
+      {q:"TSを用いた基準点測量において，水平角観測においては，対回内の観測方向数は5方向以下とする。",a:"〇",e:"正しい。問題文の通り。方向角が多くなれば観測時間が長くなることにより、観測機器の変動や大気の変化が大きくなり、測量の精度が低下する。"},
+      {q:"測量法で規定する回転楕円体の長半径及び扁平率の数値は，政令で定められている。",a:"〇",e:"正しい。測量法11条3-1の文章である。政令は測量法施行令3条1,2項で、長半径 6,378,137ｍ、扁平率1/298.257222101 である。"},
+      {q:"TSを用いた基準点測量において新点を２点以上設置する場合の偏心距離は，測点間距離の６分の１以下を標準とする。",a:"〇",e:"正しい。問題文の通り。結合多角方式における偏心距離の制限は、S/e≧６（S：測点間距離、e：偏心距離）である。新点を１点設置する場合は、100ｍ以内を標準とする。"},
+      {q:"GNSS測量機を用いた基準点測量では，準天頂衛星の測位信号は，日本以外でも東南アジア，オセアニア地域で受信可能である。",a:"〇",e:"正しい。問題文の通り。準天頂衛星の軌道は、北半球と南半球をまわる非対称の８の字軌道である。このため、軌道直下にあるアジア・オセアニア地域での利用が可能となる。"},
+      {q:"定常的な地殻変動によるひずみの影響は，元期からの経過時間や点間の距離が長いほど大きい。",a:"〇",e:"正しい。問題文の通り。地殻変動なので，そのひずみは累積する。また，遠方の電子基準点を既知点とした場合は，補正を行わないと近傍の基準点との整合性が図れない。"},
+      {q:"準天頂衛星は，約 24 時間ごとにほぼ同じ配置を取る。",a:"〇",e:"正しい。問題文の通り。軌道の周期 準天頂衛星は地球の自転周期とほぼ同じ約24時間で地球を一周するため、毎日ほぼ同じ時刻に同じ位置（配置）になる。"},
+      {q:"日本経緯度原点及び日本水準原点の原点数値は、政令で定められている。",a:"〇",e:"正しい。測量法11条4の文章である。政令は測量法施行令 2条1-2,2-2であり、経緯度原点は、東経139°44′28.8869″、北緯35度39分29.1572″、水準原点、24.3900ｍである。"},
+      {q:"GNSS測量機を用いた基準点測量において、対流圏における電波の伝搬遅延に起因する誤差は，２周波の観測により軽減することができる。",a:"×",e:"間違い。2周波の観測で軽減できるのは、「電離層遅延誤差」である。対流圏遅延誤差を軽減するためには、気象補正を基線解析ソフトに設定されているデフォルト値を用いて行うことである。"},
+      {q:"基準点測量において，電離層における伝播遅延に起因する誤差は，２周波観測により軽減することができる。",a:"〇",e:"正しい。周波数の異なるＬ1帯とＬ2帯の２周波を同時受信し，両周波の伝播距離の差を解析し電離層遅延を補正している。"},
+      {q:"基準点測量において，スタティック法は，複数の観測点に GNSS 測量機を整置して，GNSS 衛星からの信号を同時に受信し，それに基づく基線解析により，観測点間の基線ベクトルを求める観測方法である。",a:"〇",e:"正しい。問題文の通り。スタティック法の定義である。複数の地点で同時に長時間静止して観測し、後で基線解析を行うことで、点と点の間の相対的な位置関係（基線ベクトル）を求める手法である。"},
+      {q:"TSを用いた基準点測量において，観測に使用する機器の点検は，観測着手前及び観測期間中に適宜行い，必要に応じて機器の調整を行う。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"基準点測量において，ネットワーク型 RTK法は，位置情報サービス事業者が算出した補正データ又は面補正パラメータを，携帯電話などの通信回線を介して移動局で受信し，移動局側において解析処理を行い，即時に位置を求める観測方法である。",a:"〇",e:"正しい。問題文の通り。ネットワーク型RTK法の概要である。電子基準点などのデータから作られた補正情報を通信回線で受け取り、移動局1台でリアルタイムに位置を特定する手法で、「VRS方式」や「FKP方式」があある。"},
+      {q:"RTK法では，GNSS衛星からの信号を固定局と移動局で同時に受信し，移動局で取得した信号を，無線装置などを用いて固定局に転送し，固定局側において即時に基線解析を行うことで，固定局と移動局の間の基線ベクトルを求める。",a:"×",e:"間違い。RTK法では固定局の観測データを移動局へ転送する。移動局では転送されたデータと移動局での観測データを用いて、整数値バイアスの決定や移動局側の座標計算が移動局側の受信機でリアルタイムに行われる。"},
+      {q:"一般に観測値は、観測するごとにわずかに異なった値となる｡この観測値と最確値との差を誤差という｡",a:"×",e:"間違い。（誤差＝観測値－真値）である。真値とは正確な値を言い、観測によって求めることはできない。"},
+      {q:"ネットワーク型RTK法は、配信事業者で算出された補正データ又は面補正パラメータを、携帯電話などの通信回線を介して移動局で受信し、移動局側において即時に解析処理を行い、位置を求める観測方法である。",a:"〇",e:"正しい。問題文の通りである。配信事業者からのデータを受信すると同時にGNSS衛星からの信号を受信し、移動局側で解析処理を行って基線ベクトルを求める。その後、複数の観測点に次々と移動して移動局の位置が即時に求められる。"},
+      {q:"電子基準点や，電子基準点のみを既知点として設置された基準点を既知点とする4 級基準点測量では，2 級以上の性能を有するTS を使用する場合は，既知点数及び路線図形の条件が緩和される。",a:"×",e:"間違い。緩和されるのは、路線の辺数及び路線長である。条件の緩和については結合多角方式の場合、路線の辺数が10から15辺以下に、路線長は500ｍから700ｍ以下となる。"},
+      {q:"短縮スタティック法は、複数の観測点にGNSS測量機を整置して、観測時間を短縮するために基線解析においてGNSS衛星の組合せを多数作る処理を行い、基線ベクトルを求める観測方法である。",a:"〇",e:"正しい。問題文のように同時にGNSS衛星からの信号を受信して行う。基線解析においてGNSS衛星の組合せを多数作るのが特徴である。これにより観測時間の短縮が行われる。"},
+      {q:"GNSS測量機を用いた基準点測量において，スタティック法による観測距離10km 以上の観測でGPS 準天頂衛星及びGLONASS 衛星を用いる場合は，使用衛星数を6衛星以上とする。",a:"〇",e:"正しい。問題文の通り。GLONASS衛星を用いて観測する場合は、GPS・準天頂衛星及びGLONASS衛星をそれぞれ２衛星以上用いること。"},
+      {q:"GNSS測量機を用いた基準点測量において、ネットワーク型RTK 法は，配信事業者で算出された補正データ又は面補正パラメータを，携帯電話などの通信回線を介して移動局で受信し，移動局側において即時に解析処理を行い位置を求める観測方法である。",a:"〇",e:"正しい。ネットワーク型RTK法の概要である。ネットワーク型RTK法は現地で受信された衛星データと３点以上の電子基準点からの補正情報を組合せてリアルタイムで現地の位置を求める手法である。補正情報はデータ配信事業者からリアルタイムで配信され、VRS（仮想基準点）方式とFKP（面補正パラメータ）方式がある。基準局設置の必要がなく、従来に比べて省力化とコストダウンが図れる。"},
+      {q:"TSを用いた基準点測量において３級基準点測量及び級基準点測量において新点を設置する場合は，厳密水平網平均計算及び厳密高低網平均計算又は三次元網平均計算により設置された同級の基準点を既知点とすることができる。ただし，既知点とする同級の基準点の数は，使用する既知点数の分の４分の３以下とする。",a:"×",e:"間違い。既知点とする同級の基準点の数は、使用する既知点数の２分の１である。"},
+      {q:"準天頂衛星は，GPS 衛星と同じ軌道を周回している。",a:"×",e:"間違い。異なる軌道を周回している。GPS衛星の軌道は、赤道面に対して約55°傾いた、地球周回軌道。準天頂衛星の軌道は傾斜静止衛星軌道と呼ばれる、日本～インドネシア～オーストラリア（アジア・オセアニア地域）のあたりを８の字を描く特殊な軌道である。"},
+      {q:"基準点測量において，スタティック法によるGNSS観測において，GPS衛星及びGLONASS衛星を用いて観測する場合は，これらの衛星を４衛星以上使用する。",a:"×",e:"間違い。スタティック法では，GPS衛星のみを使用する場合は同時に４衛星以上。GPS衛星とGLONASS衛星を併用する場合は，同時に５衛星以上使用する。（GPS２衛星+GLONASS３衛星，またはGPS３衛星+GLONASS２衛星）とし，10㎞以上の観測では，６衛星以上必要となる。"},
+      {q:"TSの距離測定において，気温が下がると測定距離は短くなり，気圧が上がると測定距離は長くなるなど，気象条件の影響を受ける。",a:"×",e:"間違い。気温が上がると測定距離は短くなる。光波測距儀（TSによる距離測量）の気象補正計算により、気温が高く（上がる）なった場合には観測距離は短くなる。"},
+      {q:"準天頂衛星には，地表に投影すると数字の8の字のような軌跡を描く衛星と，ほぼ同じ位置に留まって見える衛星がある。",a:"〇",e:"正しい。問題文の通り。軌道の形状 準天頂軌道の衛星は地上から見ると8の字の軌跡を描くが、静止軌道（地球の自転と同じ周期で周回）にある衛星は常に空の同じ位置に留まって見える。みちびきは、日本上空に長く滞在する「準天頂軌道衛星」と、赤道上の「静止軌道衛星」で構成されている。"},
+      {q:"基準点測量において，GNSS衛星の軌道情報は放送暦を標準とする。",a:"〇",e:"正しい。GNSS衛星に搭載された日付情報を放送暦と呼ぶ(ユリウス日という通算日になっている)。"},
+      {q:"TSを用いた基準点測量において，厳密水平網平均計算及び厳密高低網平均計算による新点水平位置の標準偏差の許容範囲は100 mm，新点標高の標準偏差の許容範囲は200 mm を標準とする。",a:"〇",e:"正しい。1～4級基準点測量において、新点水平位置の標準偏差の許容範囲は、100㎜、新点標高は200㎜である。"},
+      {q:"短縮スタティック法による観測は，1 機の準天頂衛星からの測位信号と4 機のGPS衛星からの測位信号を同時に受信できれば可能である。",a:"〇",e:"正しい。短縮スタティック法では、GPS衛星と準天頂衛星の組合せが５衛星以上であればよい。"},
+      {q:"基本測量及び公共測量における位置は，地理学的経緯度及び平均海面からの高さで表示する。また，地心直交座標で表示することもできる。",a:"〇",e:"正しい。測量法11条1の文章である。基本測量及び公共測量における位置は、地理学的経緯度及び平均海面からの高さで表示する。また、直角座標及び平均海面からの高さ、極座標及び平均海面からの高さ又は地心直交座標で表示する。"},
+      {q:"１級基準点測量において，電子基準点のみを既知点とする場合は，標高補正パラメータファイルを使用したセミ・ダイナミック補正を適用しなければならない。",a:"×",e:"間違い。標高補正パラメータではなく，国土地理院が提供する，「地殻変動補正パラメータ」である。"},
+      {q:"RTK法は、固定局と移動局で同時にGNSS衛星からの信号を受信し、固定局で収得した信号を、無線装置などを用いて移動局に転送し、移動局側において即時に基線解析を行い、基線ベクトルを求める観測方法である。",a:"〇",e:"正しい。問題文の通りであるが、固定局と移動局の基線ベクトルを求めるには、直接観測法と間接観測法がある。"},
+      {q:"新点の測量成果は，既知となる基準点の測量成果に補正量を加え，測量計算（網平均計算）を行った後，求められた新しい基準点の位置情報から補正量を差し引くことで求めることができる。",a:"〇",e:"正しい。問題文の通り。セミ・ダイナミック補正とは，既知点の元期座標を今期（こんき）座標に補正し，新点の今期座標を元期座標に補正する事である。"},
+      {q:"気象補正前の測定距離は，気温が上がった場合は短くなり，気圧が下がった場合は短くなるなど，気象条件の影響を受ける。",a:"〇",e:"正しい。問題文の通り。気温が上がると短く、気圧が下がると短くなる。"},
+      {q:"アンテナの機種によってPCVによる影響が異なることから、位相中心をアンテナ 　底面　 で観測した状態に補正する必要がある。 　アンテナ位相特性　 モデルは、アンテナの機種によって異なるアンテナオフセットとPCVの値を、理想的な観測状態で算出し、定数の組合せとしてまとめたものである。",a:"〇",e:"正しい。問題文の通りである。"},
+      {q:"厳密水平網平均計算及び厳密高低網平均計算による新点位置及び新点標高の標準偏差の許容範囲は100 mm を標準とする。",a:"×",e:"間違い。新点位置の標準偏差の許容範囲は100㎜、新点標高の標準偏差の許容範囲は200㎜である（作業規程の準則 第43条3-1-ハ）。"},
+      {q:"準天頂衛星の測位信号は，日本以外でも東南アジア，オセアニア地域で受信可能である。",a:"〇",e:"正しい。準天頂衛星は日本のほぼ上空に滞留し、日本～インドネシア～オーストラリアのあたりを8の字の特殊な軌道を描いている。準天頂衛星は常時測位信号を送信しているため、日本だけではなくアジア・オセアニア地域でも受信できる。"},
+      {q:"TSにおける水平角の観測の良否は，倍角差及び観測差により判定するが，測量の精度が低下しないように対回内の観測方向数は5方向以上としている。",a:"×",e:"間違い。観測方向数は5方向以下である。観測方向数が多くなれば、観測時間が長くなり、観測機器の変動や大気の変化が大きくなり測量の精度が低下することを防ぐため、作業規程の準則では、１組の観測方向は５方向以下としている。"},
+      {q:"GNSS測量機を用いた基準点測量において，スタティック法及び短縮スタティック法による基線解析では，原則としてPCV補正を行う。",a:"〇",e:"正しい。問題文の通り。PCV補正は異なる機種のアンテナを組合わせて行う場合に必要となる補正である。"},
+      {q:"GNSS測量機を用いた基準点測量では，異なる衛星測位システムを組み合わせて使用することで，測量できる場所や時間帯を拡大できる。",a:"〇",e:"正しい。問題文の通り。例えば準天頂衛星はGPSと同等の信号を送信することにより、GPS衛星を補完し、測位可能な時間帯を拡大している。"},
+      {q:"準天頂衛星の測位信号は、日本でのみ受信可能である。",a:"×",e:"間違い。準天頂衛星は常時測位信号を送信しているため、日本だけではなくアジア・オセアニア地域でも受信できる。"},
+      {q:"公共測量において，スタティック法による 10km 以上の観測を行う場合，観測に必要な衛星 数は GPS 衛星と準天頂衛星を合わせて最小で4衛星である。",a:"×",e:"間違い。観測時間： 10km以上の距離（1級?3級基準点測量など）を観測する場合、必要な衛星数は5衛星以上が標準である。作業規程の準則には、「スタティック法による10㎞以上の観測では、GPS・準天頂衛星を用いて観測する場合は5衛星以上とし、GPS・準天頂衛星及びGLONASS衛星を用いて観測する場合は6衛星以上とする。」とある。10㎞未満であれば、4衛星でである。"},
+      {q:"スタティック法及び短縮スタティック法においてPCV補正は1～2級基準点測量のみに行えば良い。",a:"×",e:"間違い。スタティック法及び短縮スタティック法においてPCV補正を行う必要があるのは、1～4級基準点測量である。"},
+      {q:"TSを用いた基準点測量において観測に使用する機器の点検は，観測着手前及び観測期間中に適宜行い，必要に応じて機器の調整を行うものとする。",a:"〇",e:"正しい。問題文の通り。常に所要の精度が確保できる状態を維持する必要がある。"},
+      {q:"測量では、十分な注意を払って観測を行っても 、真値を求めることはできない｡したがって、複数の観測値から最確値を統計的に推定する。",a:"〇",e:"正しい。観測では真値を求めることはできない。そこで、観測作業を繰り返し行い最も確からしい値である、最確値を求める。真値＝最確値±誤差 である。"},
+      {q:"GNSS測量機を用いた基準点測量において，スタティック法及び短縮スタティック法におけるアンテナ高の測定は，標識上面からGNSSアンテナの位相中心までとする。",a:"×",e:"間違い。アンテナ高はGNSSアンテナ底面までであり、アンテナ高は標識上面からGNSSアンテナ底面までの距離を垂直が測定される。"},
+      {q:"スタティック法及び短縮スタティック法において 　1～4級基準点測量を実施する場合、原則としてPCV補正を行う必要があり、基線解析の際に、　アンテナ位相特性　 モデルを適用して補正を行うことで、より高精度な解が得られる。",a:"〇",e:"正しい。問題文の通りである。"},
+      {q:"GNSS衛星とGNSS受信機の時計のずれに起因する誤差は、二重位相差による解析処理で消去することができる。",a:"〇",e:"正しい。二重位相差（２個の衛星と２個のGNSS受信機による位相（電波の波）の差）により、衛星時計と受信機時計の誤差を消去する事ができる。干渉測位法では、４衛星３組の未知点における二重位相差から基線ベクトルを求めている。"},
+      {q:"GNSS 衛星の軌道情報は精密暦を標準とする。",a:"×",e:"間違い。放送暦である。衛星の位置をGNSS受信機で計算するために衛星から常に出されている軌道情報が放送暦である。精密暦は、観測局のネットワークを用いて放送暦から衛星の精密な軌道を計算した精密軌道情報である。"},
+      {q:"ネットワーク型RTK法では，配信事業者で算出された補正データ又は面補正パラメータを，携帯電話などの通信回線を介して移動局で受信し，移動局で受信したGNSS衛星からの信号と組み合わせて，移動局において即時に解析処理を行うことで，位置を求める。",a:"〇",e:"正しい。ネットワーク型RTK法では、基地局と移動局間の距離の制限がなく、受信機１台での観測作業が可能となったため、効率的に観測作業が行える。"},
+      {q:"GNSS測量機を用いた基準点測量では，GNSS 測量において，準天頂衛星はGPS 衛星と同等の衛星として扱うことができる。",a:"〇",e:"正しい。問題文の通り。作業規程の準則ではGPS・準天頂衛星と表記されている。"},
+      {q:"基準点測量において，対流圏における伝播遅延に起因する誤差の補正は，基線解析ソフトウェアで採用している標準大気により行う。",a:"〇",e:"正しい。問題文の通り。標準的な気象要素の値を用い，近似的に補正が行われる。"},
+      {q:"基本測量及び公共測量における距離及び面積は、測量法で規定する回転楕円体の表面上の値で表示する。",a:"〇",e:"正しい。測量法11条2の文章である。いわゆる世界測地系（準拠楕円体）上の値で表示する。"},
+      {q:"GNSS衛星からの電波をGNSSアンテナにおいて受信する際，電波の反射角によって受信する位置（位相中心）が変化することをPCV（Phase Center Variation）という。",a:"×",e:"間違い。反射角ではなく，入射角である。"},
+      {q:"GNSS 測量では，GPS 衛星，準天頂衛星及びSLR衛星を組み合わせて使用することができる。",a:"×",e:"間違い。GNSS衛星である。作業規程の準則によれば、準天頂衛星はGPS衛星と同等の衛星として扱うことができる。GNSS測量では、GPS、準天頂衛星、GLONASSの衛星測位システムが適用される。SLRは衛星レーザ測距を言う。"},
+      {q:"偏心点を設ける場合，偏心距離は測点間距離の6分の1以下でなければならない。",a:"〇",e:"正しい。問題文の通り。１～４級基準点測量における偏心距離の制限は、S/e≧6 である。"},
+      {q:"準天頂衛星には，日本における衛星測位の利用可能エリアや利用時間帯を広げる効果がある。",a:"〇",e:"正しい。安定した位置情報を得るためには、より多くの衛星が見えることが望ましい。しかし、GPS衛星は都市部や山間部ではビルや樹木などに電波が遮られて可視衛星数が減り、位置情報が安定的に得られないことがある。準天頂衛星はGPSと一体で利用できるため、常時安定した高精度測位を行うことを可能とする衛星数を確保することができる。"},
+      {q:"スタティック法による10 km以上の観測を行う場合は，GPS・準天頂衛星及びGLONASS衛星の組合せで5 衛星以上必要である。",a:"×",e:"間違い。６衛星以上必要である。５衛星でよいのはGPS・準天頂衛星の組合せである。スタティック法による10㎞未満の観測であればGPS・準天頂衛星・GLONASS衛星の組合せでも５衛星以上でよい。"},
+      {q:"キネマティック法は、固定局と移動局で同時に単独測位を行い、それぞれの観測点で得た座標値の差から、基線ベクトルを求める観測方法である。",a:"×",e:"間違い。基準となる固定局と移動局で構成され、移動局を次々と観測点に移動して固定局と移動局の基線ベクトルを求める観測方法である。"},
+      {q:"基準点測量により偏心点を設ける場合，偏心距離は測点間距離の6 分の1 以下とする。",a:"〇",e:"正しい。作業規程の準則 第23条2 １～４級基準点測量における偏心距離の制限は、S/e≧6 ここで、Sは「測点間距離」とある。電子基準点のみを既知点とする場合は「新点間の距離」である。"},
+      {q:"対流圏における電波の伝搬遅延に起因する誤差は、２周波の観測により軽減することができる。",a:"×",e:"間違い。２周波の電波を同時に受信できる１級GNSS測量機では、このL1とL2帯の同時受信を行う事により、電離層遅延の補正を行っている。対流圏遅延は温度、気圧、湿度を用いて補正しているが、二重位相差を観測しているため、気象補正を行わなくとも遅延誤差が相殺されるため、標準的な気象状態の値を用いて補正を行っている。"},
+      {q:"測量法で規定する回転楕円体の長半径及び扁平率の数値は、政令で定められている。",a:"〇",e:"正しい。測量法11条3-1の文章である。政令は測量法施行令3条1,2項で、長半径 6,378,137ｍ、扁平率1/298.257222101 である。"},
+      {q:"測量における誤差には、測量機器が正常に機能していない場合や、観測者に固有の癖がある場合に一定の傾向で生じる偶然誤差がある。",a:"×",e:"間違い。問題文の誤差は系統誤差と呼ばれる。系統誤差とは観測に対して一定の割合（大きさ）で生じる誤差である。原因が解っている場合はある程度小さく（消去）することができる。"},
+      {q:"測量における観測者の不注意によって生じる測定値の誤りを過失誤差として、誤差に含めることもある。",a:"〇",e:"正しい。いわゆる観測ミス（ミステイク）である。一般的には誤差の中に含むことはない。"},
+      {q:"新点の位置精度は，既知点及び新点の配置によって影響を受けるため、作業規程において標準となる路線の辺数、路線長， 路線図形等が定められている。",a:"〇",e:"正しい。問題文の通り。例えば、TSを用いた１級基準点測量（結合多角方式）では、５辺以下、路線長は3km以下、直線から外側40°以下などとなっている。"},
+      {q:"GNSS 衛星から直接到達する電波以外に電波が構造物などに当たって反射したものを受信してしまうことをサイクルスリップといい，誤差要因の一つである。",a:"×",e:"間違い。マルチパスである。反射された電波を受信するのがマルチパス。受信中の電波が遮られ観測データが欠落するのがサイクルスリップである。"},
+      {q:"GNSS測量機を用いた基準点測量において，ネットワーク型 RTK 法では，位置情報サービス事業者で算出された補正データ等又は面補正パラメータを，携帯電話等の通信回線を介して移動局で受信すると同時に，移動局でGNSS衛星からの信号を受信し， 移動局側において即時に解析処理を行って位置を求める。この解析処理は，観測終了後に後処理により行ってもよい。",a:"〇",e:"正しい。問題文の通り。後処理とは観測終了後に位置情報サービス事業者から補正データ等又は面補正パラメータを取得して解析処理を行うことである。つまり、ネットワーク型RTK法の観測データを用いてキネマティック解析が行われる。"},
+      {q:"GNSS測量機を用いた基準点測量において、アンテナ位相特性が異なるアンテナ同士でのGNSS 測量では，PCV 補正を適用することにより異機種間観測での精度を確保することができる。",a:"〇",e:"正しい。PCVとはGNSS衛星からの電波の入射角に応じてアンテナの受信位置が変化する状況をいう。このズレの量を補正することにより受信位置の補正が行われる。他機種のアンテナや電子基準点を使用する場合にはPCV補正量を用いて基線解析を行う必要がある。同機種のアンテナではPCV補正の必要はない。"},
+      {q:"基本測量及び公共測量における距離及び面積は，測量法で規定する回転楕円体の表面上の値で表示する。",a:"〇",e:"正しい。測量法11条2の文章である。いわゆる世界測地系（準拠楕円体）上の値で表示する。"},
+      {q:"TSを用いた基準点測量において，距離測定は，1視準1読定を1セットとし， 2セット行う。",a:"×",e:"間違い。距離測定では、１視準２読定を１セットとする。"},
+      {q:"スタティック法は、複数の観測点にGNSS測量機を整置して、基線ベクトルを求める観測方法である。",a:"〇",e:"正しい。問題文のように同時にGNSS衛星からの信号を受信し、基線解析を行って基線ベクトルを求める。"},
+      {q:"基準点測量において，GLONASS衛星を用いて観測する場合は，GPS衛星及びGLONASS衛星を，それぞれ２衛星以上用いる必要がある。",a:"〇",e:"正しい。問題文の通り。GPS衛星とGLONASS衛星の間では，二重位相差が作れないため，２つの衛星が必要となる。"},
+      {q:"短縮スタティック法では，複数の観測点にGNSS測量機を整置して，GNSS衛星からの信号を同時に受信し，基線解析において衛星の組合せを多数作るなどの処理を行うことで，観測時間を短縮している。",a:"〇",e:"正しい。短縮スタティック法では観測時間を短くするために、できるだけ多くのGNSS衛星から電波を受信する必要がある（３～４級基準点測量に用いられる）。"},
+      {q:"TSを用いた基準点測量において，偏心点を設ける場合，偏心距離は測点間距離の5 分の1 以下を標準とする。",a:"×",e:"間違い。1/5以下ではなく、1/6である。作業規程の準則には、（測点間距離）/（偏心距離）≧6とある（結合多角方式）。"},
+      {q:"TSの距離測定において，気温が上がると測定距離は短くなり，気圧が下がると測定距離は長くなるなど，気象条件の影響を受ける。",a:"×",e:"間違い。気圧が上がると測定距離は長くなる。光波測距儀（TSによる距離測量）の気象補正計算により、気圧が高い（上がる）なった場合には観測距離は長くなる。"}
+    ]
+  }
+  ,{
+    name:"水準測量", icon:"📏",
+    questions:[
+      {q:"GNSS水準測量では，高精度な重力モデルを用いることにより，近傍に水準点がない場合でも３級水準点が設置できる。",a:"×",e:"間違い。重力モデルではなくジオイドモデルである。"},
+      {q:"GNSS水準測量において電子基準点を既知点として使う場合は，「標高区分：水準測量による」となっている電子基準点に限り使用することができる。",a:"〇",e:"正しい。既知点の種類は、１～２等水準点、１～２級水準点、電子基準点（標高区分：水準測量による）である。"},
+      {q:"標尺の零日盛が正しくないために生じる誤差への対策は、水準点から次の水準点までのレベルの整置回数を偶数回にすることである。",a:"〇",e:"正しい。零目盛誤差への対策。「出発点に立てた標尺を終点に立てる」などの言い回しもある。"},
+      {q:"公共測量における１級水準測量について、ジオイドモデルが高精度化し、ジオイド高が改定されても、直接水準測量で求められた水準点の標高は変わらない。",a:"〇",e:"正しい。直接水準測量にジオイド高は関係がない。ジオイド高が必要なのはGNSS測量機を用いた場合である。"},
+      {q:"１級水準測量及び２級水準測量において再測を行った場合，同方向の観測値を採用するものとする。",a:"×",e:"間違い。同方向の観測値を採用してはいけない。"},
+      {q:"標尺補正量は、観測時の気温、標尺改正数、膨張係数及び水準点間の観測距離により求める。",a:"×",e:"間違い。観測距離ではなく「観測高低差」である。"},
+      {q:"GNSS水準測量では、スタティック法により、標高の測量を行う。",a:"〇",e:"正しい。スタティック法で行われ、GNSS水準測量で３級水準点の設置が行われる。"},
+      {q:"渡海（河）水準測量の観測は、交互法、経緯儀法、俯仰ねじ法のいずれかにより行う。",a:"〇",e:"正しい。渡海水準には「交互法」「仰俯ねじ法」「経緯儀法」がある。"},
+      {q:"１級水準測量では，標尺目盛を後視，前視，前視，後視の順に読定することにより，三脚の沈下による誤差を小さくすることができる。",a:"〇",e:"正しい。チルチングレベルやオートレベルでは、後視小目盛→前視小目盛→前視大目盛→後視大目盛と読定する。"},
+      {q:"標尺の目盛誤差を消去・軽減するためには、標尺を後視，前視，前視，後視の順に観測する必要がある。",a:"×",e:"間違い。往路の出発点に立てる標尺と復路の出発点に立てる標尺を交換することにより消去・軽減できる。"},
+      {q:"簡易水準測量において，標尺を前後にゆっくり動かして読定値が最大となるところを読む。",a:"×",e:"間違い。ウェービングで読定値が最小となるところを読む。"},
+      {q:"地盤沈下地域における水準測量では、変動量を基準日に統一するため、変動補正計算を行う。",a:"〇",e:"正しい。統一した基準日を設け全路線の観測をその日に実施したように補正する。この補正を変動補正計算という。"},
+      {q:"永久標識を設置した水準点の水平位置は，ネットワーク型RTK法を用いて求めることができる。",a:"〇",e:"正しい。単点観測法または１～４級基準点測量の観測方法によりその座標を求めることができる。"},
+      {q:"GNSS水準測量では、既知点として、水準測量により標高が取り付けられた電子基準点を使用することができる。",a:"〇",e:"正しい。既知点は一～二等水準点及び電子基準点（標高区分：水準測量）、１～２級水準点である。"},
+      {q:"２級水準測量における標尺補正計算は，水準点間の高低差が50ｍ以上の場合に行うものとする。",a:"×",e:"間違い。２級水準測量の場合、高低差が70ｍ以上の場合に行われる。１級では常に行う必要がある。"},
+      {q:"渡海（河）水準測量で両岸から同時観測を行う理由は、球差のほかに気差による影響を消去するためである。",a:"〇",e:"正しい。経緯儀法・俯仰ねじ法で用いられ、同時観測により気差と球差（両差）が消去できる。"},
+      {q:"1級水準測量においては，観測の開始時，終了時及び固定点到着時ごとに，1℃単位で気温を測定するものとする。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"離島に設置されている水準点の標高も、全て東京湾平均海面を基準として求められている。",a:"×",e:"間違い。離島における標高は験潮により決められた平均的潮位を基準にしている。測量法第11条3に「測量の基準は離島を除き日本水準原点とする」とある。"},
+      {q:"GNSS水準測量で使用できる既知点の種類は，一～二等水準点，電子基準点（標高区分：水準測量による）及び1～2級水準点である。",a:"〇",e:"正しい。観測に必要な既知点数は３点以上。"},
+      {q:"１級水準測量における直接水準測量の場合，標尺目盛の読定単位は0.1㎜を標準とする。",a:"〇",e:"正しい。１級水準測量の場合、視準距離は最大50ｍ、読定単位は0.1㎜である。"},
+      {q:"GNSS水準測量では，2級水準点及び3級水準点を設置することができる。",a:"×",e:"間違い。GNSS水準測量では3級水準測量が行える。2級水準点は設置できない。"},
+      {q:"正規正標高補正量（楕円補正量）は、観測点の経度と標高により求めることができる。",a:"×",e:"間違い。水準路線の出発点と終末点の緯度と水準路線の平均標高が必要となる。"}
+    ,
+      {q:"GNSS 水準測量では，高精度な重力モデルを用いることにより，近傍に水準点がない場合でも３級水準点が設置できる。",a:"×",e:"間違い。重力モデルではなくジオイドモデルである。"},
+      {q:"GNSS 水準測量において電子基準点を既知点として使う場合は，「標高区分：水準測量による」となっている電子基準点に限り使用することができる。",a:"〇",e:"正しい。既知点の種類は、１～２等水準点、１～２級水準点、電子基準点（標高区分：水準測量による）である。"},
+      {q:"渡海（河）水準測量の観測は、交互法 、経緯儀法、俯仰ねじ法のいずれかにより行う。",a:"〇",e:"正しい。渡海水準には「交互法」「仰俯ねじ法」「経緯儀法」がある。"},
+      {q:"簡易水準測量においては，標尺付属水準器を使用して標尺を鉛直に立てることで標尺の傾きによる誤差を小さくすることができる。 標尺付属水準器が無い標尺を使用する場合は，標尺を前後にゆっくり動かして読定値が最大となるところを読む。",a:"×",e:"間違い。標尺を前後にゆっくり動かして（ウェービング）読定値が最小となるところを読む。"},
+      {q:"地盤沈下地域における水準測量では、変勤量を基準日に統一するため、変動補正計算を行う。",a:"〇",e:"正しい。問題文の通りである。地盤沈下地域では観測中も地盤変動が進行しているため、ある統一した基準日を設け、基準日に全路線の観測を実施したように地盤沈下量を補正する必要がある。この補正を変動補正計算という。"},
+      {q:"永久標識を設置した水準点の水平位置は，ネットワーク型 RTK 法を用いて求めることができる。",a:"〇",e:"正しい。永久標識を設置した水準点の水平位置は、単点観測法又は１～４級基準点測量の観測方法により、その座標を求めることができる。"},
+      {q:"２級 水準測量における 標尺補正 計算は，水準点間の高低差が ５0 ｍ以上の場合に行うものとする。",a:"×",e:"間違い。２級水準測量の場合，標尺補正計算は高低差が70ｍ以上の場合に行われる。１級では標尺補正計算を常に行う必要がある。"},
+      {q:"渡海(河)水準測量で両岸から同時観測を行うことにより、気差による影響を軽減することができる。",a:"〇",e:"正しい。渡海水準測量で同時観測を行うのは経緯儀法と俯仰ネジ法である。ここではTSを用いた観測と考えるのが正しく、同時刻の同時観測によりかつ正反の観測値の平均を取ることにより気差と球差（両差）が消去できる。"},
+      {q:"GNSS水準測量で使用できる既知点の種類は，一～二等水準点，電子基準点（標高区分:水準測量による）及び1～2級水準点である。",a:"〇",e:"正しい。問題文の通り、既知点の数は３点以上となる。"},
+      {q:"１級水準測量における直接水準測量の場合，標尺目盛の読定単位は 0.1㎜を標準とする。",a:"〇",e:"正しい。１級水準測量の場合，視準距離は最大50ｍ，読定単位は0.1㎜である。"},
+      {q:"視準線誤差は、望違鏡の視準線が傾いているために生じる誤差である｡この誤差は、三脚の特定の１本を常に同一の標尺に向けて整置し、観測することで小さくすることができる。",a:"×",e:"間違い。視準線誤差は消去できるが、消去ではなく「小さくできる誤差」と「三脚の特定の１本…」の文章から、鉛直軸誤差のことである。"},
+      {q:"GNSS 水準測量では， 2 級水準点及び3 級水準点を設置することができる。",a:"×",e:"間違い。GNSS水準測量では、3級水準測量が行える。これにより設置される水準点の区分は、3級水準点である。2級水準点は設置できない。"},
+      {q:"正規正標高補正量(楕円補正量)は、観測点の経度と標高により求めることができる。",a:"×",e:"間違い。１級水準測量では、正規正標高補正と正標高補正（重力の実測値）を用いることができる。正規正標高補正（楕円補正）量を求めるためには、水準路線の出発点と終末点の緯度と水準路線の平均標高が必要となる。"},
+      {q:"GNSS水準測量で使用できる既知点の種類は，一～二等水準点，水準測量により標高が取り付けられた電子基準点及び1～2 級水準点である。",a:"〇",e:"正しい。問題文の通りである。観測に必要な既知点数は３点以上。地形の状況によりやむを得ない場合は２点とすることができる。"},
+      {q:"GNSS衛星が送信している信号の大気遅延が高さ方向の精度に影響することから，寒冷前線・温暖前線が接近又は通過しているときなどは，原則としてGNSS観測を行わない。",a:"〇",e:"正しい。観測地域の気象条件が台風や熱帯低気圧、寒冷前線、温暖低気圧の接近や通過。積乱雲の急速な発達や集中豪雨の予測など大気遅延の影響を受ける場合は、原則としてGNSS観測は行われない。"},
+      {q:"水準点を設置する場合は、後続作業における利用などを考え、破損、亡失、沈下などのおそれのない場所を選定する。",a:"〇",e:"正しい。問題文の通りである。"},
+      {q:"地盤沈下地域における水準測量では，変動量を基準日に統一するため，地殻変動補正パラメータを用いた変動量補正計算を行う。",a:"×",e:"間違い。問題文のように，変動量を基準日に統一するため変動量補正計算を行うが，地殻変動補正パラメータは必要がない。地殻変動補正パラメータは，セミ・ダイナミック補正に用いられる。"},
+      {q:"１級水準測量で新点の標高を求めるためには，標尺補正計算及び正規正標高補正計算を行う。ただし，正規正標高補正計算に代えて実測の重力値による補正である正標高補正計算を用いることができる。",a:"〇",e:"正しい。問題文の通り。標尺補正計算及び正規正標高補正計算（楕円補正）は、１～２級水準測量について行う。ただし、１級水準測量においては、正規正標高補正計算に代えて正標高補正計算（実測の重力値による補正）を用いることができる。"},
+      {q:"地表面に近づくと気温が高くなり大気密度が変化することにより視準線が屈折し生じる誤差を大気の屈折誤差といい，傾斜地において視準距離を長くし，地表に近い標尺の下方付近での観測を避けることにより小さくすることができる。",a:"×",e:"間違い。大気の屈折誤差を小さくするためには、視準距離を短くし、標尺の下方での観測を避ける必要がある。視準距離を長くではない。"},
+      {q:"GNSS 水準測量では，高精度なジオイド・モデルを用いることにより，近傍に水準点がない場合でも３級水準点を設置することができる。",a:"〇",e:"正しい。高精度化されたジオイド・モデル「日本のジオイド2011 ver.2」が整備された。これによりGNSS水準測量が実施できるようになった。"},
+      {q:"GNSS水準測量では，観測距離が10 km 未満の観測は， 2 級GNSS 測量機により行うことができる。",a:"〇",e:"正しい。問題文の通り。使用機器に関しては1級GNSS測量機を基本として、観測距離が10㎞未満の場合に限って、2級GNSS測量機を使用することができる。"},
+      {q:"公共測量における１級水準測量について、所定の検定を受けたレベル及び標尺は、観測着手前及び観測期間中の点検調整を省略できる。",a:"×",e:"間違い。点検調整は、観測着手前に行い、１級水準測量及び２級水準測量では、観測期間中おおむね１０日ごと行うものとする。（作業規程の準則 第63条2）"},
+      {q:"レベルを用いた水準測量において，望遠鏡の鉛直軸が傾いているために生じる誤差を視準線誤差といい，三脚の特定の1本を常に同一の標尺に向けて整置し，観測することで消去できる。",a:"×",e:"間違い。鉛直軸が傾いているために生じる誤差は、「鉛直軸誤差」である。消去法は問題文の通りである。視準線誤差は、望遠鏡の視準線と気泡管軸が平行でないために生じる誤差である"},
+      {q:"標尺が鉛直に立てられていないために生じる誤差への対策は、標尺を前後に傾けて読定値が最小となるところを読むことや、標尺付属水準器を使用して標尺を鉛直に立てることである。",a:"〇",e:"正しい。標尺の傾きによる誤差に関する文章である。標尺を前後に傾けて最小の読定値を読む作業をウェービングともいう。"},
+      {q:"GNSS水準測量では，スタティック法又はネットワーク型RTK法により観測を行う。",a:"×",e:"間違い。スタティック法のみで行う。"},
+      {q:"GNSS水準測量により得られる高さはジオイド高であるため、標高の算出には、高精度な楕円体高が必要となる。",a:"×",e:"間違い。GNSS水準測量により得られる高さは楕円体高である。このためジオイド・モデルによる高精度なジオイド高が必要となる。"},
+      {q:"正規正標高補正量（楕円補正量）は、観測点の経度と標高により求める。",a:"×",e:"間違い。楕円補正量は、観測点の緯度と標高により求める。正規標高補正量とは、各水準点における重量値を用いて、水準測量による高低差を厳密な高低差に変換する値（式）である。通常の公共測量では、楕円補正が用いられる。楕円補正量は緯度に関係するが、経度には無関係である。"},
+      {q:"GNSS 水準測量を実施する場合は，既知点は一， 二等水準点，水準測量で標高が取り付けられた電子基準点又は１，２級水準点を使用する。観測は，平均図などに基づきネットワーク型RTK法により観測を行う。",a:"×",e:"間違い。スタティック法である。GNSS水準測量を行う場合の既知点の種類は、一～二等水準点、電子基準点（「標高区分：水準測量による」に限る）、１～２級水準点である。また既知点数は３点以上である。"},
+      {q:"水準測量の誤差について、観測中に三脚の沈下により生じる誤差の対策は、２本の標尺を結ぶ線上にレベルを置き、進行方向に対し三脚の特定の２本を常に視準線に平行に設置し、かつそのうちの特定の１本を常に同一標尺に向ける事である。",a:"×",e:"間違い。誤差の対策は、標尺の読み取りを後視、前視、前視、後視の順に行う事である。"},
+      {q:"レベルの三脚は、特定の２脚と視準線とを常に平行にし、進行方向に対して常に同一方向になるように整置する。",a:"×",e:"間違い。鉛直軸誤差の累積を防ぐために、レベルの三脚は進行方向に対して左右交互に整置するのが正しい。また、レベルの整置は望遠鏡を常に同一の方向に（特定の標尺に）向けて行う必要がある。"},
+      {q:"直接水準測量で結ぶことができない水準路線は，渡海（河）水準測量により連結するものとする。",a:"〇",e:"正しい。水準路線は，２点以上の既知点を結合する路線を言う。直接水準測量で結ぶ事のできない水準路線は，問題文のように渡海（河）水準測量により連結される。"},
+      {q:"標尺補正量は、観測時の気温、基準温度における標尺改正数、膨張係数及び水準点間の高低差により求める。",a:"〇",e:"正しい。標尺補正量（⊿C）は、⊿C＝｛C0＋(T－T0)α｝⊿H の式で与えられる。標尺定数（改正数）：C0 、膨張係数：α 、気温：T0 ，T 、高低差：⊿H となる。"},
+      {q:"GNSS 衛星から発信された電波の大気遅延は高さ方向の精度に影響することから，観測時の気象条件に十分注意することが必要である。",a:"〇",e:"正しい。作業規程の準則によれば、作業地域の気象条件によっては、GNSS観測を行わないように定めている。"},
+      {q:"水準測量の誤差について、レベルの鉛直軸の傾きにより生じる誤差の対策は、往路の出発点に立てる標尺と復路の出発点に立てる標尺を交換する事である。",a:"×",e:"間違い。誤差の対策は、２本の標尺を結ぶ線上にレベルを置き、進行方向に対し三脚の特定の２本を常に視準線に平行に設置し、かつそのうちの特定の１本を常に同一標尺に向ける事である。"},
+      {q:"レベルを用いた水準測量で球差を消去・軽減するためには、2本の標尺を結ぶ線上にレベルを置き，レベルと前視の標尺及び後視の標尺との距離を等しくする必要がある。",a:"〇",e:"正しい。球差は地球が球面体であるために生じる誤差で、この誤差を消去するためには視準距離（レベルと前後標尺の距離）を等しくする。"},
+      {q:"水準測量で観測中，日傘や覆いを用いてレベルへの直射日光を避けるのは，熱膨張による影響を避けるためである。",a:"〇",e:"正しい。気泡管（チルチング）レベルを用いる場合は問題文の理由から必要である。オートレベルはコンペンセータが用いられているので省略できる。電子レベルは内部の温度上昇を防ぐために直射日光を避ける必要がある。"},
+      {q:"レベルの鉛直軸の傾きにより生じる誤差への対策は、２本の標尺を結ぶ線上にレベルを置き、進行方向に対し三脚の特定の2本を常に視準線に平行に整置し、そのうちの特定の1本を常に同一標尺に向けることである。",a:"〇",e:"正しい。鉛直軸誤差に関する文章である。"},
+      {q:"GNSS水準測量で使用できる既知点の種類は、一 ～ 二等水準点、電子基準点(水準測量により標高が取り付けられた点に限る)及び１～２級水準点である。また、GNSS水準測量により、１級水準点を設置することができる。",a:"×",e:"間違い。GNSS水準測量により設置できるのは、３級水準点である。"},
+      {q:"レベルの点検調整は、作業の着手前及び期間中の中間日に行う。",a:"×",e:"間違い。中間日ではなく、概ね10日間毎（作業規程の準則 第63条2）である。"},
+      {q:"GNSS水準測量では，国土地理院が提供するジオイド・モデルを用いることにより，既知点からの距離が6～40㎞の範囲において3級水準点を設置できる。",a:"〇",e:"正しい。問題文の通り。路線の辺数６辺以下、路線長60ｋｍ以下である。"},
+      {q:"鉛直軸誤差は、望違鏡の鉛直軸が水平でないために生じる誤差である｡この誤差は、レベルと前視標尺及び後視標尺との距離を等しくすることで消去できる。",a:"×",e:"間違い。レベルと前後標尺の視準距離を等しくすることにより消去できる誤差は、視準線誤差と球差である。視準線誤差の文章である。"},
+      {q:"GNSS水準測量では，1 級及び2 級GNSS測量機が使用できる。ただし，2 級GNSS測量機が使用できるのは，10 km未満の基線の場合のみである。",a:"〇",e:"正しい。問題文の通りである。"},
+      {q:"GNSS 水準測量を行うことができるようになった背景には，衛星測位システムの充実及び国土地理院が提供するジオイド・モデルの高精度化がある。",a:"〇",e:"正しい。国土地理院が提供する高精度化ジオイドモデル、日本のジオイド2011（ver2.1）と衛星測位システムの充実により、GNSS測量機を用いたスタティック法で高精度に標高の測量が行えるようになった。このためGNSS水準測量の適用範囲はジオイド・モデルの提供地域である"},
+      {q:"GNSS水準測量では、電波の大気遅延は標高に大きく影響する場合があることから，作業地域の気象条件には十分注意する必要がある。",a:"〇",e:"正しい。作業地域の気象条件に注意する必要があるのは、電波の大気による遅延（大気遅延）である。大気遅延は基線解析ソフトに設定されている標準値を用いて補正され、電離層遅延はL1L2の２周波数帯の組合せで消去される。対流圏遅延のこと。"},
+      {q:"直接水準測量の最大視準距離は，水準測量の等級区分によらず，機器の性能によって定められている。",a:"×",e:"間違い。機器の性能は関係がない。最大視準距離は、作業規程の準則により水準測量の等級よって定められている（1級で50m、2級で60m、3・4級で70m、簡易水準測量で80m）。"},
+      {q:"点検計算の許容範囲のうち，既知点から既知点までの閉合差は，Ｓを㎞単位で表した片道の観測距離とした時，１～３級水準測量では，15㎜√Ｓ が標準である。",a:"〇",e:"正しい。点検計算の許容範囲は，問題文の場合 15㎜√Ｓ である。環閉合差の場合，１級で2㎜√Ｓ，２級で5㎜√Ｓ，３級で10㎜√Ｓ となる。"},
+      {q:"GNSS水準測量は大気中に含まれる水蒸気などによって電波の伝搬遅延量が増加し，高さ方向の精度に影響することから，寒冷前線や温暖前線が通過しているときは，原則として観測を行わない。",a:"〇",e:"正しい。問題文の通り。その他GNSS観測を行わない作業地域の気象条件として・台風又は熱帯低気圧が近接又は通過しているとき・積乱雲の急速な発達や集中豪雨が予測されるときなどがある。"},
+      {q:"１級水準測量においては， 正規正標高補正 計算に代えて 重力補正 計算を行う事ができる。",a:"×",e:"間違い。正規正標高補正 計算に代えて 正標高補正 計算を行う事ができる。"},
+      {q:"1級水準測量においては，標尺の下方 20cm以下を読定しないものと定められているが，これは地面付近の大気の屈折による誤差の影響を小さくするためである。",a:"〇",e:"正しい、問題文の通り。地面に近い場所は温度変化が激しく、大気屈折（レフラクション効果）の影響を受ける。このため、作業規程の準則によると、1級水準測量では標尺の下方20cm読定しないとある。"},
+      {q:"水準測量の誤差について、観測中に三脚の沈下により生じる誤差の対策は、標尺の読み取りを後視、前視、前視、後視の順に行う事である。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"1 級水準測量における標高値の補正計算では，正標高補正計算に代えて実測の重力値を用いた正規正標高補正計算を用いることができる。",a:"×",e:"間違い。１級水準測量では、「正規正標高補正（楕円補正）」に代えて「正標高補正（重力値による補正）」を用いることができる。問題文は逆である。"},
+      {q:"GPS、準天頂衛星　 システム、GLONASSなどの衛星測位システムの充実や高精度化されたジオイド・モデル｢日本のジオイド 　2011　 ｣の整備により、 　キネマティック法　 によるGNSS観測で効率的に標高の測量が行えるようになった。",a:"×",e:"間違い。キネマティック法ではなく、スタティック法である。"},
+      {q:"GNSS 水準測量では，観測距離は6 km 以上，かつ40 km 以下である。",a:"〇",e:"正しい。問題文の通り。観測距離は6㎞以上、かつ40㎞以下であり、これには新点間距離も含まれている。なお、路線長は60㎞以下である。"},
+      {q:"直接水準測量の平均計算において，重量は観測距離の逆数とし，観測方程式又は条件方程式を用いて行う。",a:"〇",e:"正しい。問題文の通り。直接水準測量の平均計算は、距離の逆数を重量とし観測方程式又は条件方程式を用いて行う。"},
+      {q:"標尺の零目盛が正しくないために生じる誤差は、水準点から次の水準点までのレベルの整置回数を偶数回にすることにより、消去することができる。",a:"〇",e:"正しい。標尺の零目盛誤差（零点誤差）の消去法である。"},
+      {q:"GNSS水準測量は標高を定める測量であるため，GNSS水準測量では，PCV補正を行わない。",a:"×",e:"間違い。原則として、PCV補正を行う必要がある。"},
+      {q:"永久標識を設置した水準点の水平位置は、ネットワーク型RTK法を用いて求めることができる。",a:"〇",e:"正しい。単点観測法等により座標を求めることができる。単点観測法では、ネットワーク型RTK法により単独で測点の座標を求める。"},
+      {q:"レベルを用いた水準測量において，標尺の下方を読定しないことで，大気の屈折による誤差の影響を小さくすることができる。",a:"〇",e:"正しい。問題文の通り。大気の屈折誤差（レフラクション）の事である。"},
+      {q:"標尺の零点誤差を消去・軽減するためには、2本1 組の標尺を用いる場合は，水準点又は固定点への到着時の測点数を偶数とする。",a:"〇",e:"正しい。標尺の零点誤差は標尺底面の摩耗などにより、零目盛の位置が正しくないために生じる誤差で、この誤差を消去するためには、測定回数を偶数回にする（出発点に立てた標尺を終点に立てる。往路と復路の標尺は交換する）必要がる。"},
+      {q:"公共測量における１級水準測量について、直接水準測量の平均計算において、重量は観測距離の逆数を用いる｡",a:"〇",e:"正しい。直接水準測量の平均計算は、距離の逆数を重量とし、観測方程式又は条件方程式を用いて行うものとする。（作業規程の準則 第70条1）"},
+      {q:"水準測量の誤差について、レベルの槐準線が水平でないために生じる誤差の対策は、標尺の読み取りを後視、前視、前視、後視の順に行う事である。",a:"×",e:"間違い。誤差の対策は、レベルと前視の標尺及び後視の標尺との距離を等しくする事である。"},
+      {q:"地球の曲率の影響によって生じる誤差への対策は、レベルと前視標尺及び後視標尺との距離を等しくすることである。",a:"〇",e:"正しい。球差に関する文章である。"},
+      {q:"GNSS 水準測量では，スタティック法により観測を行う。",a:"〇",e:"正しい。GNSS水準測量はスタティック法により観測を行う。使用衛星数は GPS・準天頂衛星の場合５衛星以上、GPS・準天頂衛星及びGLONASSの場合６衛星以上である。"},
+      {q:"公共測量における１級水準測量について、永久標識を設置した水準点の水平位置を求めるには、ネットワーク型RTK法を用いてもよい。",a:"〇",e:"正しい。永久標識を設置した水準点については、GNSS測量（スタティック、短縮スタティック、）、キネマティック、RTK、ネットワークRTK法）を用いて、成果数値データファイルに記載するものとする。(作業規程の準則 第59条6)"},
+      {q:"大気の屈折による誤差の影響を小さくするためには、標尺の下方を読定しないことが効果的である。",a:"〇",e:"正しい。大気の屈折誤差（レフラクション）を小さくするには、標尺の下方（１級水準測量では20㎝以下）を読定しないようにする。"},
+      {q:"水準測量の誤差について、２本の標尺を使用して往復観測を行う場合、それぞれの標尺の目盛が正確に刻まれていないために生じる誤差の対策は、標尺の読み取りを後視、前視、前視、後視の順に行う事である。",a:"×",e:"間違い。誤差の対策は、往路の出発点に立てる標尺と復路の出発点に立てる標尺を交換する事である。"},
+      {q:"水準点の標高は，観測値に対し，必要に応じて 標尺補正 ， 正標高補正 及び変動量補正を実施し，平均計算を行って求める。このうち 標尺補正 及び 正規正標高補正 は，１～２級水準測量について行う。",a:"×",e:"間違い。必要に応じて 標尺補正 ， 正規正標高補正 及び変動量補正を実施する。"},
+      {q:"GNSS水準測量では、電波の大気遅延が高さ方向の精度に影響することから、観測時の気象条件に十分注意することが必要である。",a:"〇",e:"正しい。大気遅延量は水蒸気量により変化するため、大気遅延の影響を大きく受ける場合（台風の接近や寒冷前線、温暖前線の接近など）は観測を行わない。"},
+      {q:"標尺に付いている円形水準器が十分に調整されていない場合に生じる誤差は、傾斜地で累積する性質を持っている。",a:"〇",e:"正しい。気泡管の調整が不十分であるということは、標尺が常に一定方向に傾いているという事である。これは、一方の標尺の読定値が常に大きくなる事であり、前後標尺の高低差が大きい、つまり傾斜地の場合に累積する。"},
+      {q:"GNSS 水準測量の既知点として，全ての電子基準点が使用できる。",a:"×",e:"間違い。全ての電子基準点ではない。既知点として使用できるのは、電子基準点でも標高区分が「水準測量による」に限られている。"},
+      {q:"レベルを用いた水準測量で視準線誤差を消去・軽減するためには、2 本の標尺を結ぶ線上にレベルを置き，進行方向に対し三脚の特定の2 本を常に視準線に平行に設置し，かつそのうちの特定の1 本を常に同一標尺に向ける必要がある。",a:"×",e:"間違い。視準線誤差を消去するためには、視準距離（レベルと前後標尺の距離）を等しくする。"},
+      {q:"１級水準測量を実施する場合は、標尺補正計算を行うため、観測開始時、観測終了時及び固定点到着時に、１℃単位で気温を測定する。",a:"〇",e:"正しい。問題文の通り。作業規程の準則 第64条2 による。"},
+      {q:"GNSS水準測量では、電波の電離層遅延は標高に大きく影響する場合があることから，作業地域の気象条件には十分注意する必要がある。",a:"×",e:"間違い。作業地域の気象条件に注意する必要があるのは、電波の大気による遅延（大気遅延）である。大気遅延は基線解析ソフトに設定されている標準値を用いて補正され、電離層遅延はL1L2の２周波数帯の組合せで消去される。対流圏遅延のこと。"},
+      {q:"GNSS水準測量を行うことができるようになった背景の一つには、 GPS、準天頂衛星、GLONASS等の衛星測位システムの充実がある。",a:"〇",e:"正しい。問題文の通りである。また問題文にプラスして高精度化されたジオイド・モデル「日本のジオイド2011 ver.2」が整備されたことも背景の１つである。"},
+      {q:"GNSS 水準測量では，セミ・ダイナミック補正を行う。",a:"×",e:"間違い。マニュアルの改正前は、既知点座標及び楕円体高はセミ・ダイナミック補正による今期座標としていたが、マニュアル改正後は、元期以降に標高成果を改正している場所においてセミ・ダイナミック補正を行うと、二重補正となるためセミ・ダイナミック補正を行いわないものとした。"},
+      {q:"レベルと前視標尺及び後視標尺との距離を等しくすることにより、傾斜地で生じる気差の影響を小さくすることができる。",a:"×",e:"間違い。問題文は視準線誤差の消去法である。気差の影響を除くためには、地表付近の目盛を読まないことが大切である。作業規程の準則では、「１級水準測量においては、標尺の下方20㎝以下は読定しないものとする」とある（第64条7）。"},
+      {q:"公道において、水準測量を実施する場合は、事前に所轄の警察署長の道路使用許可を受けなければならない。",a:"〇",e:"正しい。道路（公道）を測量や工事で使用する場合には、次の２つの機関から許可を得る必要がある。道路使用許可：道路交通法により、所轄の警察署長の許可。道路占用許可：道路法により道路管理者の許可。"},
+      {q:"２級水準測量では、レベルから標尺への視準距離は最大80ｍである。",a:"×",e:"間違い。60ｍ（作業規程の準則 第64条2）である。"},
+      {q:"レベルの鉛直軸誤差は，望違鏡の鉛直軸が傾いているために生じる誤差である。この誤差は，三脚の特定の１本を常に同一の標尺に向けて整置し，観測することで小さくすることができる。",a:"〇",e:"正しい。鉛直軸誤差は，望違鏡の鉛直軸が傾いているために生じる誤差である。この誤差は，三脚の特定の１本を常に同一の標尺に向けて整置し，観測することで小さくすることができる。"},
+      {q:"GPS、準天頂衛星　 システム、GLONASSなどの衛星測位システムの充実や高精度化されたジオイド・モデル｢日本のジオイド 　2000　 ｣の整備により、 　スタティック法　 によるGNSS観測で効率的に標高の測量が行えるようになった。",a:"×",e:"間違い。「日本のジオイド2000」ではなく、2011である。"},
+      {q:"水準測量の観測標高に加える楕円補正量は、東西方向の水準路線ほど大きい。",a:"×",e:"間違い。楕円補正は南北方向に長い路線に適用する。また、東西方向の補正量は零となる。"},
+      {q:"地球の曲率によって生じる誤差を気差による誤差といい，前視・後視の視準距離を等しくすることで消去できる。",a:"×",e:"間違い。地球の曲率によって生じる誤差は球差である。気差ではない。"},
+      {q:"公共測量における１級水準測量について、新点で観測を行う場合には、永久標識の設置後24時間以上経過してから行う。",a:"〇",e:"正しい。問題文の通り。（作業規程の準則 第64条4）"},
+      {q:"１級水準測量及び２級水準測量において再測を行った場合，往復観測における同方向の観測値を採用するものとする。",a:"×",e:"間違い。１級及び２級水準測量の再測は、測定を繰り返すと大きくなるような系統的誤差を避けるため、同方向の観測値を採用しない。"},
+      {q:"地盤沈下地域における水準測量では、不動点は地盤沈下地域内の水準点から選定する。",a:"×",e:"間違い。地盤沈下地域の水準測量の不動点は、地盤沈下の影響の少ない点から選ばなければ意味がない。"},
+      {q:"GNSS 水準測量では，電波の大気遅延が高さ方向の精度に影響することから，観測時の気象条件に十分注意する。",a:"〇",e:"正しい。作業地域の気象条件に注意する必要があるのは、電波の大気による遅延（大気遅延）である。大気遅延は基線解析ソフトに設定されている標準値を用いて補正され、電離層遅延はL1L2の２周波数帯の組合せで消去される。"},
+      {q:"標尺は2本1組とし，往路及び復路の観測において標尺を交換するものと定められているが，これにはレベルの視準軸の傾きに起因する誤差を消去する目的が含まれている。",a:"×",e:"間違い。往路と復路で標尺を交換するのは、標尺の零点誤差を消去するためである。視準軸の傾きによる誤差を消去するためには、後視と前視の視準距離を等しくする必要がある。"},
+      {q:"GNSS水準測量では，国土地理院が提供するジオイド・モデルを用いることにより，周辺6～40 kmの範囲に2 級水準点が設置できる。",a:"×",e:"間違い。設置できるのは２級水準点ではなく、３級水準点である。GNSS水準測量は、GNSS測量機により３級水準点を設置するための作業である。"},
+      {q:"GNSS 水準測量では，スタティック法により，２時間以上を標準とした GNSS 観測を行う必要がある。",a:"×",e:"間違い。GNSS測量機による水準測量は、スタティック法により５時間以上の観測を行う必要がある。これは、水平に比べて高さのバラツキが大きく精度が劣るためであり、長時間の観測を行うことで、観測データが多くなることやマルチパスなどの観測値に与える影響も平均化により軽減されるためである。"},
+      {q:"GNSS 水準測量を実施する場合は，既知点は一， 二等水準点，水準測量で標高が取り付けられた電子基準点又は１，２級水準点を使用する。観測は，平均図などに基づきスタティック法により観測を行う。",a:"〇",e:"正しい。GNSS水準測量を行う場合の既知点の種類は、一～二等水準点、電子基準点（「標高区分：水準測量による」に限る）、１～２級水準点である。また既知点数は３点以上である。"},
+      {q:"GNSS水準測量では，元期からの地殻変動量が二重に補正されるおそれがあるため，セミ・ダイナミック補正は行わない。",a:"〇",e:"正しい。マニュアルの改正前は、既知点座標及び楕円体高はセミ・ダイナミック補正による今期座標としていたが、マニュアル改正後は、元期以降に標高成果を改正している場所においてセミ・ダイナミック補正を行うと、二重補正となるためセミ・ダイナミック補正を行いわないものとした。"},
+      {q:"鉛直軸誤差は、望違鏡の鉛直軸が傾いているために生じる誤差である｡この誤差は、三脚の特定の１本を常に同一の標尺に向けて整置し、観測することで小さくすることができる。",a:"〇",e:"正しい。消去ではなく「小さくできる誤差」と「三脚の特定の１本…」の文章から、鉛直軸誤差のことである。"},
+      {q:"レベルの視準線が水平でないために生じる誤差への対策は、レベルと前視標尺及び後視標尺との距離を等しくすることである。",a:"〇",e:"正しい。視準線誤差に関する文章である。"},
+      {q:"GPS、準天頂衛星　 システム、GLONASSなどの衛星測位システムの充実や高精度化されたジオイド・モデル｢日本のジオイド2011｣の整備により、スタティック法によるGNSS観測で効率的に標高の測量が行えるようになった。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"レベルの鉛直軸誤差を消去・軽減するためには、往路の出発点に立てる標尺と復路の出発点に立てる標尺を交換する必要がある。",a:"×",e:"間違い。鉛直軸誤差を軽減するためには三脚の特定の１本（２本）の向きと望遠鏡を、常に同一の標尺に対抗させるように据付け観測する必要がある。"},
+      {q:"GNSS水準測量で使用できる既知点の種類は、一 ～ 二等水準点、電子基準点(水準測量により標高が取り付けられた点に限る)及び１～２級水準点である。また、GNSS水準測量により、３級水準点を設置することができる。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"直接に水準測量で結ぶことができない水準路線は，渡海（河）水準測量又は GNSS 観測による間接水準測量により連結することができる。",a:"×",e:"間違い。渡海（河）水準測量により連結することはできるが、GNSS観測による間接水準測量では連結できない"},
+      {q:"GNSS 水準測量では，既知点として，水準測量により標高が取り付けられた電子基準点を使用することができる。",a:"〇",e:"正しい。GNSS水準測量を行う場合の既知点の種類は、一～二等水準点、電子基準点（「標高区分：水準測量による」に限る）、１～２級水準点である。また既知点数は３点以上である。"},
+      {q:"GNSS 水準測量を実施できるのは，国土地理院のジオイド・モデルが提供されている地域である。",a:"〇",e:"正しい。問題文の通り。GNSS測量機による水準測量の適用範囲は、ジオイド・モデルの提供地域である。"},
+      {q:"地盤沈下調査を目的とする水準測量では、変動量を基準日に統一するため、変動量補正計算を行う。",a:"〇",e:"正しい。旧観測月日と新観測月日を用いて統一する月日に対する変動量を求める。"},
+      {q:"標尺を後視、前視、前視、後視の順に読み取ることにより、三脚の沈下による誤差を小さくすることができる。",a:"〇",e:"正しい。レベルが一様な速度で沈下していると考えた場合、観測時間に注意すれば問題文のような順序で標尺を読み取ることにより、三脚の沈下による誤差を小さくすることができる。"},
+      {q:"１級水準測量においては， 正規正標高補正 計算に代えて 正標高補正 計算を行う事ができる。",a:"〇",e:"正しい。正規正標高補正 計算に代えて 正標高補正 計算を行う事ができる。"},
+      {q:"標尺の零目盛が正しくないために生じる誤差を零点誤差といい，レベルのすえつけ回数を奇数回にすることで消去できる。",a:"×",e:"間違い。零点誤差は、レベルの据付回数を偶数回にすることで消去できる。奇数回ではない。"},
+      {q:"レベルを用いた水準測量において，地球の曲率の影響によって生じる誤差は，前視標尺と後視標尺を結ぶ直線上の中央にレベルを整置することで消去できる。",a:"〇",e:"正しい。問題文の通り。球差のことである。"},
+      {q:"1級及び2級水準測量におけるレベルの点検調整は，観測着手前及び観測期間中おおむね 10 日ごとに行うものとする。",a:"〇",e:"正しい。問題文の通り。1級・2級水準測量では、観測着手前および観測期間中おおむね10日ごとにレベルの点検調整を行う必要がある。"},
+      {q:"レベルの視準線と鉛直軸が平行でないために生じる誤差を視準線誤差といい，前視・後視の視準距離を等しくすることで消去できる。",a:"×",e:"間違い。視準線誤差は、レベルの視準線と気泡管軸が平行でないために生じる誤差である。鉛直軸ではない。"},
+      {q:"標尺の誤差として零点誤差と標尺目盛誤差がある。零点誤差は往観測と復観測で標尺を入れ替えることにより小さくすることができ，標尺目盛誤差は，観測点数を偶数にすることにより小さくすることができる。",a:"×",e:"間違い。零目盛誤差は往路と復路の標尺を入替えることや測定回数を偶数回にすることにより小さくできるが、目盛誤差は防ぐことができない。"},
+      {q:"標尺の零点誤差は、零目盛の位置が正しくないために生じる誤差である。この誤差は、隣り合う水準点間のレベルの整置回数を偶数回にすることで消去できる。",a:"〇",e:"正しい。標尺の零目盛誤差は、測定回数を偶数にすればよい（または出発点に立てた標尺を終点に立てる）。"},
+      {q:"GNSS 水準測量は原則として結合多角方式により行い，既知点から新点又は新点から新点の距離は ６ km 以上であり，かつ 40 km 以下が標準とされている。",a:"〇",e:"正しい。原則として結合多角方式であり、既知点数は３点以上、路線の辺数は６辺以下、観測距離は６㎞以上かつ40㎞以下、路線長は60㎞以下である。"},
+      {q:"観測に使用する機器は、常に良好な状態を保つ必要があるため、観測着手時及び観測期間中概ね10日ごとに点検及び調整を行う。",a:"〇",e:"正しい。作業規程の準則 第63条2 　１・２級水準測量においては観測作業中おおむね10日ごとについても行う。"},
+      {q:"往復観測を行う場合に、往路と復路の観測で前視と後視の標尺を入れ替えることで、二本の標尺の目盛誤差を小さくすることができる。",a:"〇",e:"正しい。２本の標尺の目盛誤差の差によって生じる系統的誤差を軽減する方法である。"},
+      {q:"レベルを用いた水準測量において，標尺の零目盛が正しくないために生じる誤差を零点誤差といい，レベルの設置回数（測点数）を偶数回にすることで消去できる。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"２級 水準測量における 標尺補正 計算は，水準点間の高低差が 70 ｍ以上の場合に行うものとする。",a:"〇",e:"正しい。問題文の通りである。"},
+      {q:"レベルの鉛直軸が傾いているために生じる誤差を鉛直軸誤差といい，前後の標尺を結ぶ直線上にレベルを置き，三脚の特定の１本を常に異なる標尺に対向するように整置し観測することで小さくすることができる。",a:"×",e:"間違い。鉛直軸誤差は、三脚の特定の１本を常に同一の標尺に対抗するように整置、観測することで小さくすることができる。異なる標尺ではない。"}
+    ]
+  }
+  ,{
+    name:"地形測量", icon:"🏔️",
+    questions:[
+      {q:"RTK法による地形、地物などの測定は、TSによる測量を併用して実施する必要がある。",a:"×",e:"間違い。現地測量ではTS等またはGNSS測量機を用いて、または併用して地形・地物等を測定する。必ず併用する必要はない。"},
+      {q:"GNSS測量機を用いた細部測量において，ネットワーク型RTK法による地形，地物等の測定は，間接観測法又は単点観測法により行う。",a:"〇",e:"正しい。単点観測法は電子基準点を固定点とした放射法。間接観測法は２台のGNSS測量機で同時観測を行い結合する多角網を形成する方法。"},
+      {q:"地上レーザスキャナによる計測では，器械点から遠くなるほど，放射方向の計測点間隔及びスポット径は広がっていく。",a:"〇",e:"正しい。スキャナは放射状にレーザを照射するため、距離が遠くなるほど点間隔およびスポット径は広がる。"},
+      {q:"現地測量では地形，地物などの状況により，基準点にTS又はGNSS測量機を整置して細部測量を行うことが困難な場合は，適切な場所にTS点を設置し，そのTS点に基づいて地形，地物などを測定することができる。",a:"〇",e:"正しい。基準点による観測が困難な場合はTS点（補助基準点）を設けて細部測量を行うことができる。"},
+      {q:"GNSS測量機を用いた現地測量において、標高を求める場合は，国土地理院が提供するジオイド・モデルを使用する。",a:"〇",e:"正しい。国土地理院が提供するジオイド・モデルより求めたジオイド高を用いて楕円体高を補正して標高を求める。"},
+      {q:"地上レーザスキャナを用いた地形測量において，地上レーザ測量で設置する標定点は，地上レーザ観測の有効範囲の外に設置することを原則とする。",a:"〇",e:"正しい。少なくとも作業地域あるいは有効範囲の外に設置し、地上レーザスキャナからの標定点の方向は等角度となる配置が望ましい。"},
+      {q:"地形測量の現地測量において、TSによる測量で地形，地物などの測定を行う場合は，必ずRTK法による測量を併用して実施する必要がある。",a:"×",e:"間違い。現地測量ではTS等またはGNSS測量機を用いて、または併用して測定する作業である。"},
+      {q:"GNSS測量機を用いた細部測量において，GNSS測量機による地形，地物等の測定は，観測を２セット行う。",a:"×",e:"間違い。２セットではなく１セットである。キネマティック法・RTK法・ネットワーク型RTK法による観測は1セット行う。"},
+      {q:"地上レーザスキャナを用いた地形測量における数値図化では，オリジナルデータから地形，地物などの座標値を取得し，数値図化データを記録する。",a:"〇",e:"正しい。オリジナルデータは地上レーザスキャナにより観測し測地座標系に変換して作成される。"},
+      {q:"TSによる細部測量において，測定した座標値等には，その属性を表すために原則として，分類コードを付すものとする。",a:"〇",e:"正しい（作業規程の準則 第96条5）。"},
+      {q:"現地測量で使用する基準点は，4級基準点，簡易水準点又はこれと同等以上の精度を有する基準点とする。",a:"〇",e:"正しい。作業規程の準則において、現地測量で使用する基準点は４級基準点・簡易水準点またはこれと同等以上の精度を有する基準点に基づいて実施と定められている。"},
+      {q:"斜面にレーザスキャナを設置してその斜面を計測する場合には，低いところから高いところに向けて計測を行うと，距離測定の精度が良くなる。",a:"〇",e:"正しい。上り斜面の方が多くのレーザ光が当たり観測点間隔が短くなるため精度が良くなる。"},
+      {q:"GNSS測量機を用いた細部測量において，キネマティック法又はRTK法による地形，地物等の測定は，基準点又はTS点にGNSS測量機を整置し，放射法により行う。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"道路縁内外にかかわらず，得られた観測データはすべて数値図化することを標準とする。",a:"×",e:"間違い。数値図化範囲は道路縁内を原則としている。"},
+      {q:"GNSS測量機を用いた現地測量においてネットワーク型RTK法の単点観測法により測定した結果が周辺の既知点と整合していない場合，水平の整合処理はヘルマート変換などの適切な方法を採用する。",a:"〇",e:"正しい。補正手法にはヘルマート変換・アフィン変換・重み付け補間による方法がある。"},
+      {q:"車載写真レーザ測量とは、車両を道路で走行させながら道路及びその周辺の地形、地物などの三次元位置情報を計測する技術である。",a:"〇",e:"正しい。車載写真レーザ測量の定義である。"},
+      {q:"車載写真レーザ測量において道路の高架下などの上空視界が不良な場所では、標定点による調整処理を行っても数値地形図データを作成することができない。",a:"×",e:"間違い。GNSS衛星からの電波が受信できない場所では、標定点（調整点）との調整処理を行ってデータを得ることができる。"}
+    ,
+      {q:"GNSS測量機を用いた細部測用において，ネットワーク型RTK法による地形，地物等の測定は，間接観測法又は単点観測法により行う。",a:"〇",e:"正しい。問題文の通り。単点観測法とは電子基準点（又は仮想点）を既知の固定点として１台のGNSS測量機を用いた放射法によるものである。間接観測法とは２台のGNSS測量機を用いて，同時観測を行い結合する多角網を形成する観測方法である。"},
+      {q:"地上レーザスキャナによる計測では，器械点から遠くなるほど， 放射方向の計測点間隔及びスポット径は広がっていく。",a:"〇",e:"正しい。問題文の通り。スキャナは放射状にレーザを照射するため、距離が遠くなるほど、点間隔およびスポット径は広がる。"},
+      {q:"ネットワーク型RTK法による地形、地物などの測定は、間接観測法又は単点観測法により行う。",a:"〇",e:"正しい。問題文の通り。単点観測法とは、仮想点(VRS)や電子基準点(FKP)を固定点とした放射法により観測点の座標値を求める方法。間接観測法とは、仮想点や電子基準点の情報を用いて、既知点と観測点の基線ベクトルを求めて間接的に観測点の座標値を求める方法である。"},
+      {q:"３年前に作成した地図情報レベル1000の数値地形図データを修正する場合，経年変化箇所において，ネットワーク型RTK法による単点観測法で修正データを取得した。",a:"〇",e:"正しい。問題文の通り。予察結果に基づき、ネットワーク型ＲＴＫ法により、修正データを取得しても何ら問題は無い。"},
+      {q:"GNSS測量機を用いた現地測量において、ネットワーク型RTK法の観測による地形、地物の測定は、間接観測法により行うことができる。",a:"〇",e:"正しい。作業規程の準則 第98条1による。ネットワーク型RTK法による地形、地物の測定は、間接観測法又は単点観測法により行われる。"},
+      {q:"地形測量の現地測量において、TS による測量で地形，地物などの測定を行う場合は，必ずRTK 法による測量を併用して実施する必要がある。",a:"×",e:"間違い。現地測量では、TS等又はGNSS測量機を用いて、又は併用して、地形、地物等を測定し、数値地形図データを作成する作業である。"},
+      {q:"GNSS測量機を用いた細部測量において，GNSS 測量機による地形，地物等の測定は，観測を２セット行う。",a:"×",e:"間違い。２セットではなく１セットである。キネマティック法またはRTK法、ネットワーク型RTK法による地形、地物等の観測は1セット行う。"},
+      {q:"GNSS測量機を用いた細部測用において，地形，地物等の測定を行うほか，編集時に必要となる地名，建物の名称，取得したデータの結線のための情報に関する資料を作成する。",a:"〇",e:"正しい。地形，地物等の測定は基準点又はTS点から行われ，編集及び編集した図形の点検に用いる資料（測定位置確認資料）が作成される。測定位置確認資料は問題文の通りであり，作成には，現地において図形編集装置に入力する方法と，写真等で現況等を記録する方法のいずれかが用いられる。"},
+      {q:"TSによる細部測量において，測定した座標値等には、その属性を表すために原則として、分類コードを付すものとする。",a:"〇",e:"正しい。問題文の通り。（作業規程の準則 第96条5）"},
+      {q:"標定点は，地上レーザ観測の有効範囲の外に設置する。",a:"〇",e:"正しい。地上レーザスキャナから標定点までの距離は、観測精度が確保される範囲で遠いほうが望ましい。これにより作業地域内の観測点が平面直角座標系への変換精度以内に収まるようにする。"},
+      {q:"5年前に作成した地図情報レベル1000の数値地形図データを公共測量により修正しようとする場合，1年前に完成した海岸部の埋立地について，UAV写真測量によって修正データを取得した。",a:"〇",e:"正しい。問題はない。適切な作業である。"},
+      {q:"地形測量の現地測量において、ネットワーク型RTK 法により観測を行う場合は，観測点において上空視界が確保できれば， GNSS 測量機1 台で観測作業を行うことができる。",a:"〇",e:"正しい。ネットワーク型RTK法では、配信事業者から配信されたデータとGNSS衛星からのデータを移動局で受信して解析処理後に基線ベクトルを求める手法である。GNSS測量機１台での観測作業が可能である。"},
+      {q:"３年前に作成した地図情報レベル1000の数値地形図データを修正する場合，公共測量で半年前に作成した縮尺 1/500 の平面図の数値地形図データを用い，経年変化箇所の修正データを取得した。",a:"〇",e:"正しい。1/500 データはレベル1000よりも情報量が多く，修正前のデータよりも作成年が新しいため，用いることができる。"},
+      {q:"斜面にレーザスキャナを設置してその斜面を計測する場合には，低いところから高いところに向けて 計測を行うと，距離測定の精度が良くなる。",a:"〇",e:"正しい。精度を高めるには、低いところから高いところに向けた観測が有効である。地上レーザスキャナからの同じ水平距離でも、上り斜面の方が多くのレーザ光が当たり、観測点間隔が短くなる。このため低いところから高い所への計測で精度が良くなると言える。"},
+      {q:"GNSS測量機を用いた細部測用において，キネマティック法又はRTK法による地形，地物等の測定は，基準点又はTS点にGNSS測量機を整置し，放射法により行う。",a:"〇",e:"正しい。問題文の通り。キネマティック法又はRTK法による地形，地物等の測定方法である。"},
+      {q:"GNSS 測量機を用いた現地測量においてネットワーク型 RTK 法の単点観測法により測定した結果が周辺の既知点と整合していない場合，水平の整合処理はヘルマート変換などの適切な方法を採用する。",a:"〇",e:"正しい。問題文の通り。 水平の整合処理は、座標補正として平面直角座標で行うことを標準とし、補正手法は適切な方法を採用する。この場合の適切な補正手法には、・ヘルマート変換・アフィン変換・重み付け補間による方法がある。"},
+      {q:"ネットワーク型RTK法による細部測量において，TS点を設置し、作業地域周辺の既知点において単点観測法により整合を確認する際は、既知点数は、 　 ２点以上を標準とする。",a:"×",e:"間違い。TS点を設置し、作業地域周辺の既知点において単点観測法により整合を確認する際は、既知点数は、3 点以上を標準とする。（作業規程の準則 第94条4のロ）"},
+      {q:"地上レーザ測量により作成する数値地形図データの地図情報レベルは，1000 が標準である。",a:"×",e:"間違い。地上レーザ測量により作成する数値地形図データの地図情報レベルは250及び500が標準である。"},
+      {q:"現地測量において現地において実施する補備測量は，基準点，TS点及び編集済データに表現されている確実かつ明確な点に基づいて地形，地物などの測定を行う。",a:"〇",e:"正しい。補備測量は取得漏れや経年変化の補完について現地で直接測量する作業である。保管の必要性がなければ省略することができる。"},
+      {q:"キネマティック法又はRTK法による地形、地物などの測定は、基準点又はTS点に GNSS測量機を整置し、放射法により行う。",a:"〇",e:"正しい。問題文の通り。放射法により観測は１セット行う。キネマティック法による放射法とは、固定局から移動局の（基線）ベクトルを観測し、移動局の座標値を決定する方法である。"},
+      {q:"航空レーザ測量では，上空から地上に向けてレーザ光を照射するため，ラストリターンパルスによって地表面を識別できる。そのため，電線や樹木といった数値地形図データ作成に不必要な情報を自動的に除去しやすい。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"現地測量において、GPS 衛星のみでRTK 法により観測を行う場合，使用する衛星数は4 衛星以上とし，セット内の観測はFIX 解を得てから10 エポック以上行うことを標準とする。",a:"×",e:"間違い。キネマティック法またはRTK法による地形、地物等の測定では、GPS・準天頂衛星を使用する場合、使用衛星数は「５衛星以上」とされている。"},
+      {q:"地上レーザスキャナを用いて計測したデータには，対象物を正しく計測できなかった計測点のデータも含まれることから，現地調査の結果や別途撮影した写真を参照しながらデータの除去を行うことが必要である。",a:"〇",e:"正しい。三次元点群編集（いわゆるフィルタリング）のことである。三次元点群データからだけでは、観測点が地形を捉えているかが分からない場合があるため、撮影された写真を参考にして編集を行う必要がある。"},
+      {q:"GNSS測量機を用いた現地測量において，ネットワーク型RTK 法による地形，地物等の測定は，間接観測法又は単点観測法により行うものとし，観測は， 1 セット行うものとする。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"車載写真レーザ測量では、トンネルなどGNSS衛星からの測位信号の受信が困難な箇所については、データ処理時に調整点を用いた調整処理を行う必要がある。",a:"〇",e:"正しい。調整点を用いた調整処理。調整点は、解析結果の点検や調整処理に必要な水平位置および標高の基準となる点であり、最低３点以上設置される。設置位置は精度確保の対策が取りづらい（GNSS衛星の電波が受信しづらい）場所である。"},
+      {q:"地形測量において地上レーザスキャナから見た放射方向の座標精度の悪化を補うためには観測点密度を高める必要があり，その方法として同一の場所から器械高を変えて観測することが有効である。",a:"〇",e:"正しい。同一の場所から器械高を変えて観測を実施すれば、観測点が密になり座標測定精度が高くなる。"},
+      {q:"地上レーザ測量では，不必要な情報はファーストリターンパルスのみによっては自動的に除去することが比較的難しいため，地上レーザ測量の対象地域はレーザ光を遮るものが少ない地域に限定することが望ましいと考えられる。",a:"×",e:"間違い。ファーストリターンパルスではなく、ラストリターンパルスである。ファーストリターンパルスは最初に照射部から近い樹木や地物等で反射してくる光で、ラストリターンパルスは最後にレーザ照射部分から一番遠い地表面で反射されて戻る光である。"},
+      {q:"GNSS測量機を用いた現地測量において、ネットワーク型RTK法の単点観測法により測定した標高データを、周囲の既知点の標高に整合させる場合は、アフィン変換により行う。",a:"×",e:"間違い。作業規程の準則 第94条4の2のロの(2)による。問題文にある、アフィン変換は座標データ（平面）の整合手法である。標高の整合は、国土地理院が提供するジオイドモデルによる。"},
+      {q:"TSによる細部測量において，地形の測定では、地性線及び標高値を測定し、図形編集装置によって等高線描画を行うものとする。",a:"〇",e:"正しい。問題文の通り。（作業規程の準則 第96条3の1）"},
+      {q:"車載写真レーザ測量システムは，自車位置姿勢データ取得装置，数値図化用データ取得装置及び解析ソフトウェアで構成される。",a:"〇",e:"正しい。問題文の通り。この車載写真レーザ測量システムを使用し、主に道路の数値地形図データを作成する技術を車載写真レーザ測量と呼ぶ。"},
+      {q:"地上レーザスキャナによる三次元点群データ作成とは，数値地形モデルから地形を捉えられなかった点を除去していき，地形を表現する標高値の集合を作成することである。",a:"×",e:"間違い。数値地形モデルではなく、三次元観測データである。"},
+      {q:"地形測量の現地測量において、キネマティック法又はRTK 法によるTS 点の設置で，GPS 衛星と準天頂衛星を用いて観測する場合，使用する衛星数は5 衛星以上とし，セット内の観測回数はFIX 解を得てから10 エポック以上行うことを標準とする。",a:"〇",e:"正しい。問題文の通り。データ取得間隔は１秒以上（キネマティック法は５秒以下）である。"},
+      {q:"車載写真レーザ測量システムは、GNSS測量機などの車両の位置と姿勢のデータを取得する装置や、レーザ測距装置などの数値図化用のデータ取得装置などから構成される。",a:"〇",e:"正しい。車載写真レーザ測量システムの構成である。"},
+      {q:"ネットワーク型RTK法による細部測量において，地形、地物等の測定は、単独測位方式により１セット行うものとする。",a:"×",e:"間違い。地形、地物等の測定は、 干渉測位 方式により１セット行うものとする。（作業規程の準則 第97条3）"},
+      {q:"GNSS 測量機を用いた現地測量においてキネマティック法又は RTK 法による TS 点の設置の際，観測値を点検する場合の較差の許容範囲は，水平面の南北成分と東西成分が20mm，水平面からの高さ成分が 30mm である。",a:"〇",e:"正しい。問題文の通り。作業規程の準則によると、キネマティック法またはRTK法を用いてTS点を設置する場合、較差の許容範囲は、水平（南北・東西）成分で20mm、水平面からの高さ成分で30mmと規定されている。"},
+      {q:"地上レーザスキャナを用いた地形測量において，地上レーザスキャナを用いて傾斜のある地形を計測する場合，観測の方向は地形の高い方から低い方への向きを原則とする。",a:"×",e:"間違い。高い方からではなく、低い方から高い方へ観測する。逆に行うとレーザのスポット長径が大きくなり、観測点間隔が大きくなる。低い方から高い方への観測を行った方が多くの観測点が得られる。"},
+      {q:"GNSS測量機を用いた現地測量において，使用する測量機は，2級以上の性能を有するGNSS測量機とする。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"GNSS 測量機を用いた現地測量においてネットワーク型 RTK法による地形，地物等の測定では，GPS，準天頂衛星システム及び GLONASS を用いることができる。",a:"〇",e:"正しい。問題文の通り。作業規程の準則において、ネットワーク型RTK法では、GPSだけでなく、GLONASSや準天頂衛星システムを利用することが認められている。"},
+      {q:"地形測量の現地測量において、キネマティック法又はRTK 法による地形，地物などの測定は，基準点又はTS 点にGNSS 測量機を整置し，放射法により行う。",a:"〇",e:"正しい。問題文の通りである。観測は１セット、使用衛星数は５個以上（GPS・準天頂衛星を使用）である。"},
+      {q:"地上レーザスキャナを用いてオリジナルデータを作成する場合，内挿処理による点群データの細密化は行ってはならない。",a:"〇",e:"正しい。問題文の通り。作業規程の準則によりオリジナルデータの作成において、欠測部分を周囲のデータから計算して埋める内挿処理による細密化は行ってはならない。"},
+      {q:"GNSS測量機を用いた細部測量において，ネットワーク型 RTK 法による地形，地物等の測定は，直接観測法又は間接観測法により行う。",a:"×",e:"間違い。直接観測法ではなく、単点観測法である。ネットワーク型RTK法による場合は、GNSS測量機を２台用いて行う２台同時観測方式か１台準同時観測方式による間接観測法又は単点観測法により行う。"},
+      {q:"GNSS測量機を用いた現地測量において，ネットワーク型RTK法による地形，地物等の測定は，GNSS測量機1台で行うことができる。",a:"〇",e:"正しい。問題文の通り。ネットワーク型RTK法の特徴を考えれば１台で行うことができる。"},
+      {q:"水平な場所において地上レーザスキャナを用いた計測を行う場合，地上レーザスキャナを器械高1.75 m で整置し，50 m 先の地面を計測すると，レーザ光の入射角は約１度となる。",a:"×",e:"間違い。地上高1.75ｍからレーザを照射して50ｍ先の地面の入射角を計算すると、tanθ＝1.75／50＝0.035　となり、約2度となる。"},
+      {q:"地形測量において地上レーザスキャナから同じ水平距離内においては，上り斜面に向けて観測を行った場合より下り斜面に向けて観測を行った場合のほうが，多くの観測点を得ることができる。",a:"×",e:"間違い。斜面にレーザスキャナを設置してその斜面を計測する場合には、低いところから高いところに向けて 計測を行うと、観測点の数が多くなる。地上レーザスキャナからの同じ水平距離でも、上り斜面の方が多くのレーザ光が当たり、観測点間隔が短くなる。このため低いところから高い所への計測で観測点数（取得される点群）が多くなり精度が良くなると言える。"},
+      {q:"GNSS測量機を用いた現地測量において、初期化を行う観測点では、観測値の点検のため１セットの観測終了後に再初期化を行い、２セット目の観測を行う。",a:"〇",e:"正しい。作業規程の準則 第97条4の2による。"},
+      {q:"現地測量で設置する基準点の配点密度は，作成する数値地形図データが地図情報レベル500 で市街地近郊地域の場合，10,000 ㎡ あたり5 点を標準とする。",a:"〇",e:"正しい。基準点の10，000㎡当たりの配点密度は、地図情報レベルにより異なり、市街地近郊で地図情報レベル250では６点、500で５点、1000で４点が標準となる。ちなみに市街地では前記の点数に＋１をした数値が標準である。"},
+      {q:"現地測量において、GLONASS 衛星を用いてキネマティック法により観測する場合は，GPS 衛星及びGLONASS 衛星をそれぞれ２衛星以上用い，合計６衛星以上使用する。",a:"〇",e:"正しい。キネマティック法またはRTK法よる地形、地物等の測定では、GLONASS衛星を用いて観測する場合は、使用衛星数は６衛星以上。ただし、GPS・準天頂衛星及びGLONASS衛星を、それぞれ２衛星以上用いること。とされている。"},
+      {q:"GNSS測量機を用いた細部測用において，ネットワーク型RTK法の単点観測法により測定した結果が周囲の既知点と整合していない場合，高さの整合処理には楕円体高を用いることを標準とする。",a:"×",e:"間違い。GNSS測量機を用いた細部測量で標高を求める場合は，地理院が提供するジオイドモデルによりジオイド高を補正して求める。高さの整合処理は標高補正として原則標高で行う必要がある。"},
+      {q:"３年前に作成した地図情報レベル1000の数値地形図データを修正する場合，市域の一部において他機関が１年前に作成した地図情報レベル 1000 の基盤地図情報が公開されていたため，当該基盤地図情報に係る項目のうち，修正の対象となる項目を取得しそのまま利用した。",a:"〇",e:"正しい。作成年，レベルともに問題は無く，他の数値地形図データを修正に用いても問題は無い。"},
+      {q:"地上レーザスキャナによる計測の方向は，地形の高い方から低い方への向きを原則とする。",a:"×",e:"間違い。地形の低い方から高い方への向きを原則とする。地上レーザ測量において、高い所から低い所を見下ろして計測すると、手前の地物や地形の起伏による死角を生じる。このため、下から上を仰ぎ見るように計測することで、死角を最小限に抑え、地形の形状を正確に捉えることができる。"},
+      {q:"地上レーザスキャナを用いた地形測量において，地上レーザスキャナの距離観測方法は，TOF（タイム・オブ・フライト）方式又は位相差方式とする。",a:"〇",e:"正しい。問題文の通り。地上レーザスキャナではTOF方式を採用しているものが多い。TOF方式は光源から発射された光が対象物で反射して帰ってくるまでの時間を計測することで対象物との距離を計測する方法である。"},
+      {q:"現地測量で使用する基準点は、４級基準点、簡易水準点又はこれらと同等以上の精度を有する基準点とする。",a:"〇",e:"正しい。問題文の通り現地測量の実施において基づく基準点の精度である。"},
+      {q:"車載写真レーザ測量により作成する数値地形図データの地図情報レベルは，500 及び 1000が標準である。",a:"〇",e:"正しい。問題文の通り。作業規程の準則で規定する性能をもつ。車載写真レーザシステムでは、GNSS衛星の数や配置、上空視界が良好であれば、地図情報レベル500の精度を得ることができる。"},
+      {q:"ネットワーク型RTK法による細部測量において，配信事業者から送信される補正情報を用いて即時にネットワーク解析を行い、地形、地物等の位置を測定する。",a:"×",e:"間違い。配信事業者から送信される 補正情報 を用いて即時に 基線解析 を行い、地形、地物等の位置を測定する。（作業規程の準則 第37条2の2のヌ準用）"},
+      {q:"車載写真レーザ測量は、車両に搭載したGNSS/IMU 装置、走行距離計、計測用カメラ、レーザ測距装置などで構成されるシステムを用いて、主に道路及びその周辺における数値地形図データを作成する手法である。",a:"〇",e:"正しい。ＭＭＳ（車載写真レーザ測量：モバイルマッピングシステム）は、車両を道路で走行させながら道路及びその周辺の地形、地物などの三次元位置情報を計測する技術である。"},
+      {q:"地上レーザスキャナは，地形，地物等とレーザ光がなす角を入射角とし，標準的な地形，地物等が入射角 1.5 度以上で観測できる性能を有するものとする。",a:"〇",e:"正しい。入射角は、被写体との角度を言う。最低の入射角1.5度はレーザ光が戻ってくる限界とされている。"},
+      {q:"ネットワーク型RTK法によるTS点の設置は、単点観測法を用いた場合、作業地域周辺の3点以上の既知点を使用し、整合を確認しなければならない。",a:"〇",e:"正しい。整合の確認は既知点が作業地域を囲むように、３点以上を用いて許容範囲内で整合しているかを確認する。"},
+      {q:"地形測量の現地測量において、TS による測量で地形，地物などの測定を行う場合は，必ずRTK 法による測量を併用して実施する必要がある。",a:"×",e:"間違い。現地測量では、TS等又はGNSS測量機を用いて、又は併用して、地形、地物等を測定し、数値地形図データを作成する作業である。"},
+      {q:"ネットワーク型RTK法により、複数の観測点を次々と移動して細部測量を実施すると、誤差が累積する。",a:"×",e:"間違い。ネットワーク型RTK法は１台の受信機（移動局）の位置を周囲の電子基準点の観測データから得られる補正情報を用いて決定する技術である。観測点ごとに補正情報を用いて決定するため、誤差の累積はない。"},
+      {q:"地上レーザスキャナを用いて，数値図化の対象地物を計測する場合は，放射方向の計測点間隔又はスポット長径のいずれかの計測条件を満たす必要がある。",a:"〇",e:"正しい。問題文の通り。数値地形図データの地図情報レベルは、250及び500を標準とし、計測条件が地図情報レベルに応じて放射方向の計測点間隔または、放射方向のスポット長径が、満たされている必要がある。地形に関しては、放射方向の計測点間隔、地物に関しては、放射方向の計測点間隔と放射方向のスポット長径のいずれかが満たされる必要がある。"},
+      {q:"GNSS測量機を用いた細部測量において，GNSS 測量機により標高を求める場合は，ジオイド・モデルより求めた平均海面 を用いて，楕円体高を補正して求める。",a:"×",e:"間違い。平均海面ではなく、ジオイド高である。キネマティック法又はRTK法、ネットワーク型RTK法ともに同様である。"},
+      {q:"地形測量の現地測量において、TS による測量で地形，地物などの測定を行う場合は，必ずRTK 法による測量を併用して実施する必要がある。",a:"×",e:"間違い。現地測量では、TS等又はGNSS測量機を用いて、又は併用して、地形、地物等を測定し、数値地形図データを作成する作業である。"},
+      {q:"現地測量は写真測量に比べて精度が低いため、作成する数値地形図データの地図情報レベルが1000以下のときは現地測量を用いるべきではない。",a:"×",e:"間違い。現地測量により作成する数値地形図データの地図情報レベルは、原則として1000以下とし250、500及び1000を標準とする。"},
+      {q:"5年前に作成した地図情報レベル1000の数値地形図データを公共測量により修正しようとする場合，半年前の土砂災害で形状が変化した斜面について，UAV（無人航空機）レーザ測量によって修正データを取得した。",a:"〇",e:"正しい、。適切な作業である。UAVレーザ測量では経年変化等の修正箇所の修正データが取得される。UAVレーザ測量における修正数値図化である。"},
+      {q:"現地測量により作成する数値地形図データの地図情報レベルは，原則として1000 以下とする。",a:"〇",e:"正しい 。問題文の通り。作業規程の準則により、現地測量により作成する数値地形図データの地図情報レベルは、原則として1000以下とし250、500及び1000を標準とする。"},
+      {q:"地上レーザスキャナは，標準的な地形，地物等が入射角 1.5°以上で計測できる性能を有するものを使用しなければならない。",a:"〇",e:"正しい。問題文の通り。作業規程の準則によれば、「地上レーザスキャナの性能として、地形、地物等とレーザ光がなす角を入射角とし、標準的な地形、地物等が入射角１．５度以上で計測できること。」がある。"},
+      {q:"GNSS測量機を用いた現地測量において、GLONASS衛星を用いて観測する場合は、GPS衛星及びGLONASS衛星をそれぞれ２衛星以上用い、合計６衛星以上使用する。",a:"〇",e:"正しい。作業規程の準則 第93条3による。（GPS衛星のみを使用する場合は、５衛星以上）"},
+      {q:"地形測量の現地測量において、TS による測量で地形，地物などの測定を行う場合は，必ずRTK 法による測量を併用して実施する必要がある。",a:"×",e:"間違い。現地測量では、TS等又はGNSS測量機を用いて、又は併用して、地形、地物等を測定し、数値地形図データを作成する作業である。"},
+      {q:"GNSS測量機を用いた現地測量において，ネットワーク型RTK法によるTS点の設置を単点観測法により行う場合は，作業地域周辺の既知点において単点観測法により整合を確認するものとし，整合を確認する既知点数は1点を標準とする。",a:"×",e:"間違い。整合を確認する既知点数は、３点以上を標準とする。"},
+      {q:"車載写真レーザ測量は、GNSS/IMU 装置による計測データから得られる内部標定要素 、計測用カメラにより撮影された写真及びレーザ測距装置による距離データを用いて、数値図化用データを作成することができる。",a:"×",e:"間違い。GNSS／IMU装置で得られるのは、カメラの撮影位置や方向（傾き）でありこれらを外部標定要素と言う。内部標定要素は、カメラの幾何学的要素つまり画面距離や画素サイズなどである。"},
+      {q:"３年前に作成した地図情報レベル1000の数値地形図データを修正する場合，移動計測車両による測量システムを用い，道路の経年変化箇所の修正データを取得した。",a:"〇",e:"正しい。H24年5月に国土地理院から「移動計測車両により測量システムを用いる数値地形データ作成マニュアル(案)」が発表された。"},
+      {q:"5年前に作成した地図情報レベル1000の数値地形図データを公共測量により修正しようとする場合，4年前に完成した道路について，車載写真レーザ測量によって修正データを取得した。",a:"〇",e:"正しい。問題はない適切な修正方法である。車載写真レーザ測量では、経年変化等の修正箇所の修正データが取得される。車載写真レーザ測量による修正図化である。"},
+      {q:"地上レーザスキャナを用いた地形測量において，局地座標系で観測する場合は，相似変換による方法又は後方交会による方法を用いることを原則とする。",a:"〇",e:"正しい。問題文の通り。平面直角座標系で観測する場合は、器械点と後視点による方法が用いられる。"},
+      {q:"車載写真レーザ測量では、トンネルなどGNSS衛星からの測位信号の受信が困難な箇所については、データ処理時に仮想基準点を用いた調整処理を行う必要がある。",a:"×",e:"間違い。調整点を用いた調整処理。調整点は、解析結果の点検や調整処理に必要な水平位置および標高の基準となる点であり、最低２点以上設置される。設置位置は精度確保の対策が取りづらい（GNSS衛星の電波が受信しづらい）場所である。"},
+      {q:"現地測量で使用する機器は，3級トータルステーション又は2級 GNSS 測量機と同等以上の性能を持つものを標準とする。",a:"〇",e:"正しい。問題文の通り。現地測量（細部測量）で使用する機器は、問題文の通り、TSであれば3級以上、GNSS測量機であれば2級、セオドライトは3級以上の性能を持つものとされている。"},
+      {q:"TSを用いた現地測量で、基準点からの見通しが悪く細部測量を行うことが困難な場合は、GNSS測量機を用いてTS点を設置することができる。",a:"〇",e:"正しい。TS点は、TS又はGNSS測量機を用いたキネマティック法又はRTK法、ネットワーク型RTK法により行われる。"},
+      {q:"GNSS測量機を用いた現地測量において、使用する測量機は，２級以上の性能を有するGNSS 測量機とする。",a:"〇",e:"正しい。現地測量に使用する機器として、２級GNSS測量機以上とされている。"},
+      {q:"TSによる細部測量において，地形、地物等の測定において、TSによる測量とRTK法による測量とは、併用して実施してはならない。",a:"×",e:"間違い。併用できる。（作業規程の準則 第96条1）"},
+      {q:"5年前に作成した地図情報レベル1000の数値地形図データを公共測量により修正しようとする場合，市域の一部において，2年前に撮影した空中写真から地上画素寸法0.4ｍの写真地図を作成していたため，3年前に完成した体育館の修正データを当該写真地図から取得した。",a:"×",e:"間違い。不適切である。地図情報レベル1000の水平位置誤差は1ｍ以内で、写真地図の地上画素寸法は0.2ｍ以内である。"},
+      {q:"現地測量において使用する機器は，3 級TS又は2 級GNSS測量機と同等以上のものを使用する。",a:"〇",e:"正しい。現地測量に用いられる機器はTSは３級、GNSS測量機は２級、またはそれらと同等以上が使用される。"},
+      {q:"斜面にレーザスキャナを設置してその斜面を計測する場合には，高いところから低いところに向けて 計測を行うと，距離測定の精度が良くなる。",a:"×",e:"間違い。精度を高めるには、低いところから高いところに向けた観測が有効である。地上レーザスキャナからの同じ水平距離でも、上り斜面の方が多くのレーザ光が当たり、観測点間隔が短くなる。このため低いところから高い所への計測で精度が良くなると言える。"},
+      {q:"地形測量では、地上レーザスキャナで取得された高密度の標高点群とその波長を基に地物などを描画していく。",a:"×",e:"間違い。高密度の標高点群と反射強度を基に地物などを描画する。"},
+      {q:"TSによる細部測量において，基準点又はTS点にTSを整置し、放射法又は同等の精度を確保できる方法により地形、地物の位置を測定し、数値地形図データを取得する。",a:"〇",e:"正しい。問題文の通り。（作業規程の準則 第96条1）"},
+      {q:"GNSS測量機を用いた細部測量において，地形，地物等の測定を行うほか，編集時に必要となる取得したデータの標定のための情報や，地名，建物等の名称に関する資料を作成する。",a:"×",e:"間違い。データの標定ではなく結線である。測定位置確認資料の作成に関する文章である。測定位置確認資料は、現地において図形編集装置に地名、建物の名称、結線情報等を入力する方法と写真等で現況等を記録する方法のいずれかで作成される。"},
+      {q:"ネットワーク型RTK法による細部測量において，GPS衛星のみで観測を行う場合、使用する衛星数は５衛星以上とし、セット内の観測回数はFIX解を得てから５エポック以上を標準とする。",a:"×",e:"間違い。GPS衛星のみで観測を行う場合、使用する衛星数は５衛星以上とし、セット内の観測回数はFIX解を得てから 10 エポック以上を標準とする。（作業規程の準則 第93条3）"},
+      {q:"車載写真レーザ測量で取得した三次元点群データなどから、構造物の形状の三次元モデルを作成することができる。",a:"〇",e:"正しい。得られる点（点群）データは、平面位置と高さが取得されている。このため、問題文のように三次元モデルを作成することができる。"},
+      {q:"GNSS測量機を用いた現地測量において，キネマティック法又はRTK法による地形，地物等の測定は，基準点又はTS点にGNSS測量機を整置し，放射法により行うものとし，観測は1セット行うものとする。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"車載写真レーザ測量システムで固定式システムのキャリブレーションの有効期間は，1 年が標準である。",a:"〇",e:"正しい。車載写真レーザ測量システムは、固定式と着脱式に分けられ、キャリブレーション（較正や調整）の有効期間は、固定式で１年、着脱式で６ヶ月が標準である。固定式のキャリブレーションは主にメーカー工場等で行われ、キャリブレーション状態の長期保持が保証できるため有効期間を１年としている。"},
+      {q:"斜面に対する観測の方向は，地形の高い方から低い方への向きを原則とする。",a:"×",e:"間違い。低いほうから高いほうへの向きが原則である。逆に行うとレーザのスポット長径が大きくなり、観測点間隔が大きくなる。"},
+      {q:"GNSS 測量機を用いた現地測量においてRTK 法による地形，地物等の測定において，初期化を行う観測点では，観測値の点検のため，1セット目の観測終了後に再初期化を行い，2セット目の観測を行う。",a:"〇",e:"正しい。問題文の通り。RTK法やネットワーク型RTK法では、整数値バイアスが正しく決定されているかを確認する必要がある。初期化を行う観測点では、観測を1セット終えた後に再初期化（通信を切るなど）を行い、2セット目の観測を行い、再初期化した２セット目の観測値を採用値とする。"},
+      {q:"地上レーザスキャナを用いた三次元点群データ作成においては，地上レーザスキャナを用いて観測した三次元観測データから地形を捉えられなかった点を除去する必要がある。",a:"〇",e:"正しい。三次元点群データ作成は、三次元観測データから地形を捉えられなかった点を除去していき、地形を標高値の集合だけ（DTM：数値地形モデル）で表現する作業である。"},
+      {q:"現地測量でRTK法において単点観測法によりTS点を設置する場合は，作業地域周辺の既知点成果値と観測値の整合を確認する。",a:"×",e:"間違い。問題文はRTK法ではなく、ネットワーク型RTK法の整合の確認方法である。キネマティック法またはRTK法によるTS点の設置は基準点からの放射法により設置される。ネットワーク型RTK法では単点観測法と間接観測法による設置が認められている"},
+      {q:"地形測量で測定した座標値等には，その属性を表すために原則として，分類コードを付す。",a:"〇",e:"正しい。問題文の通り。 作業規程の準則により、数値地形図データを作成する際、測定した座標値には、それが何を表しているか（道路、建物、等高線など）を表すために、原則として分類コード等の属性情報を付与する。"},
+      {q:"ネットワーク型RTK法による地形、地物などの測定は、GNSS測量機１台で観測作業を行うことができる。",a:"〇",e:"正しい。電子基準点や仮想点を用いてGNSS測量機１台で観測作業を行うことができる。"},
+      {q:"地上レーザスキャナを用いた三次元点群データ作成においては，反射強度データを使用する必要はない。",a:"〇",e:"正しい。地形測量では、地上レーザスキャナで取得された高密度の標高点群とその反射強度を基図として地物等を描画していく。三次元点群データ作成では、反射強度データを使用する必要はない。"},
+      {q:"地上レーザスキャナを用いた地形測量において，同一箇所から複数回観測する場合は，それぞれ地上レーザスキャナの器械高を変えることを原則とする。",a:"〇",e:"正しい。問題文の通り。地上レーザスキャナの放射方向と接線方向では観測点間隔が異なり、放射方向の座標精度は接線方向の座標精度に比べ急速に悪くなる。これを補うために地上レーザスキャナの器械高を変え、同じ場所から粗い観測となっている箇所から中間を狙えるようにするためである。"},
+      {q:"TSによる細部測量において，地形の測定では、地性線及びジオイド高を測定し、図形編集装置によって等高線描画を行うものとする。",a:"×",e:"間違い。ジオイド高ではなく、地性線及び標高値である。ジオイド高とは楕円体高と標高の差である。ジオイド高を直接測定する事はできない。（作業規程の準則 第96条3の1）"},
+      {q:"GNSS測量機を用いた現地測量において、ネットワーク型RTK 法による地物，地形などの測定は，間接観測法又は単点観測法により行う。",a:"〇",e:"正しい。問題文の通りである。"},
+      {q:"GNSS測量機を用いた細部測量において，キネマティック法又は RTK 法による地形，地物等の測定は，基準点又は TS 点に GNSS 測量機を整置し，支距法により行う。",a:"×",e:"間違い。支距法ではなく、放射法である。"},
+      {q:"地上レーザ測量では，不必要な情報はラストリターンパルスのみによっては自動的に除去することが比較的難しいため，地上レーザ測量の対象地域はレーザ光を遮るものが少ない地域に限定することが望ましいと考えられる。",a:"〇",e:"正しい。ラストリターンパルスは最後にレーザ照射部分から一番遠い地表面で反射されて戻る光である。"},
+      {q:"基準点又は TS 点から地形を測定する場合，地性線及びジオイド高を測定し，図形編集装置によって等高線描画を行う。",a:"×",e:"間違い。ジオイド高を現地で測定して等高線描画を行うわけではない。現地測量において、基準点又は TS 点から地形を測定する場合に取得するのは、現地で直接、地性線および地形の変化点の座標や標高を計測する。"},
+      {q:"地形測量の現地測量において、TS による測量で地形，地物などの測定を行う場合は，必ずRTK 法による測量を併用して実施する必要がある。",a:"×",e:"間違い。現地測量では、TS等又はGNSS測量機を用いて、又は併用して、地形、地物等を測定し、数値地形図データを作成する作業である。"},
+      {q:"固定局は，取得区間との基線距離を原則 10 km 以内とし，やむを得ない場合でも 30 km を超えてはいけない。",a:"〇",e:"正しい。問題文の通り。移動取得計画においては、空中写真測量や航空レーザ測量と比較して構造物、植生等によりGNSS衛星からの電波の受信状況が悪くなりがちなので10㎞を標準としている。"},
+      {q:"数値地形図作成において，観測した三次元観測データは，標定点等を使用して平面直角座標系へ変換し，オリジナルデータとする。",a:"〇",e:"正しい。局地座標系で観測した三次元観測データは、観測毎に平面直角座標系への変換を行わなくければならない。"},
+      {q:"ネットワーク型RTK法による現地測量を行う場合は、GNSS測量機１台で観測作業が行える。",a:"〇",e:"正しい。ネットワーク型RTK法では、移動局の受信機１台で観測作業が行える。"},
+      {q:"5年前に作成した地図情報レベル1000の数値地形図データを公共測量により修正しようとする場合，市域の一部において，国土地理院が2年前に作成した地図情報レベル2500の基盤地図情報が公開されていたため，当該基盤地図情報から経年変化箇所の建築物の外周線データを取得した。",a:"×",e:"間違い。不適切である。地図情報レベル25200から地図情報レベル1000の修正はできない。地図情報レベル2500の誤差を持つ地図情報レベル1000の基盤地図情報となってしまう。"},
+      {q:"GNSS 測量機を用いた現地測量においてネットワーク型 RTK 法による地形，地物等の測定は，ある一つの点から，基準方向と各細部点の交角及び距離を測定する手法で行うことができる。",a:"×",e:"間違い。問題文はTSのように角度と距離を測定するとあるが、GNSSでは直接三次元座標値を測定している。観測しているものが異なる。"},
+      {q:"地形測量の現地測量において、ネットワーク型RTK 法による地形，地物などの測定は，間接観測法又は単点観測法により行う。",a:"〇",e:"正しい。問題文の通りである。間接観測法は２台同時観測方式または１台準同時観測方式により基線ベクトルを求める。"},
+      {q:"車載写真レーザ測量は、GNSS/IMU 装置による計測データから得られる外部標定要素 、計測用カメラにより撮影された写真及びレーザ測距装置による距離データを用いて、自動車位置姿勢データを作成することができる。",a:"×",e:"間違い。得られるのは数値図化用データ（点群データ）と呼ばれる各点の３次元座標値である。"},
+      {q:"GNSS測量機を用いた現地測量において，キネマティック法又はRTK法による地形，地物等の測定において，観測に使用する衛星数は，5衛星以上を標準とする。",a:"〇",e:"正しい。問題文の通り。GLONASS衛星を用いて観測する場合は、６衛星以上となる。"},
+      {q:"地上レーザスキャナを用いて計測したデータには，対象物を正しく計測できなかった計測点のデータも含まれることから，現地調査の結果や別途撮影した写真を参照しながらデータの補間を行うことが必要である。",a:"×",e:"間違い。補間ではなく除去である。三次元点群編集（いわゆるフィルタリング）のことである。三次元点群データからだけでは、観測点が地形を捉えているかが分からない場合があるため、撮影された写真を参考にして編集を行う必要がある。"},
+      {q:"３年前に作成した地図情報レベル1000の数値地形図データを修正する場合，他機関が１年前にフイルム航空カメラで撮影した撮影縮尺 1/12,500 の空中写真を使用し，図化により修正データを取得した。",a:"×",e:"間違い。撮影年は問題が無い。しかし，レベル1000の数値地形図を修正するためには，1/6,000～8,000の撮影縮尺が必要となる。フィルム航空カメラで撮影する写真縮尺と地図情報レベルの関係から，1/25,000 の撮影縮尺だと地図情報レベルは2500となる。"},
+      {q:"細部測用において，地形，地物等の測定におけるGNSS測量機による観測は，干渉測位方式により２セット行うことを原則とし，１セット目の観測終了後に再初期化を行う。",a:"×",e:"間違い。GNSS測量機による観測（キネマティック法，RTK法，ネットワーク型RTK法）では，干渉測位方式により１セット行い，初期化を行う観測点では１セットの観測終了後に再初期化を行い，２セット目の観測が行われる。この２セット目の観測値を採用値として観測が継続される。"},
+      {q:"ネットワーク型RTK法による細部測量において，配信事業者から送信される時刻情報を用いて即時に基線解析を行い、地形、地物等の位置を測定する。",a:"×",e:"間違い。配信事業者から送信される 補正情報 を用いて即時に 基線解析 を行い、地形、地物等の位置を測定する。（作業規程の準則 第37条2の2のヌ準用）"},
+      {q:"GNSS測量機を用いた現地測量において、使用する測量機は、１級GNSS測量機又は２級GNSS測量機とする。",a:"〇",e:"正しい。作業規程の準則 第87条による。"},
+      {q:"車載写真レーザ測量で道路及びその周辺の大縮尺の数値地形図データを作成する場合、トータルステーションなどを用いた現地測量に比べて、広範囲を短時間でデータ取得できる。",a:"〇",e:"正しい。車載写真レーザ測量は、走行しながら地形、地物の三次元データの取得が可能であるため、現地測量の時間を大幅に短縮できる。"}
+    ]
+  }
+  ,{
+    name:"写真測量", icon:"📷",
+    questions:[
+      {q:"写真地図の作成で数値地形モデルの作成において，すべての河川及び湖沼などの陸水面は地表面に分類し，その標高は周辺陸域の最近傍値からの内挿処理によって求める。",a:"×",e:"間違い（準則401条9項）。すべての河川及び湖沼ではなく、河川及び小規模な湖沼等の陸水面である。"},
+      {q:"対空標識の設置とは，同時調整及び数値図化において基準点，水準点，標定点などの写真座標を測定するため，基準点などに一時標識を設置する作業をいう。",a:"〇",e:"正しい。対空標識設置の要点である。"},
+      {q:"同時調整では，パスポイント・タイポイント・標定点の写真座標を測定し，標定点成果及び外部標定要素を統合して調整計算を行い，各写真の外部標定要素の成果値，水平位置及び標高を決定する。",a:"〇",e:"正しい。同時調整の説明として問題文の通り。"},
+      {q:"熱赤外線リモートセンシングは，対象物からの熱放射を観測するため，夜間も観測することができる。",a:"〇",e:"正しい。熱赤外リモートセンシングは雲がなければ夜間でも地表を観測することができる。"},
+      {q:"デジタル航空カメラを用いて撮影した等高度鉛直空中写真において，撮影高度が高いほど，地上画素寸法は小さくなる。",a:"×",e:"間違い。撮影高度が高いほど写真縮尺が小さくなるため、地上画素寸法は大きくなる。"},
+      {q:"航空レーザ測量において既存データとの整合は，重複区間を設定して比較及び点検を行い，必要に応じて再計算処理又は再計測などの是正処置を実施する。",a:"〇",e:"正しい（作業規程の準則第441条）。"},
+      {q:"UAV写真点群測量において，同一コース内の隣接写真との重複度を60％以上確保できるように撮影計画を立案した。",a:"×",e:"間違い。同一コース内の重複度は80％以上、隣接コースとの重複度は60％以上を確保することを標準としている。"},
+      {q:"合成開口レーダ（SAR）は，観測対象物が自ら放射する電波を受信して，その性質を調べる受動型センサである。",a:"×",e:"間違い。合成開口レーダはマイクロ波を地上に発射しその反射波を受信する能動型センサである。"},
+      {q:"航空レーザ測量において，東西10km・南北10kmの平坦な地域で計測を行う場合，調整用基準点は標準で５点必要となる。",a:"〇",e:"正しい。調整用基準点は作業地域の面積（km²）÷25＋1を標準とし最低数は４点。10×10＝100÷25＝4、4＋1＝5点。"},
+      {q:"同時調整では，パスポイント・タイポイント・標定点の地上座標を測定し，調整計算を行う。",a:"×",e:"間違い。調整計算では標定点の写真座標を測定する。地上座標ではない。"},
+      {q:"UAVレーザ測量において，コース間重複度は，30％以上とすることを標準とする。",a:"〇",e:"正しい。コース間重複度は30％以上とすることを標準とする。"},
+      {q:"デジタル航空カメラを用いて撮影した等高度鉛直空中写真において，撮像面の素子数（画面の画素数）が多いほど，地上画素寸法は大きくなる。",a:"×",e:"間違い。画素数が多い（高解像度）ため、地上画素寸法は小さくなる。"},
+      {q:"同時調整では，パスポイント・タイポイント・標定点の写真座標を測定し，各写真の内部標定要素の成果値を決定する。",a:"×",e:"間違い。同時調整では外部標定要素の成果値等を決定する。内部標定要素ではない。"},
+      {q:"UAVレーザ測量では，UAVに搭載した位置姿勢データ取得装置及びレーザ測距装置を用いて地形・地物等を計測し，三次元形状復元計算により三次元点群データを作成する。",a:"×",e:"間違い。UAVレーザ測量に三次元形状復元計算の工程はない。三次元形状復元計算はUAV写真点群測量の作業工程である。"},
+      {q:"同時調整における調整計算は，ブロック内の各撮影コースの両端付近に標定点を配置することを標準とする。",a:"×",e:"間違い。ブロックの四隅付近と中央部付近に計５点配置することを標準としている。"},
+      {q:"写真地図の作成において，段差の大きい人工斜面や高架橋が存在する地域において，ブレークライン法を使って数値地形モデルを作成した。",a:"〇",e:"正しい。ブレークライン法は地形の傾斜が急激に変化する箇所を連続的な線として取得する方法。人工斜面・高架橋の他に尾根・谷・主な水涯線にも用いられる。"},
+      {q:"調整計算において，GNSS/IMUにより取得された外部標定要素を使用することで，使用する標定点の点数を多くすることができる。",a:"×",e:"間違い。外部標定要素を使用することで、使用する標定点の点数を少なくすることができる。"},
+      {q:"空中写真測量における細部数値図化は、線状対象物、建物、植生、等高線の順に行う。",a:"〇",e:"正しい。脱落を防ぐためにこの順番で行う。"},
+      {q:"合成開口レーダ（SAR）は，マイクロ波を地表面に照射し，地表面より戻ってくる反射波を受信する。マイクロ波を利用することから雲に覆われていても地表を観測することができる。",a:"〇",e:"正しい。合成開口レーダは能動型で自らマイクロ波を発射し反射波をとらえる。昼夜天候に左右されずに観測が行える。"},
+      {q:"近赤外線の波長帯は，可視光の波長帯に比べて植物からの反射率が高い。",a:"〇",e:"正しい。近赤外線は植物（緑）に対して反射率が高く、赤外線写真では緑地が白く写る。"},
+      {q:"GNSS/IMU装置を用いた撮影では，IMUの累積誤差を考慮し，撮影コース長をおおむね15分以内で撮影できる距離とする。",a:"〇",e:"正しい。等速直線飛行は進入を含めて概ね15分以内とし、これを超える場合は適宜IMU初期化飛行を実施する。"}
+    ,
+      {q:"写真地図の作成で数値地形モデルの作成において，すべての河川及び湖沼などの陸水面は地表面に分類し，その標高は，周辺陸域の最近傍値からの内挿処理によって求める。",a:"×",e:"間違い。作業規程の準則401条9項。すべての河川及び湖沼ではなく、河川及び小規模な湖沼等の陸水面である。"},
+      {q:"同時調整では、 デジタルステレオ図化機 を用いて、パスポイント、タイポイント、標定点の 写真座標 を測定し、標定点成果及び撮影時に得られた 外部標定要素 を統合して調整計算を行い、各写真の 外部標定要素 の成果値、パスポイント、タイポイント等の水平位置及び標高を決定する作業を行う｡",a:"〇",e:"正しい。当時調整の説明。問題文の通りである。"},
+      {q:"デジタル航空カメラを用いて撮影した等高度鉛直空中写真において，撮影基準面からの撮影高度が高いほど，撮影基準面における地上画素寸法は小さくなる。",a:"×",e:"間違い。撮影高度が高いほど写真縮尺が小さくなるため，地上画素寸法は大きくなる。"},
+      {q:"航空レーザ測量において既存データとの整合は，既存データとグラウンドデータとの重複区間を設定して比較及び点検を行い，必要に応じて再計算処理又は再計測などの是正処置を実施する。",a:"〇",e:"正しい。問題文の通り（作業規程の準則第441条）。点検箇所は、調整用基準点及び地表遮蔽物の影響が少ないグラウンド、公園、道路等で平坦な個所を対象とする。"},
+      {q:"三次元点群データの作成において，UAV 写真点群測量において，同一コース内の隣接写真との重複度を60 ％ 以上確保できるように撮影計画を立案した。",a:"×",e:"間違い。同一コース内の隣接写真との重複度が80％以上、隣接コースの数値写真との重複度が60％以上を確保することを標準としている。"},
+      {q:"航空レーザ測量において，東西 10km，南北10km の平坦な地域で航空レーザ計測を行う予定である。三次元計測データの点検及び調整を行うための調整用基準点は，標準で５点必要となる。",a:"〇",e:"正しい。調整用基準点は、作業地域の面積（平方キロメートル）を25で割った値に１を足した値を標準とし、最低数は４点とする。よって、作業地域の面積（10×10＝100ｋ㎡）を25で割り（100ｋ㎡÷25＝４）、これに１を足した値（４＋１＝５）となる。"},
+      {q:"同時調整では、 デジタルステレオ図化機 を用いて、パスポイント、タイポイント、標定点の 地上座標 を測定し、標定点成果及び撮影時に得られた 外部標定要素 を統合して調整計算を行い、各写真の 外部標定要素 の成果値、パスポイント、タイポイント等の水平位置及び標高を決定する作業を行う｡",a:"×",e:"間違い。調整計算では、標定点の写真座標を測定する。"},
+      {q:"UAVレーザ測量において，標準的な計測点間隔は，要求点間隔（要求点密度等を満たすために均等かつ最小限に計測する場合の点間隔）と定数を用いて，計測点間隔＝要求点間隔 /θ （ただし，θは1.1～1.5) で求めることを標準とする。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"デジタル航空カメラを用いて撮影した等高度鉛直空中写真において，撮像面の素子数（画面の画素数）が多いほど,撮影基準面における地上画素寸法は大きくなる。",a:"×",e:"間違い。撮像面の画素数が多い（高解像度）であるため，地上画素寸法は小さくなる。"},
+      {q:"同時調整では、 デジタルステレオ図化機 を用いて、パスポイント、タイポイント、標定点の 写真座標 を測定し、標定点成果及び撮影時に得られた 外部標定要素 を統合して調整計算を行い、各写真の 内部標定要素 の成果値、パスポイント、タイポイント等の水平位置及び標高を決定する作業を行う｡",a:"×",e:"間違い。同時調整では、 標定点の 写真座標 を測定し、各写真の 外部標定要素 の成果値等を決定する。"},
+      {q:"三次元点群測量において，UAVレーザ測量では，UAVに搭載した位置姿勢データ取得装置及びレーザ測距装置を用いて地形，地物等を計測し，三次元形状復元計算により三次元点群データを作成する。",a:"×",e:"間違い。UAVレーザ測量に三次元復元計算の工程はない。問題文はUAV写真点群測量の作業工程である。三次元復元計算は、撮影された数値写真及び標定点を用いて数値写真の外部標定要素、数値写真に撮像された地点（特微点）の位置座標を求め、地形地物等の三次元形状を復元し、オリジナルデータを作成する作業である。"},
+      {q:"同時調整における調整計算は，区域撮影においては原則として，作業地区全域を一つのブロックとしてバンドル法により行うものとし，標定点は，フロック内の各撮影コースの両端付近に配置することを標準とする。",a:"×",e:"間違い。ブロック内の各撮影コースの両端付近ではなく、ブロックの四隅付近と中央部付近である。標定点の配置及び点数は区域撮影ではブロックの四隅付近と中央部付近に計５点配置することを標準としている。四隅の配置で確実にブロック全体を測地座標系に合致させ、中央部の配置点でブロック内の歪みを確認・防止しようとしている。"},
+      {q:"調整計算において、 GNSS/IMU により取得された 外部標定要素 を使用することで、これを使用しない場合と比較して、使用する標定点の点数を 多くすることができる。",a:"×",e:"間違い。外部標定要素 を使用することで、使用する標定点の点数を 少なく することができる。"},
+      {q:"数値地形モデル（DTM）の点検は、無作為に抽出した標高点について、デジタルステレオ図化機を用いて計測された標高値と比較する。",a:"〇",e:"正しい。数値地形モデルから無作為に抽出された標高点について行われる。"},
+      {q:"空中写真測量におけるGNSS / IMU 装置を用いた撮影では、IMU の累積誤差を考慮し、撮影コース長をおおむね15 分以内で撮影できる距離とする。",a:"〇",e:"正しい。問題文の通り。撮影前後に整数値バイアス決定及びIMUドリフト初期化のための飛行を行い、等速直線飛行は進入を含めて概ね15分以内とし、これを超える場合は適宜IMU初期化飛行を実施する。"},
+      {q:"リモートセンシングにおいて合成開口レーダ（SAR）は，マイクロ波を地表面に照射し，地表面より戻ってくる反射波を受信する。また，マイクロ波を利用することから雲に覆われていても地表を観測することができる。",a:"〇",e:"正しい。マイクロ波センサには、能動型と受動型の２種類があり、合成開口レーダは能動型で自らマイクロ波を発射し、地表面から反射されるマイクロ波をとらえて観測する方法である。マイクロ波を用いるため、昼夜天候に左右されずに観測が行える"},
+      {q:"森林などの植生が密生している地域において、地表面の標高計測を行うためには、自動標高抽出技術を用いた方法よりも等高線法が適している。",a:"〇",e:"正しい。地表面が不明のため、地上座標の距離間隔などを手掛かりに標高計測を行う等高線法のほうが適している。"},
+      {q:"現在、地上画素寸法が50㎝程度の光学センサを搭載した人工衛星が実用化されている。",a:"〇",e:"正しい。いわゆる「超高解像度光学衛星」のことであり、代表的なものでは商業衛星として「ワールドビュー4号」が約30㎝の分解能を持っている。"},
+      {q:"空中写真測量における撮影計画においては、すべてのモデルが撮影区域内に収まるように設定する。",a:"×",e:"間違い。撮影区域を完全にカバーするため、撮影コースの始めと終わりの撮影区域外をそれぞれ最低１モデル、場合によっては数モデル確保する。"},
+      {q:"実体視が可能な画像を取得することができる人工衛星は、まだ実用化されていない。",a:"×",e:"間違い。「だいち2号」ではパンクロマチック立体視センサー（PRISM）により可能である。"},
+      {q:"UAVによる空中写真測量の三次元点群データの作成では、作成した三次元点群データの位置精度を評価するため，標定点のほかに検証点を設置する。",a:"〇",e:"正しい。標定点とは別に三次元点群の検証を行う点（検証点）を設置し、検証点は標定点からできるだけ離れた場所に、計測対象範囲内に均等に配置することを標準とする。設置する検証点の数は、設置する標定点の総数の半数以上を標準とする。"},
+      {q:"三次元点群データ作成におけるUAV 写真点群測量において，三次元形状復元計算に必要な標定点を，作業地域を囲むように配置するとともに，作業地域内で最も標高の低い地点及び最も標高の高い地点に設置した。",a:"〇",e:"正しい。問題文の通り。標定点は三次元点群データに平面直角座標を与える役割を担う。このため、標定点及び検証点の配置は図形の強さを考える必要がある。このため、図形の強さに欠ける高さ方向（標高の高い地点と低い地点）に標定点が必要となる。"},
+      {q:"GNSS/IMU 装置とは，空中写真の外部標定要素を算出するため，航空機搭載のGNSS測量機，加速度計及び空中写真の露出時の傾きを検出するための３軸のジャイロで構成されるIMU（慣性計測装置），解析ソフトウェア，電子計算機及び周辺機器で構成ざれるシステムである｡",a:"〇",e:"正しい。GNSS/IMU 装置に関する説明である。問題文の通り。"},
+      {q:"リモートセンシングにおいて，可視光の波長帯は，近赤外線の波長帯に比べて植物からの反射率が高い。",a:"×",e:"間違い。植物は近赤外線を強く反射する特性がある。植物は700ｎｍ以上の近赤外線を強く反射し、これにより植物の種類や健康状態を識別すること可能である。可視光は、一般に人間の目に見える電磁波の範囲で、波長はおよそ380ｎｍ～780ｎｍである。近赤外線の波長はおおよそ700ｎｍ～2500ｎｍの範囲の電磁波である。"},
+      {q:"写真地図の作成において，モザイクとは，隣接する空中写真をデジタル処理により結合させ，モザイク画像を作成する作業をいい，モザイク画像を正射変換して正射投影画像を作成する。",a:"×",e:"間違い。モザイクとは、モザイク画像を正射変換して正射投影画像を作成するのではなく、隣接する正射投影画像をデジタル処理で結合させモザイク画像を作成する作業である。"},
+      {q:"UAV レーザ測量において，画像による地物確認に用いるため，レーザ計測と同時期に数値写真を撮影する。",a:"〇",e:"正しい、。問題文の通り。数値写真の撮影は、計測範囲の状況等が変化しないよう、可能な限り計測と同時期に行う必要がある。"},
+      {q:"デジタル航空カメラを用いて撮影した等高度鉛直空中写真において，隣接コースの空中写真との重複度が大きいほど，１コース当たりの撮影枚数は多くなる。",a:"×",e:"間違い。隣接コースの空中写真（サイドラップ）の重複度と１コースの枚数は関係がない。オーバーラップの重複度が大きいと１コース当たりの撮影枚数は多くなる。"},
+      {q:"三次元点群データの作成において，UAV（無人航空機）写真点群測量において，三次元点群データの位置精度を評価するため，標定点とは別に検証点を設置した。",a:"〇",e:"正しい。問題文の通り。三次元点群データの要求精度は、検証点との較差で表される。検証点は、一時的な基準点であり、測量手法の不安定さを補い測量成果の精度を担保する重要な役割を担う。また検証点には対空標識が設置される。"},
+      {q:"写真地図の作成において正射投影画像は，数値写真を標定し，数値地形モデルを用いて作成する。",a:"〇",e:"正しい。問題文の通り（作業規程の準則407条）。正射変換とは数値写真を中心投影から正射投影に変換し、正射投影画像を作成する作業である。"},
+      {q:"リモートセンシングにおいて人工衛星から観測した衛星画像は，航空機から撮影した空中写真より高度が非常に高いため，実体視ができるオルソ画像となる。",a:"×",e:"間違い。航空写真や衛星写真は中心投影法である。これを正射変換したオルソ画像では実体視ができない。"},
+      {q:"同時調整とは，デジタルステレオ図化機を用いて，パスポイント，タイポイント，標定点の写真座標を測定し，標定点成果及び撮影時にGNSS/IMU装置で取得したデータの解析処理で得られた内部標定要素の観測データを統合して調整計算を行い，各写真の内部標定要素の成果値，パスポイント，タイポイントなどの水平位置及び標高を決定する作業である。",a:"×",e:"間違い。内部標定要素ではなく外部標定要素である。同時調整時の調整計算には、撮影時に取得されたGNSS/IMUの解析計算で得られた外部標定要素の観測データ、パスポイント、タイポイント、標定点等を用いる。"},
+      {q:"同時調整とは，各写真の外部標定要素の成果値並びにパスポイント，タイポイントなどの水平位置及び標高を計算する作業をいう。",a:"〇",e:"正しい。同時調整の要点である。問題文の通り。空中三角測量により、パスポイント、タイポイント、標定点の写真座標を測定し、標定点成果及び外部標定要素を統合して調整計算を行う。"},
+      {q:"マイクロ波センサは光学センサに比べて波長の短い電波を使用するため，雲の影響を受けにくい。",a:"×",e:"間違い。光学センサは可視光と赤外線を観測し，マイクロ波センサはこれより波長の長いマイクロ波を観測するため昼夜天候を問わずに観測が行える。"},
+      {q:"人工衛星からのリモートセンシングについて，合成開口レーダ (SAR) は，観測対象物が自ら放射する電磁波を受信して，その性質を調べる受動型センサである。",a:"×",e:"間違い。受動型センサではない。合成開口レーダ (SAR) は、人工衛星自身からマイクロ波を地表に向けて照射し、その跳ね返り（後方散乱）を受信して観測を行う、能動型センサである。"},
+      {q:"航空レーザ測量においてコース間標高値の点検は，コース間の重複部分に点検箇所を選定し，コースごとの標高値の比較点検を行う。",a:"〇",e:"正しい。問題文の通り（作業規程の準則第431条）。点検箇所の数は（コース長㎞／10+1）小数点切り上げ。点検箇所の配置は、重複部分のコース端点に取り、重複部分の上下に均等に配置する。"},
+      {q:"リモートセンシングで一般的に扱われる電磁波の波長域には，波長の長い順に可視光域，赤外域，マイクロ波域などがある。",a:"×",e:"間違い。波長の長い順ではなく短い順である。波長の短い順に並べると次のようになる。γ線 → X線 → 紫外線 → 可視光線 → 赤外線 → マイクロ波"},
+      {q:"UAVによる空中写真測量の三次元点群データの作成では、撮影計画の確認や機器の点検のため試験飛行を行い，状況に合わせて臨機応変に計画を変更できるようにする。",a:"〇",e:"正しい。UAVを飛行させるに当たっては、撮影計画が実際に適合するか確認する飛行（試験飛行）を行い、機器の点検と撮影計画の点検を行う。また、撮影計画は、撮影時の明るさや風速、風向、地形・地物の経年変化等により、現場での見直しが生じることを考慮しておく。"},
+      {q:"航空レーザ測量において，東西 10km，南北10km の平坦な地域で航空レーザ計測を行う予定である。三次元計測データの点検及び調整を行うための調整用基準点は，標準で４点必要となる。",a:"×",e:"間違い。４点ではなく５点である。調整用基準点は、作業地域の面積（平方キロメートル）を25で割った値に１を足した値を標準とし、最低数は４点とする。よって、作業地域の面積（10×10＝100ｋ㎡）を25で割り（100ｋ㎡÷25＝４）、これに１を足した値（４＋１＝５）となる。"},
+      {q:"三次元点群測量において，航空レーザ測量では，航空レーザ測量システムを用いて地形，地物等を計測し，レーザ測距データと最適軌跡解析データの統合解析により，三次元点群データを作成する。",a:"〇",e:"正しい、。問題文の通り。航空レーザ測量による点群データの作成作業である。"},
+      {q:"UAV レーザ測量では，オリジナルデータの点検測量を，検証点の設置による点検や横断測量による点検などの方法で行うことができる。",a:"〇",e:"正しい。問題文の通り。オリジナルデータの点検測量は、・検証点の設置による点検・UAVレーザ測量による点検・横断測量による点検・他の測量手法での三次元点群データによる点検で行うことができる。"},
+      {q:"人工衛星からのリモートセンシングの特徴は、広域を一度に観測できることや周期的な観測ができることである。",a:"〇",e:"正しい。リモートセンシングの特徴として、「広い範囲を一度にとらえる」、「同じ地域を長期間観測できる」、「現地に直接出向かずに状態が分かる」、「温度など人間の目で判断できないことが解る」などがある。"},
+      {q:"高層建物が密集している都市部で、建物の倒れ込みの影響が少ない写真地図を作成するために、同一撮影コース内の隣接空中写真との重複度及び隣接撮影コースの空中写真との重複度ができるだけ小きくなるように、撮影計画を立てた。",a:"×",e:"間違い。ＯＬやＳＬを小さくすると建物が主点から遠くなり、倒れこみが大きくなる。"},
+      {q:"GNSS/IMU 装置において、GNSSｱﾝﾃﾅは航空カメラに，IMUは機体頂部に取り付ける。",a:"×",e:"間違い。GNSSｱﾝﾃﾅは機体頂部、IMUは航空カメラ本体に取り付ける。"},
+      {q:"調整計算において、 GNSS/IMU により取得された 外部標定要素 を使用することで、これを使用しない場合と比較して、使用する標定点の点数を 少なく することができる。",a:"〇",e:"正しい。問題文の通り。GNSS/IMUより外部標定要素が得られない場合は、外部標定要素の観測データと基準点を使用して調整計算を行う必要がある。"},
+      {q:"熱赤外線のリモートセンシングでは，対象物からの熱放射を観測するため，夜間でも水面の温度や雲の分布を観測することができる。",a:"〇",e:"正しい。熱赤外線のリモートセンシングでは、地表面や物体から放出される熱エネルギーが測定される。このため、対象物の温度を知ることができる。熱赤外線リモートセンシングでは、可視、反射赤外線リモートセンシングと異なり、夜間でも地表面や水面の温度の測定ができる。"},
+      {q:"写真地図の作成において数値地形モデルの点検は，デジタルステレオ図化機などを用いて計測された標高点と，抽出された数値地形モデルファイルの標高点を比較して行う。",a:"〇",e:"正しい。問題文の通り（作業規程の準則405条4項）。点検位置は無作為に抽出された標高点とし、点検結果は精度管理表にまとめるものとする。"},
+      {q:"GNSS/IMU 装置とは，空中写真の外部標定要素を算出するため，航空機搭載のGNSS測量機，高度計及び空中写真の露出時の高度を検出するための３軸のジャイロで構成されるIMU（慣性計測装置），解析ソフトウェア，電子計算機及び周辺機器で構成ざれるシステムである｡",a:"×",e:"間違い。GNSS/IMU 装置は，GNSS測量機，加速度計及び空中写真の露出時の傾きを検出するための３軸のジャイロで構成されるIMU（慣性計測装置）である｡"},
+      {q:"三次元点群データ作成における地上レーザ測量において同一箇所から複数回計測する場合は，それぞれ地上レーザスキャナの器械高を変えて行う。",a:"〇",e:"正しい。問題文の通り。作業規程の準則には、「同一箇所から複数回計測する場合は、それぞれ地上レーザスキャナの器械高を変えることを原則とする。」とある。これは観測条件を変えることでデータ取得の信頼性を高め、より正確で信頼性の高い三次元点群データを取得するためである。"},
+      {q:"高高度で撮影した空中写真と低高度で撮影した空中写真の撮影範囲が同一の場合、高高度で撮影した方が、建物などの倒れ込みの少ない空中写真を撮影することができる。",a:"〇",e:"正しい。問題文の通りである。撮影範囲を同一とすると撮影高度が低いほど写真サイズは大きくなる。"},
+      {q:"数値図化において標高点の水平位置の許容誤差は，地図情報レベル2500 の場合0.6 m 以内である。",a:"×",e:"間違い。標高点の較差の許容範囲は地図情報レベル2,500では0.4ｍ以内である。0.6ｍは地図情報レベル5,000である。"},
+      {q:"森林などの植生が密生している地域において、地表面の標高計測には、自動標高抽出技術を用いた方法よりも等高線法が適している。",a:"〇",e:"正しい。地表面が隠されて（高層建築物の多い都市部や濃淡の少ない森林や裸地）いる場所では、自動標高抽出によるミスマッチングが起こりやすく、地上座標の距離間隔などを手掛かりに標高計測を行う等高線法などを用いて補う必要がある。"},
+      {q:"人工衛星による熱赤外線のリモートセンシングでは，電磁波を照射し，対象物からの反射の強さを観測するため，夜間も観測することができる。",a:"×",e:"間違い。光学センサを利用するリモートセンシングで、電磁波の反射の強さを観測するのは、可視・近赤外リモートセンシングである。熱赤外線リモートセンシングでは、太陽光を浴びて暖められた地表面から放出される熱赤外線をとらえて観測する方法である。"},
+      {q:"航空レーザ測量における航空レーザ用数値写真の撮影範囲は必要に応じて設定し，計測対象地域の80 ％を標準とする。",a:"×",e:"間違い。作業規程の準則第424条4項。地表面画像の撮影範囲は、計測対象地域を十分カバーしなければならない。計測データは、作業地域の外周を格子間隔の１０倍以上の距離を延伸した範囲について取得する。航空レーザ測量におけるレーザ測距装置の位置は，地上に設置した固定局との基線解析をスタティック法により行い求めることができる。"},
+      {q:"UAVによる空中写真測量の三次元点群データの作成で、対空標識の設置に当たっては，あらかじめ土地の所有者又は管理者の許可を得る。",a:"〇",e:"正しい。標定点及び検証点には対空標識を設置する必要があり、当然設置される土地の所有者、管理者の許可を得る必要がある。"},
+      {q:"デジタル航空カメラを用いて撮影した等高度鉛直空中写真において，同一コース内の隣接空中写真間の重複度が大きいほど，撮影基線長は短くなる。",a:"〇",e:"正しい。１組の空中写真で主点間の長さを考えれば良い。重複度が大きければ互いの写真主点が近づくため，基線長が短くなる。"},
+      {q:"航空レーザ測量において，航空レーザ測量システムは，ボアサイトキャリブレーションを実施したものを用い，キャリブレーションの有効期間は１年とする。",a:"×",e:"間違い。１年ではなく６ヶ月である。"},
+      {q:"光学センサで広く採用されているプッシュブルーム走査方式のラインセンサでは，人工衛星の進行とともに帯状に画像を取得しており，その画像は正射投影画像である。",a:"×",e:"間違い。プッシュブルーム方式のようなラインセンサは、センサ取付直下点の軌跡に対して両側に倒れ込むように写る（一次元中心投影）。正射投影画像ではない。リモートセンシングの主なセンサタイプは、中心投影方式（フレーム、ライン、ポイントの各センサ）と非中心投影方式（レーダ、合成開口レーダ）に大別される。"},
+      {q:"リーモートセンシングにおいて、近赤外線は，可視光線に比べて植生からの反射率が高い。",a:"〇",e:"正しい。近赤外線は家電製品のリモコンや赤外線カメラなどに利用される。植生は太陽光の可視域（可視光線）の反射が低く、近赤外域の反射が非常に強いという分光反射特性をもつ。"},
+      {q:"作成した標高データをデジタルステレオ図化機でステレオモデルと重ねて表示したら、著しく地表面と異なる点があったため、デジタルステレオ図化機を用いて標高データを修正した。",a:"〇",e:"正しい。数値地形モデルの編集作業のことである。デジタルステレオ図化機を用いて行われる。"},
+      {q:"人工衛星からのリモートセンシングについて，マイクロ波センサは光学センサに比べ波長の長い電磁波を観測し，雲の影響を受けにくい。",a:"〇",e:"正しい。マイクロ波は光学センサの可視光・赤外線よりも波長が長く、雲を透過しやすいため、全天候型の観測が可能である。マイクロ波（1cm～10cm）などの波長が長い電磁波は雲の水滴を回り込むことができ、雲を通過することが可能である。"},
+      {q:"リモートセンシングにおいて，光学センサで広く採用されているプッシュブルーム走査方式のラインセンサでは，人工衛星の進行とともに帯状に画像を取得しており，その画像は正射投影画像である。",a:"×",e:"間違い。一時中心投影である。プッシュブルーム方式のようなラインセンサは、センサ取付直下点の軌跡に対して倒れこむように写る（一次元中心投影）。このため、正射投影ではない。リモートセンシングの主なセンサタイプは、中心投影方式（フレームセンサ、ラインセンサ、ポイントセンサ）、非中心投影方式（側視レーダ、合成開口レーダ）がある。"},
+      {q:"UAVによる空中写真測量の三次元点群データの作成では、目的に応じて三次元点群データの位置精度を設定し，それに合わせて撮影を計画する。",a:"〇",e:"正しい。作成する三次元点群の位置精度はその目的に応じて設定し、それぞれの位置精度に必要な作業を行う。"},
+      {q:"三次元点群データの作成において，三次元形状復元計算とは，撮影した数値写真及び標定点を用いて，数値写真の外部標定要素及び数値写真に撮像された地点の位置座標を求め，地形，地物等の三次元形状を復元し，オリジナルデータを作成する作業をいう。",a:"〇",e:"正しい。問題文の通り。三次元復元計算の定義である。三次元復元計算とは一般的にSfM（Structure from Motion）と呼ばれるソフトウェアによる処理である。これにより対象物を撮影した複数枚の写真から対象物の三次元点群データを得ることができる。"},
+      {q:"UAV 写真点群測量では，撮影した数値写真を用いて，三次元形状復元計算により三次元点群データを作成する。",a:"〇",e:"正しい。問題文の通り。UAV写真点群測量の概要である。作業規程の準則によれば、三次元形状復元計算とは、撮影した数値写真及び標定点を用いて、数値写真の外部標定要素及び数値写真に撮像された地点（特徴点）の位置座標を求め、地形、地物等の3次元形状を復元し、点群が生成される"},
+      {q:"デジタル航空カメラを用いて撮影した等高度鉛直空中写真において，カメラの画面距離が長いほど，空中写真１枚に写る範囲は広くなる。",a:"×",e:"間違い。画面距離（焦点距離）が長いと視野が狭くなるので写真範囲も狭くなる。"},
+      {q:"同時調整とは，空中写真用スキャナを用いて，パスポイント，タイポイント，標定点の写真座標を測定し，標定点成果及び撮影時にGNSS/IMU装置で取得したデータの解析処理で得られた外部標定要素の観測データを統合して調整計算を行い，各写真の外部標定要素の成果値，パスポイント，タイポイントなどの水平位置及び標高を決定する作業である。",a:"×",e:"間違い。空中写真用スキャナではなくデジタルステレオ図化機である。同時調整に使用される機器は、パスポイント、タイポイントの選定・観測などの機能が優れているデジタルステレオ図化機に変わってきている。作業規程の準則（第196条）ではデジタルステレオ図化機が用いられることを前提としている。"},
+      {q:"写真地図の作成において，撮影縮尺1/30,000 の空中写真及びグリッド間隔50 m，標高点の標準偏差5 m の数値地形モデルを使用して地図情報レベル2500 の写真地図を作成した。",a:"×",e:"間違い。地図情報レベル2500の写真地図を作成するためには、撮影縮尺1/10,000～1/12,500、グリッド間隔25ｍ以内、標高点の標準偏差1.0ｍ以内の精度が必要になる。問題文は、地図情報レベル10000の精度である。"},
+      {q:"三次元点群測量において，UAV（無人航空機）写真点群測量では，UAVにより地形，地物等を撮影し，その数値写真を用いて三次元点群データを作成する。",a:"〇",e:"正しい。問題文の通り。UAV写真測量に関する文章である。"},
+      {q:"空中写真測量における数値地形図データ作成では、無人航空機（UAV）で一定の条件で撮影した空中写真も使用可能である。",a:"〇",e:"正しい。無人航空機、いわゆるドローンを用いた空中写真測量である。"},
+      {q:"人工衛星からのリモートセンシングについて，プッシュブルーム走査方式の光学ラインセンサを搭載した人工衛星により，面的に連続した衛星画像を得たとき，その投影中心はスキャンラインごとに1点となる。",a:"〇",e:"正しい。プッシュブルーム方式（ラインセンサ）は、進行方向に沿って1列ずつスキャンする。このため、1列（スキャンライン）ごとに投影中心が存在し、画像全体として中心が1つの中心投影とは異なる。プッシュブルーム方式のようなラインセンサは、センサ取付直下点の軌跡に対して倒れこむように写る（一次元中心投影）。リモートセンシングの主なセンサタイプは、中心投影方式（フレームセンサ、ラインセンサ、ポイントセンサ）、非中心投影方式（側視レーダ、合成開口レーダ）がある。"},
+      {q:"三次元点群データ作成におけるUAV 写真点群測量には，性能などが作業規程に規定されている条件を満たしていれば，市販されているデジタルカメラを使用できる。",a:"〇",e:"正しい。問題文の通り。作業規程の準則に定められた性能及び機能を満たしていれば市販のカメラを使用することができる。"},
+      {q:"三次元点群データ作成における車載写真レーザ測量では，車載写真レーザ測量システムを用いて道路などを計測し，計測した距離と角度から三次元形状復元計算により三次元点群データの座標を求めている。",a:"×",e:"間違い。距離と角度を計測しているのではない。レーザ光の反射を利用した直接計測を行っている。"},
+      {q:"写真地図の作成において，高層建物が密集している都市部で，建物による影の少ない写真地図を作成するために，太陽高度の高い時間帯を選んで空中写真撮影を行った。",a:"〇",e:"正しい。問題文の通り。太陽高度が高い、つまり太陽が天頂に近い場所にあれば、当然建物による影は少なくなる。"},
+      {q:"合成開口レーダ（SAR）は，マイクロ波を対象物に照射し，対象物からの反射波を観測するため，夜間も観測することができる。",a:"〇",e:"正しい。合成開口レーダ（マイクロ波センサー）はマイクロ波（可視光線や赤外線より波長が長い）を地上に発射しその反射波を受信する。このため、昼夜を問わず悪天候でも観測が行える。"},
+      {q:"数旗地形モデルを作成する際に、地形を忠実に表したデータを作成するため、段差の大きい人工斜面などの地形が急激に変化する場所では、これらの斜面の傾斜方向と平行にブレークラインを取得した。",a:"×",e:"間違い。ブレークラインは、斜面傾斜方向と直角に入れる。"},
+      {q:"三次元点群データの作成において，地上レーザ点群測量は，地表面だけでなく，周囲に存在する地物の側面の三次元点群データも作成できる。",a:"〇",e:"正しい。問題文の通り。三次元点群データを作成する作業である。"},
+      {q:"航空レーザ測量におけるレーザ測距装置の位置は，地上に設置した固定局との基線解析をスタティック法により行い求めることができる。",a:"×",e:"間違い。作業規程の準則第420条 固定局の設置に関する文章。スタティック法ではなく、レーザ測距装置の位置をキネマティック法で求める。固定局の設置はレーザ測距装置の位置を求めるための地上固定局を設置する作業である。"},
+      {q:"建物の倒れ込みの影響の少ない写真地図を作成するため、同一撮影コース内の隣接空中写真との重複度及び隣接コースの空中写真との重複度ができるだけ大きくなるように撮影計画を立てる。",a:"〇",e:"正しい。空中写真は中心投影であるため、写真主点から離れるほど倒れ込みが大きくなる。問題のようにOLやSLをできるだけ大きくすれば、建物が主点に近くなり倒れ込みの影響は少なくなる。"},
+      {q:"撮影計画においては，全ての主点位置が撮影区域内に収まるように設定する。",a:"×",e:"間違い。撮影計画では撮影区域を完全にカバーするため、撮影コースの始めと終わりの撮影区域外をそれぞれ最低１モデル以上設定する必要がある。"},
+      {q:"数値地形モデル（DTM）を使用して正射投影画像を作成すると、すべての地物が正しい平面位置に投影される。",a:"×",e:"間違い。正射投影画像の作成は、数値写真を標定し数値地形モデルを用いて行われるが、橋梁や高架道路など空中に架設されたものなどは正しい平面位置に投影されない。"},
+      {q:"三次元点群測量において，車載写真レーザ測量では，車両に搭載した自車位置姿勢データ取得装置，レーザ測距装置，計測用カメラなどを用いて道路及びその周辺の地形，地物等を計測し，取得した写真点群データから三次元点群データを作成する。",a:"〇",e:"正しい。問題文の通り。車載写真レーザ測量の概要である。"},
+      {q:"UAVレーザ測量において，スキャン角度は，計測対象物へのレーザ光の入射角を45°以上とするとともに，必要な計測距離を満たすように定めることを標準とする。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"リーモートセンシングにおいて、熱赤外線センサは，対象物からの熱放射を観測するため，夜間も観測することができる。",a:"〇",e:"正しい。熱赤外線センサは太陽の光を浴びて暖められた地表の表面から放出される熱赤外線をとらえて観測する。放射の強さにより、地面や海の表面温度などが計測される。熱赤外リモートセンシングは、雲がなければ夜でも地表を観測することができる。熱赤外線センサは，対象物からの熱放射を観測するため，夜間も観測することができる。"},
+      {q:"写真地図の作成において数値写真は原則として1 年以内に撮影されたものを用いることとし，撮影時期，天候，撮影コースと太陽位置との関係などによって現れる色調差や被写体の変化を考慮して用いる。",a:"〇",e:"正しい。問題文の通り（作業規程の準則399条）。"},
+      {q:"航空レーザ測量において，レーザ測距装置はファーストパルス及びアザーパルスの２パルス以上計測できる必要がある。",a:"×",e:"間違い。アザーパルスではなくラストパルスである。航空レーザ測量システムを構成する１つである、レーザ測距装置の性能には・ファーストパルス及びラストパルスの２パルス以上の計測ができる。・スキャン機能を有する。・人体への影響を防止する機能がある。・安全基準が明確に示されていること。などがある。"},
+      {q:"リモートセンシングで一般的に扱われる電磁波の波長域には，波長の短い順に可視光域，赤外域，マイクロ波域などがある。",a:"〇",e:"正しい。問題文の通り。電磁波は波長の短い順で、放射線 → 紫外線 → 可視光 → 赤外線 → 電波（マイクロ波）である。"},
+      {q:"空中写真測量におけるモデルの数値図化範囲は、原則としてパスポイントで囲まれた区域内とする。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"リモートセンシングにおいて，光学センサで受信する電磁波は，マイクロ波センサで受信する電磁波より波長が短く，より雲を透過しづらい。",a:"〇",e:"正しい。雲を通過しづらい。電磁波は波長によってその通過性が異なる。このため、波長が短いもの、可視光（380ｎｍ～700ｎｍ）では雲や霧の水滴の大きさ（0.1㎜以上）に比べて短く雲の水滴によって乱されて通過しづらい。マイクロ波（1cm～10cm）などの波長が長い電磁波は雲の水滴を回り込むことができ、雲を通過することが可能である。"},
+      {q:"リーモートセンシングにおいて、光学センサで使用する電磁波の波長はマイクロ波センサで使用するものより長いため，雲の影響を受けない。",a:"×",e:"間違い。光学センサは可視・近赤外リモセンと熱赤外リモセンに分類される。可視・近赤外は太陽光が地上の物体に当たることで反射する可視光線や近赤外線を捉えて観測する方法。熱赤外は太陽光で暖められた地表から放出される熱赤外線を捉えて観測する方法である。どちらも雲がある場合は、地表で反射（放出）されるものが遮られるため観測できない。"},
+      {q:"実体視可能な像が得られる地球観測衛星も実用化されており，この画像から標高データを取得できる。",a:"〇",e:"正しい。国土地理院の「だいち」には，パンクロマチック立体視センサが搭載されており，地表の三次元データを取得できる。"},
+      {q:"合成開口レーダ（SAR）によく使用される周波数帯には，Ｌバンド，Ｘバンドがある｡",a:"〇",e:"正しい。SARに用いられる周波数帯には，Lバンド、Cバンド、Xバンドのマイクロ波周波数帯がある。それぞれ波長が異なるためその特徴も違っている。"},
+      {q:"同時調整における調整計算は，区域撮影においては原則として，作業地区全域を一つのブロックとして多項式法により行うものとし，標定点は，ブロックの四隅付近と中央部付近 に配置することを標準とする。",a:"×",e:"間違い。多項式法ではなくバンドル法である。同時調整の手法では、作業規程の準則（第196条）でバンドル法のみが規定されている。"},
+      {q:"合成開口レーダ（SAR）は、マイクロ波を地表に向けて照射し、その反射波を観測する能動型のセンサのため、一般に昼夜を問わず観測することができる。",a:"〇",e:"正しい。合成開口レーダ（マイクロ波センサー）はマイクロ波（可視光線や赤外線より波長が長い）を地上に発射しその反射波を受信する。このため、昼夜天候を問わずに観測が行える。"},
+      {q:"人工衛星からのリモートセンシングについて，近赤外線は，可視光に比べ，植物からの反射率が高い。",a:"〇",e:"正しい。問題文の通り。植物は可視光を吸収し、近赤外線を強く反射する特性がある。植物は700ｎｍ以上の近赤外線を強く反射し、これにより植物の種類や健康状態を識別すること可能である。可視光は、一般に人間の目に見える電磁波の範囲で、波長はおよそ380ｎｍ～780ｎｍである。近赤外線の波長はおおよそ700ｎｍ～2500ｎｍの範囲の電磁波である。"},
+      {q:"UAVによる空中写真測量の三次元点群データの作成では、撮影対象の比高が大きく変化する場合でも，三次元点群データの位置精度の確保のため撮影基準面は撮影対象地域全体で一定としなければならない。",a:"×",e:"間違い。撮影基準面は、撮影地域に対して一つを定めることを標準とするが、比高の大きい地域にあっては、数コース単位に設定することができる。"},
+      {q:"UAVレーザ測量において，計測対象物との距離は，使用するレーザ測距装置の最大測距距離の80%以下となるように定めることを標準とする。",a:"〇",e:"正しい。問題文の通り。併せて最大距離を超えないようにする。"},
+      {q:"リーモートセンシングにおいて、合成開口レーダー（SAR）は，対象物に電磁波を照射し，その反射波を受信して地表面の状態を把握する能動型センサである。",a:"〇",e:"正しい。合成開口レーダとは、自ら電波を発出し、対象物から反射された電波を受信し映像化するものであり。能動型とは、地球観測衛星に載せられたセンサから自らマイクロ波（電波）を発射し、地表面から反射されるマイクロ波をとらえて観測地表面の状況や災害等の監視、降雨等の計測に使用される。受動型とは、地表面から自然に放射されているマイクロ波を観測する。自然に放射されるマイクロ波の強さは、海面温度、積雪量、氷の厚さ等の観測に適している。"},
+      {q:"数値地形モデル（DTM）には、河川、湖沼などの陸水面や海水面などのすべての水部に、－9,999 m など現実に存在しない標高値を与える。",a:"×",e:"間違い。全ての水部には適用されない。大規模な湖沼水面や海水面に与えられる。"},
+      {q:"三次元点群測量において，地上レーザ測量では，地上レーザスキャナを用いて地形，地物等を計測し，取得したデータから三次元点群データを作成する。",a:"〇",e:"正しい。問題文の通り。三次元点群測量の概要である。"},
+      {q:"三次元点群データ作成におけるUAV 写真点群測量において，隣接コースの数値写真との重複度が40%以上となるように撮影計画を立案した。",a:"×",e:"間違い。重複度は30％を標準とする。作業規程の準則によれば、「同一コース内の隣接数値写真との重複度は60％、隣接コースの数値写真との重複度は30％を標準とする。」とある。"},
+      {q:"人工衛星の光学センサは、雲の影響を受けることなく地表面を観測することができる。",a:"×",e:"間違い。光学センサは、可視光線と赤外線（近赤外線、中間赤外線、熱赤外線）を観測する。このため、可視光線と近赤外線を観測する場合は太陽光の当たらない夜と地上で反射した太陽光を遮る曇の下では観測が行えない。熱赤外線を観測する場合は、昼夜を問わずに観測できるが、雲の下では観測できない。"},
+      {q:"リモートセンシングにおいて，合成開口レーダ（SAR）は，対象物にマイクロ波を照射し，その反射波を受信して地表面の状態を把握する能動型センサである。",a:"〇",e:"正しい。合成開口レーダ（マイクロ波センサ）はマイクロ波（可視光や赤外線より波長が長い）を地需要に発射してその反射波を受診する。このため昼夜や悪天候を問わず観測が行える。"},
+      {q:"写真地図の作成において，建物の倒れ込みの影響が少ない写真地図を作成するために，同一撮影コース内の隣接空中写真との重複度及び隣接撮影コースの空中写真との重複度ができるだけ大きくなるように撮影計画を立てた。",a:"〇",e:"正しい。問題文の通り。中心投影である空中写真は、写真主点から離れるほど倒れ込みが大きくなる。この影響を小さくするためには、問題文にあるように重複度を大きくする必要がある。"},
+      {q:"人工衛星からのリモートセンシングの特徴は，広域を一度に観測できることや周期的に観測ができることである。",a:"〇",e:"正しい。リモートセンシングは人工衛星による観測であるため、広域をまたその多くが太陽同期準回帰軌道を利用しているため、ある一定期間毎に同じ場所を同じ位置で観測することができる。"},
+      {q:"航空レーザ測量において，航空レーザ測量システムは，ボアサイトキャリブレーションを実施したものを用い，キャリブレーションの有効期間は６ヶ月とする。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"写真地図の作成において建物の倒れ込みの影響の少ない写真地図を作成するためには，同一撮影コース内の隣接空中写真との重複度及び隣接コースの空中写真との重複度が，できるだけ小さくなるように撮影計画を立てるとよい。",a:"×",e:"間違い。重複度（OLやSL）を小さくすると、建物が写真主点から遠ざかることになり、倒れ込みが大きくなる。"},
+      {q:"航空レーザ測量においてフィルタリング点検図は，フィルタリングが適切に行われたか否か，作成されたグラウンドデータの異常の有無について点検するために作成する。",a:"〇",e:"正しい。問題文の通り（作業規程の準則第442条）。フィルタリング点検図は国土基本図の図郭単位で作成され、格子間隔の地図情報レベルに対応した縮尺で出力する。"},
+      {q:"リーモートセンシングにおいて、合成開口レーダー（SAR）に使用される周波数帯には，L バンド，X バンドなどがあり，X バンドの方がL バンドより波長は長く樹木などを透過しやすい。",a:"×",e:"間違い。SARに使用される周波数帯はC（37.5～75㎜）,L（150～300㎜）,X（24～37.5㎜）バンド（波長）がある。XバンドよりLバンドの方が波長は長く、波長の長い電磁波のほうが樹木などを透過しやすい。"},
+      {q:"GNSS/IMU 装置において、GNSSｱﾝﾃﾅは機体頂部に，IMUは航空カメラ本体　 に取り付ける。",a:"〇",e:"正しい。GNSS/IMUの取付け部に関する説明である。問題文の通り。"},
+      {q:"人工衛星からのリモートセンシングについて，現在，地上における空間分解能が 50 cmよりも細かい画像を取得できる，光学センサを搭載した人工衛星が実用化されている。",a:"〇",e:"正しい。アメリカMaxarなどの商用衛星（WorldView-3など）は、31cmの非常に高い地上分解能（パンクロマチック）を持っている。"},
+      {q:"GNSS/IMU 装置を用いた撮影では，IMU の累積誤差を考慮し，撮影コース長をおおむね15 分以内で撮影できる距離とする。",a:"〇",e:"正しい。撮影コース長を長くとると、飛行機の姿勢（IMU）誤差が累積して大きくなり、位置（GNSS）の値と精度が大きく離れてしまうため、問題文のように定めてある。"},
+      {q:"三次元点群データの作成において，UAV 写真点群測量において，作業地域内で最も標高の高い地点及び最も標高の低い地点に標定点を設置した。",a:"〇",e:"正しい。問題文の通り。標定点は三次元点群データに平面直角座標を与える役割を担う。このため、標定点及び検証点の配置は図形の強さを考える必要がある。このため、図形の強さに欠ける高さ方向（標高の高い地点と低い地点）に標定点が必要となる。"},
+      {q:"地上画素寸法の小さいグレースケール画像と地上画素寸法の大きいカラー画像を用いて，グレースケール画像と同じ地上画素寸法で判読性の向上したカラー画像を生成することができる。",a:"〇",e:"正しい。グレー画像は白黒の濃淡が256諧調で表示され、カラー画像は三原色（RGB）で色を表示する。画素の大きいカラー画像の中に画素の小さいグレースケールの濃淡を表示すれば同色でもその濃淡により判読性の向上したカラー画像が生成される。"},
+      {q:"UAV 写真点群測量において，水平位置及び標高の基準となる標定点を検証点としても利用し，三次元点群データの位置精度の評価を行う。",a:"×",e:"間違い。標定点を検証点として利用することはできない。標定点は三次元形状復元計算に必要となる水平位置及び標高の基準となる点。検証点は三次元点群の検証を行う点である"},
+      {q:"UAVレーザ測量において，UAVの位置の決定は，GNSSによるキネマティック法で行うものとし，キネマティック解析で用いる固定局は、計測地域から直線距離で80kmを超えないものとする。",a:"×",e:"間違い。固定局の位置は、計測区域から80㎞ではなく、50㎞を超えない点を用いる。"},
+      {q:"同時調整とは，デジタルステレオ図化機を用いて，パスポイント，タイポイント，標定点の写真座標を測定し，標定点成果及び撮影時にGNSS/IMU装置で取得したデータの解析処理で得られた外部標定要素の観測データを統合して調整計算を行い，各写真の外部標定要素の成果値，パスポイント，タイポイントなどの水平位置及び標高を決定する作業である。",a:"〇",e:"正しい。同時調整はモデルの標定に必要な外部標定要素を求める作業である。これに使用される機器は、パスポイント、タイポイントの選定・観測などの機能が優れているデジタルステレオ図化機に変わってきている。作業規程の準則（第196条）ではデジタルステレオ図化機が用いられることを前提としている。"},
+      {q:"UAV 写真測量において，高低差が大きい地域を撮影する場合，撮影基準面は数コース単位に設定することができる。",a:"〇",e:"正しい。問題文の通り。作業規程の準則によれば、撮影基準面は、撮影区域に対して一つを定めることを標準とする。ただし、高低差の大きい地域にあっては、UAV運航の安全を考慮し、数コース単位に設定することができる。"},
+      {q:"GNSS/IMU 装置とは，空中写真の外部標定要素を算出するため，航空機搭載のGNSS測量機，加速度計及び空中写真の露出時の傾きを検出するためのXY軸のジャイロで構成されるIMU（慣性計測装置），解析ソフトウェア，電子計算機及び周辺機器で構成ざれるシステムである｡",a:"×",e:"間違い。XY軸ではなく、３軸のジャイロである。"}
+    ]
+  }
+  ,{
+    name:"地図編集", icon:"🗾",
+    questions:[
+      {q:"都市計画区域外の基盤地図情報の平面位置の誤差は25m以内，高さの誤差は5.0m以内である。",a:"〇",e:"正しい。計画区域内では平面位置の誤差は2.5ｍ以内、高さの誤差は1.0ｍ以内。"},
+      {q:"GISを用いると，数値標高モデルと写真などから判断した浸水箇所の位置情報を利用して，おおよその浸水域を推定し，地図上に表現できる。",a:"〇",e:"正しい。DEMと実際の浸水箇所のデータを組み合わせることで、浸水域をシミュレーションすることが可能。"},
+      {q:"GISの道路ネットワークデータを用いて，ネットワーク解析で最短経路探索を行うことにより，避難経路の検討に活用できる。",a:"〇",e:"正しい。道路を線・交差点を点としたネットワークデータを用いることで、避難所までの最短時間や最短距離を計算できる。"},
+      {q:"GISのボロノイ分割の機能により，公民館及び駅の位置を表す点データのみを用いて，市内全域の各公民館からそれぞれ直線距離が最も短い駅を特定することができる。",a:"〇",e:"正しい。ボロノイ分割により母点間を結ぶ直線の垂直二等分線を引くことで各母点間の影響範囲を示すポリゴンを形成でき、特定の施設から最も近い施設を特定できる。"},
+      {q:"球面をひずみなく平面上に表す理想的な地図投影法は存在しないため，地図の目的や用途，対象地域によって投影法を選択する必要がある。",a:"〇",e:"正しい。地図投影法は距離・角度・面積を同時にひずみなく投影することはできない。"},
+      {q:"UTM図法では，地球上の北緯84度から南緯80度までの地域をガウス・クリューゲル図法で投影している。",a:"〇",e:"正しい。北緯84°から南緯80°までの地域で適用されている。"},
+      {q:"GISのジオリファレンスの機能により，過去の写真地図に座標を与えて，現在の地図と重ね合わせて比較することができる。",a:"〇",e:"正しい。ジオリファレンス機能とは地図や写真などの画像に位置座標を与える機能である。"},
+      {q:"基盤地図情報に係る項目は，測量の基準点，海岸線，公共施設の境界線，行政区画の境界線及び代表点，道路縁及び標高点の６項目である。",a:"×",e:"間違い。この他に軌道の中心線・水涯線・建築物の外周線・市町村の町もしくは字の境界線及び代表点・街区の境界線及び代表点・河川堤防の表法肩の法線等が含まれ計13項目である。"},
+      {q:"地図上において，正角図法と正積図法の性質を同時に満足させることは，理論上可能である。",a:"×",e:"間違い。正角図法と正積図法の性質を同時に満足させることは理論上不可能である。"},
+      {q:"UTM座標系において中央経線と赤道の交点から東西方向に±100ｋｍ以内の地域と，平面直角座標系における原点からＹ軸方向に±100ｋｍ以内の地域では，どちらも縮尺係数が1未満である。",a:"×",e:"間違い。UTM座標系において中央経線上の縮尺係数は0.9996、約180㎞離れると１となる。"},
+      {q:"メタデータは，データ（製品）に関する説明情報である。クリアリングハウスを利用することで，利用者がデータの品質を確認できる。",a:"〇",e:"正しい。クリアリングハウスとは活用したい空間データを検索するシステムであり、検索対象はメタデータである。"},
+      {q:"正距方位図法で作成した地図は，地図上で選んだどの点においても距離と方位が正しく表現されている。",a:"×",e:"間違い。正距方位図法は中心からの距離と方位を正しく表示するが、「どの点においても」ではなく中心点からのものが正しい。"},
+      {q:"地図投影法とは，立体である地球の表面を平面の地図に表すための方法であり，必ず何らかのひずみが生じるため，目的に応じて投影法を選択する必要がある。",a:"〇",e:"正しい。楕円体である地球の表面を平面上に投影する場合、距離・角度・面積を同時にひずみなく投影することはできない。"},
+      {q:"ガウス・クリューゲル図法は，正角円錐図法の一種で，回転楕円体から平面に直接投影を行うものである。",a:"×",e:"間違い。正角円錐図法ではなく、正角横円筒図法である。"},
+      {q:"DTMを用いて、数値空中写真を中心投影から正射投影に変換し、正射投影画像（オルソ画像）を作成することができる。",a:"〇",e:"正しい。空中写真を正射変換するためには写真上の位置と地上の位置を対応させる必要があり、標高データであるDTMが用いられる。"},
+      {q:"都市計画区域内の基盤地図情報を基図として，地図情報レベル5000の地図を編集・作成した。",a:"〇",e:"正しい。都市計画区域内の基盤地図情報は地図情報レベル2,500相当の精度で整備されており、これを基図として地図情報レベル5,000の地図編集・作成ができる。"},
+      {q:"国が保有する基盤地図情報は，原則としてインターネットを利用して無償で提供される。",a:"〇",e:"正しい。地理空間情報推進活用法 第18条2項による。"},
+      {q:"正角図法は，地球上と地図上との対応する点において，任意の2方向のきょう角が等しくなり，ごく狭い範囲での形状が相似となる図法である。",a:"〇",e:"正しい。正角図法は地図上の任意の２点間を結ぶ線が経線に対して正しい角度となる。"},
+      {q:"メタデータの再配布に関する禁止事項は配布情報である。",a:"×",e:"間違い。制約情報である。禁止事項は使用に関する制約情報を表す。"},
+      {q:"デジタル航空カメラで撮影した数値写真を正射変換し，地図情報レベル2500の図郭割りで切り出したデータはベクタデータである。",a:"×",e:"間違い。ラスタデータである。数値写真を正射変換して切り出した写真地図であるため。"},
+      {q:"地理空間情報を地球上の位置と関連づけることを空間参照といい，郵便番号や行政コードなどから間接的に場所を特定する仕組みを地物カタログによる空間参照という。",a:"×",e:"間違い。地物カタログではなく地理識別子である。"},
+      {q:"地図投影法において，正角図法と正積図法の性質を同時に満足させることは，理論上不可能である。",a:"〇",e:"正しい。正角と正距、正距と正積は同時に満足することができるが、正角と正積は同時に満足させることができない。"},
+      {q:"基盤地図情報に係る項目は，国土交通省令で，測量の基準点，海岸線，道路の中心線，建築物の外周線などの13項目が定められている。",a:"×",e:"間違い。道路の中心線ではなく道路縁である。"}
+    ,
+      {q:"都市計画区域外の基盤地図情報の平面位置の誤差は25 m 以内，高さの誤差は5.0 m 以内である。",a:"〇",e:"正しい。問題文の通り。計画区域内では、平面位置の誤差は2.5ｍ以内、高さの誤差は1.0ｍ"},
+      {q:"GIS 及び地理空間情報の活用方法について河川が氾濫した場合，数値標高モデルと写真などから判断した浸水箇所の位置情報を利用して，おおよその浸水域を推定し，地図上に表現できる。",a:"〇",e:"正しい。問題文の通り。DEMと実際の浸水箇所のデータを組み合わせることで、周囲の地形から水がどこまで広がるかをシミュレーションすることが可能である。"},
+      {q:"GIS 及び地理空間情報の活用方法について道路のネットワークデータを用いて， GIS のネットワーク解析で最短経路探索を行うことにより，避難経路の検討に活用できる。",a:"〇",e:"正しい。問題文の通り。道路を線、交差点を点としたネットワークデータを用いることで、避難所までの最短時間や最短距離を計算できる。"},
+      {q:"GISの機能を使った地理空間情報の利用に関して, GISのボロノイ分割の機能により，公民館及び駅の位置を表す点データのみを用いて，市内全域の各公民館からそれぞれ直線距離が最も短い駅を特定することができる。",a:"〇",e:"正しい。ＧＩＳのボロノイ分割とは、特定の点（母点）に基づいて、平面を領域に分割する手法である。ボロノイ分割により、母点間を結ぶ直線（垂直二等分線）を引くことで各母点間の影響範囲を示すポリゴンを形成することができるため、特定の施設から最も近い施設や施設の分散状況を可視化することができる。"},
+      {q:"UTM図法では，地球上の北緯84度から南緯80 度までの地域をガウス・クリューゲル図法で投影している。",a:"〇",e:"正しい。北緯84°から南緯80°までの地域で適用されている。当初、北緯南緯ともに80°であったが、カナダ等の地域に配慮して現在のようになっている。"},
+      {q:"GISの機能を使った地理空間情報の利用に関して, GISのジオリファレンスの機能により，過去の写真地図に座標を与えて，現在の地図と重ね合わせて比較することができる。",a:"〇",e:"正しい。問題文の通りできる。GISのジオリファレンス機能とは、地図や写真などの画像に位置座標を与える機能である。地理的なデータを他のGISと重ね合わせて表示、照会、分析するために必要である。"},
+      {q:"基盤地図情報に係る項目は，①測量の基準点，②海岸線，③公共施設の境界線，④行政区画の境界線及び代表点，⑤道路縁及び⑥標高点の６項目である。",a:"×",e:"間違い。問題文の他に、⑦軌道の中心線、⑧水涯線、⑨建築物の外周線、⑩市町村の町もしくは字の境界線及び代表点、⑪街区の境界線及び代表点、⑫河川堤防の表法肩の法線 である。また、③公共施設の境界線は２つに分かれるため、計13項目である。"},
+      {q:"地図上において，正角図法と正積図法の性質を同時に満足させる事は，理論上可能である。",a:"×",e:"間違い。正角図法と正積図法の性質を同時に満足させる事は，理論上不可能である。"},
+      {q:"ユニバーサル横メルカトル座標系（UTM座標系）における中央経線と赤道の交点である原点から東西方向に±100ｋｍ以内の地域と，平面直角座標系における原点からＹ軸方向に±100ｋｍ以内の地域では，どちらの地域においても縮尺係数が 1 未満である。",a:"×",e:"間違い。UTM座標系において、中央経線上の縮尺係数は 0.9996、約180㎞ 離れると１となる。"},
+      {q:"メタデータは，データ（製品）に関する説明情報である。メタデータの検索を行えるクリアリングハウスを利用することで，利用者がデータの品質を確認できるため，安心して利用することができる。",a:"〇",e:"正しい。クリアリングハウスとは、活用したい空間データを検索するシステムを指す言葉である。クリアリングハウスの検索対象はメタデータである。"},
+      {q:"地図投影法とは，立体である地球の表面を平面の地図に表すための方法のことを指すが，必ず何らかのひずみが生じるため，表現したい地図の目的に応じて投影法を選択する必要がある。",a:"〇",e:"正しい。楕円体である地球の表面を平面上に投影する場合、距離、角度および面積を同時にひずみなく投影することはできない。"},
+      {q:"ガウス・クリューゲル図法は，正角円錐図法の一種で，回転楕円体から平面に直接投影を行うものであり，大・中縮尺地図の図法として多く用いられている。",a:"×",e:"間違い。正角円錐図法ではなく、正角横円筒図法である。"},
+      {q:"正角図法は，地球上と地図上との対応する点において，任意の2 方向のきょう角が等しくなり， ごく狭い範囲での形状が相似となる図法である。",a:"〇",e:"正しい。問題文の通り、正角図法は地図上の任意の２点間を結ぶ線が、経線に対して正しい角度となる。"},
+      {q:"デジタル航空カメラで撮影した数値写真を正射変換し，「作業規程の準則」の数値地形図データファイル仕様で規定する地図情報レベル2500の図郭割りで切り出したデータはベクタデータである。",a:"×",e:"間違い。ラスタデータである。数値写真を正射変換（画素データ）を切り出した写真地図であるため。"},
+      {q:"地理空間情報を地球上の位置と関連づけることを空間参照といい，座標を直接用いて位置を参照する仕組みと郵便番号や行政コードなどから間接的に場所を特定する仕組みがある。このうち，後者を地物カタログによる空間参照という。",a:"×",e:"間違い。地物カタログではなく地理識別子である。空間参照で間接的に関連付ける仕組みを地理識別子といい、郵便番号や行政コードなどが用いられその場所を間接的に特定し関連付ける。"},
+      {q:"GIS 及び地理空間情報の活用方法についてGIS を用いると浸水シミュレーションの結果や発災後の被害分布を可視化することができるので，防災計画や復興計画検討の一助となる。",a:"〇",e:"正しい。問題文の通り。被害状況を地図に重ねることで、視覚的に状況を把握し、迅速な意思決定ができる。"},
+      {q:"平面に描かれた地図において、正角図法と正積図法の性質を同時に満足させることは、理論上可能である。",a:"×",e:"間違い。地図の投影要素（正角・正積・正距）には、正角と正距を同時に満足できるが、正角と正積は同時に満足できない関係がある。また、正距と正積は満足できる。"},
+      {q:"地図投影法において，地図上において，正角図法と正積図法の性質を同時に満足させることは，理論上不可能である。",a:"〇",e:"正しい。問題文の通り。正角と正距、正距と正積は同時に満足することができるが、正角と正積は同時に満足させることができない。これは、正角は角度の情報を重視し正積は辺の長さの情報を重視するためである。"},
+      {q:"地表を任意の三角形で分割したデータ（TIN）。それぞれの三角形の各頂点には座標値及び標高値が付与されているデータは，ベクタデータである。",a:"〇",e:"正しい。情報が付与されており、TINは数値標高モデル(DEM)または点群から作成されるため。"},
+      {q:"国土地理院がインターネットで公開している地図情報サービス「地理院地図」は，極域の一部地域を除外した範囲をメルカトル投影の数式を使って作成した地図画像を使用している。",a:"〇",e:"正しい。地理院地図はいわゆるウェブ地図であり、経緯度が正方形に変換されるように、メルカトル投影の数式を用いて変換されている。"},
+      {q:"正積図法は，地球上の任意の範囲の面積が縮尺に応じて地図上に正しく表示される図法である。",a:"〇",e:"正しい。問題文の通り、正積図法の定義である。"},
+      {q:"地図投影法において，国土地理院がインターネットで公開しているウェブ地図「地理院地図」は，国土地理院刊行の1/25,000 地形図と同様，ユニバーサル横メルカトル図法（UTM 図法）が採用されている。",a:"×",e:"間違い。UTM図法ではなくメルカトル図法である。ウェブ地図とは地理院が無償で提供するオンライン地図サービスであり、世界測地系の経緯度が正方形に変換されるようにメルカトル投影の数式を用いて変換し、これを分割した正方形の画像をブラウザで表示している。"},
+      {q:"地図投影法は，三次元立体である地球の表面に存在する地物の位置や形を，できるだけ正しく平面に描くための方法である。",a:"〇",e:"正しい。地図投影法とは球面から平面上への投影方法である。地図の目的によって各投影法の選択が行われる。"},
+      {q:"都市計画区域の基盤地図情報の平面位置の誤差は2.5ｍ以内，高さの誤差は1.0ｍ以内である。",a:"〇",e:"正しい。問題文の通り。都市計画区域外では平面位置の誤差は25ｍ以内，高さの誤差は5.0ｍ以内としている。"},
+      {q:"GISの機能を使った地理空間情報の利用に関して, GISのネットワーク分析の機能により，ネットワーク化された道路中心線データと消防署及び火災現場の位置を表す点データのみを用いて，消防署から火災現場までの最短ルートを表示することができる。",a:"〇",e:"正しい。問題文の通りできる。"},
+      {q:"基盤地図情報を整備，更新する場合は，既存の成果がある場合でも，新規で作成することが推奨されている。",a:"×",e:"間違い。基盤地図情報を整備・更新する場合は、基本的に既に整備されている基盤地図情報の位置を基準として行うが、新しい地理空間情報整備された場合は、その情報を基準として基盤地図情報が整備される。"},
+      {q:"基盤地図情報を整備，更新する場合は，既存の成果がある場合でも，新規で作成することを推奨している。",a:"×",e:"間違い。基盤地図情報の整備・更新に当たっては、基本的には、既に整備されている基盤地図情報の位置を位置の基準として、その他の地理空間情報の調整を行った上で、これを活用して整備・更新を行う。ただし、既存の基盤地図情報より精度が高く、新しい地理空間情報が整備された場合には、当該情報を基準として基盤地図情報を整備・更新することになる。こうすることにより、基盤地図情報の精度と鮮度を高めていくことが可能となる。"},
+      {q:"地図投影法は、三次元立体である地球の表面上に存在する地物の位置や形をできるだけ正しく平面に描くために考えられたものである。",a:"〇",e:"正しい。地図の投影法に関する定義である。"},
+      {q:"格子間隔の大きいDTMよりも、格子間隔の小さいDTMを用いた方がより詳細な地形の断面図を作成することができる。",a:"〇",e:"正しい。格子間隔が小さいと言う事は、地形のデータが詳細に得られていると言う事である。当然、格子間隔の小さいほうが、詳細な断面図を描く事ができる。"},
+      {q:"ウェブ地図によっては，モバイル端末で取得した位置情報により，地図の中心を現在地付近に移動させることができる。",a:"〇",e:"正しい。GPS機能を利用して、現在地を画面の中心として表示することができる。"},
+      {q:"地理空間情報のエラーで、10㎡ 以下の建物は収得しない仕様にもかかわらず、取得されているのは、主題一貫性が不正確のためである。",a:"×",e:"間違い。完全性。過剰なデータ取得が行われている。"},
+      {q:"UTM図法では，経度180度から東向きに経度幅 6度ずつの座標帯に分割し，順番に1から60の座標帯番号を付与しており，各座標帯の中央に位置する経線と赤道の交点を，各座標帯における原点としている。各座標帯の原点の座標値を（E，N）で表すと，北半球の地域を表すときは（E，N）＝（5,000km，10,000 km）， 南半球の地域を表すときは（E，N）＝（5,000km，10,000m）としており，各座標帯のすべての座標値に負の数が現れないようになっている。",a:"×",e:"間違い。北半球の座標原点は、N＝0.000㎞、E＝500㎞である。南半球の座標原点は、N＝10,000㎞、E＝500㎞である"},
+      {q:"基盤地図情報の数値標高モデルから，基盤地図情報の建築物の外周線に建築物の地表面からの高さ情報を付与することはできる。",a:"×",e:"間違い。DEMは地表面のデータであり建築物のデータはない。"},
+      {q:"国土地理院が作成する基盤地図情報は，基本測量成果である。",a:"〇",e:"正しい。基盤地図情報は、次のいずれかの測量の成果であることが必要である。・測量法に規定する基本測量、測量法第５条に規定する公共測量、水路業務法で定める測量の基準に従って行われた水路測量。該当する測量成果には次のようなものがある。・都市計画基図・道路台帳図・基準点成果表・1/25000地形図・水路測量標記事・河川基盤地図"},
+      {q:"基盤地図情報は，整備更新を行う際に，その対象地域と隣接地域の境界部においてシームレスに接合される。",a:"〇",e:"正しい。問題文の通り。国土地理院では、2014年7月から全国の基盤地図情報を継ぎ目のない（シームレス）状態で提供している。"},
+      {q:"地理空間情報のエラーで草地である場所が、別の分類である常緑針葉樹林に分類されているのは、理論一貫性が図られていないためである。",a:"×",e:"間違い。主題正確度。分類（草地と常緑針葉樹林）が不正確である。"},
+      {q:"GISの機能を使った地理空間情報の利用に関して, GISのバッファリングと空間検索の機能により，自宅及び病院の位置を表す点データのみを用いて，自宅から半径 5kｍの範囲内にある病院を抽出することができる。",a:"〇",e:"正しい。問題文の通りできる。GISのバッファリング機能とは、GISにおいて特定の地物（点、面、線）を基準にして、その周囲に指定した距離の領域を作成するプロセスである。例えば特定の地点からの距離内にある施設や環境要因を特定するなどの働きができる。"},
+      {q:"メタデータの再配布に関する禁止事項は制約情報である。",a:"〇",e:"正しい。禁止事項は使用に関する制約情報を表す。"},
+      {q:"地理空間情報の製品仕様書を新たに作成する場合には，類似の地理空間情報の製品仕様書を参考にして作成することができる。",a:"〇",e:"正しい。地理空間情報を整備する際にその製品仕様書は次のパターンで作成される。①標準的な製品仕様書のある場合はそれを参考に。②新規に作成する場合にはマニュアルに従って作成する。よって，問題文のように参考として作成することができる。"},
+      {q:"地図投影では平面の地図上において，正角図法と正積図法の性質を同時に満足させることは，理論上は可能である。",a:"×",e:"間違い。正角と正積の両立はできない。"},
+      {q:"基盤地図情報として必要な精度は，国土交通省令で，都市計画区域と都市計画区域外のそれぞれについて定められている。",a:"〇",e:"正しい。問題文の通り。"},
+      {q:"都市計画区域内の基盤地図情報の平面位置の誤差は5.0 m 以内，高さの誤差は1.0 m 以内である。",a:"×",e:"間違い。基盤地図情報は平面位置の誤差2.5ｍ以内、高さの誤差1.0ｍ以内（都市計画区域内）、平面位置の誤差25ｍ以内、高さの誤差5.0ｍ以内（都市計画区域外）である。"},
+      {q:"球面上の図形の面積比が地図上でも正しく表示される投影法を正積図法という。",a:"〇",e:"正しい。地図の投影要素は正角、正距、正積の３つに分類されている。正積図法は問題文の通りであり、ランベルト図法、モルワイデ図法などがある。"},
+      {q:"UTM図法では，地球上の北緯80度から南緯80 度までの地域をガウス・クリューゲル図法で投影している。",a:"×",e:"間違い。北緯84°から南緯80°までの地域で適用されている。当初、北緯南緯ともに80°であったが、カナダ等の地域に配慮して現在のようになっている。"},
+      {q:"クリアリングハウスは，データ（製品）に関する説明情報である。クリアリングハウスの検索を行えるメタデータを利用することで，利用者がデータの品質を確認できるため，安心して利用することができる。",a:"×",e:"間違い。クリアリングハウスではなくメタデータである。またメタデータの部分がクリアリングハウスである。メタデータは、空間データの種類や所在、内容、品質、利用条件などの情報を別途詳細に示したデータであり、これにより地理情報の利用者がその地理情報が利用できるか否かを判断できるようにJPGISで共通の仕様を持たせている。"},
+      {q:"ウェブ地図において，画面の解像度やウェブブラウザの拡大率が一定の場合，同一の距離を表すスケールバーの画面上の長さは高緯度ほど長くなる。",a:"〇",e:"正しい。メルカトル図法であるため、低緯度と高緯度では高緯度になるほど表示が引き伸ばされる。"},
+      {q:"地図投影法において，心射図法とは，方位図法の一種で，地球の中心を視点として地球に接する平面に投影するものであり，この投影法による地図上の2 地点を直線で結ぶことで最短経路を知ることができる。",a:"〇",e:"正しい。問題文の通り。心射図法は視点を地球中心に置き、投影面を地表に接する平面としている。このため、大圏が平面上の直線に投影される唯一の図法となる。大圏は地球上の２地点間を結んだ弧のルートである。"},
+      {q:"地理院地図では，地図画像をタイル状に分割して配信している。個々のタイル画像は，メルカトル投影の数式を使用した上で，正方形になるよう変換されている。なお，極域の一部地域は配信対象から除外されている。",a:"〇",e:"正しい。問題文の通り。地理タイルの概要である。除外されている極域の一部地域は、北緯及び南緯 約85°以上である。"},
+      {q:"地球上のあらゆる地点間の距離を同一の縮尺で地図上に表示する事は，理論上可能である。",a:"×",e:"間違い。地球上のあらゆる地点間の距離を同一の縮尺で地図上に表示する事は，理論上不可能である。"},
+      {q:"JIS X 0410地域メッシュコードで定められた第2 次地域区画（2 次メッシュ）について，各区画を四隅座標の点列で表現したデータ。各区画のデータには第2 次地域区画を示す数字の属性情報が付与されているデータは，ラスタデータである。",a:"×",e:"間違い。ベクタデータである。情報が付与されており、メッシュ四隅が経緯度の座標点で表現されている。2次メッシュは2万5千分の1地形図の1図葉の区画に対応する。"},
+      {q:"メルカトル投影法を用いて作成されたウェブ地図では，画面の解像度やウェブブラウザの拡大率及びズームレベルを変えない場合，同一の距離を表すスケールバーの画面上の長さは高緯度ほど長くなる。",a:"〇",e:"正しい。メルカトル図法であるため、低緯度と高緯度では高緯度になるほど表示が引き伸ばされる。"},
+      {q:"JPGIS は，地理空間情報の概念スキーマを記述しクラス化するために必要となる基本的な要素を抽出して体系化したものである。",a:"×",e:"間違い。クラス化ではなく符号化である。地理情報規格群（地理情報に関する国際規格及び日本産業規格）の中から概念スキーマ（データベース構造）を符号化するために基本的要素を抽出し体系化したものが地理情報プロファイルである。"},
+      {q:"正角図法は，地球上と地図上との対応する点において，任意の２方向のきょう角が等しくなり，ごく狭い範囲での形状が相似となる図法である。",a:"〇",e:"正しい。例えば、地図上の２点間を結ぶ線が、北（経線）に対して正しい角度となる。主に航海図に使用されるが距離や面積は正確ではない。メルカトル図法などがある。"},
+      {q:"メタデータの作成に使用した原典データに関する情報は参照系情報である。",a:"×",e:"間違い。系譜である。原典データに関する情報は系譜である。"},
+      {q:"基盤地図情報を提供しようとする場合の適合すべき規格には，国際標準化機構（ISO）が定めた規格が含まれる。",a:"〇",e:"正しい。基盤地図情報を提供しようとする場合の適合すべき規格については、JISX7100シリーズの各規格やISO（国際標準化機構）19100シリーズ の各規格（地理情報に関する国内・国際標準）に準拠していることが必要である。"},
+      {q:"地理空間情報の製品仕様書は，データ交換やデータを使用するときの説明書としては利用できないが，データを作成するときの設計書としては利用できる。",a:"×",e:"間違い。製品仕様書は，「作成する地理空間データの詳細な設計書」であり，「地理空間データを流通・交換する際の取扱説明書」である。"},
+      {q:"地図情報レベル 5000以下の数値地形図の調製において数値地形図への表現は，表示する対象をそれぞれの上方からの正射影で形状を表示することが原則である。",a:"〇",e:"正しい。問題文の通り。困難なものについては，正射影の位置に定められた記号で表示される。（第4条）"},
+      {q:"都市計画基図，道路台帳図，河川基盤地図は，基盤地図情報の整備に活用することができる。",a:"〇",e:"正しい。その他として，基準点成果表，１/25000地形図，水路測量標記事などがある。"},
+      {q:"地図情報レベル 5000以下の数値地形図の調製において等高線，基準点，数値地形モデルを取得する場合の座標次元は，３次元である。",a:"〇",e:"正しい。問題文の通り。地形の座標次元は，３次元とする。（第44条）"},
+      {q:"DTM 基盤地図情報（建築物の外周線）を用いて、三次元建物データを作成することができる。",a:"×",e:"間違い。DTMは地表面の標高値を表す数値地形モデルであり、建物の外周線を用いても建物を三次元で表すことはできない。建物を三次元で表すには、DSM（数値表層モデル）が必要となる。"},
+      {q:"基盤地図情報は，国が保有する基盤地図情報は，原則としてインターネットを利用して無償で提供されている。",a:"〇",e:"正しい。問題文の通り。国土地理院の基盤地図情報ダウンロードサービスを通じて、誰でも原則無償でデータを取得できます。"},
+      {q:"公共測量に使用する基盤地図情報のメタデータを調べたところ，当該基盤地図情報の整備にA町の公共測量成果が使用されていた。この場合，A町に対して測量成果の使用承認申請を行わなければならない。",a:"×",e:"間違い。問題文に「国土地理院が整備する基盤地図情報」とあるため、A町の公共測量成果といえ測量法に基づき国土地理院に測量成果の使用申請が必要となる。"},
+      {q:"地理空間情報のエラーで、属性値の定義域が正の整数の仕様にもかかわらず、負の整数の値になっているのは、完全性がないためである。",a:"×",e:"間違い。論理一貫性。定義域の一貫性が図られていない。"},
+      {q:"地図上において，正距図法と正積図法の性質を同時に満足させることは，理論上可能である。",a:"〇",e:"正しい。理論上不可能なのは、正積図法と正角図法の性質を同時に満足させることである。"},
+      {q:"地図情報レベル 5000以下の数値地形図の調製において、数値地形図に表示する対象は,測量作業時に現存し，永続性のあるものが原則であるが，建設中であっておおむね１年以内に完成する見込みのものは表示することができる。",a:"〇",e:"正しい。表示の対象として，測量作業時に現存し，永続性のあるものが原則である。また建設中の物で，「おおむね１年以内に完成する見込みのもの。」，「永続性のないもので，特に必要と認められるもの。」も表示することができる。（第3条）"},
+      {q:"平面直角座標系(平成14年国土交通省告示第9号)に用いられている投影法は，正積図法である。",a:"×",e:"間違い。平面直角座標系は正角図法である。"},
+      {q:"基盤地図情報として，国土地理院から 5mメッシュ及び 10m メッシュの数値標高モデルが提供されている。",a:"〇",e:"正しい。基盤地図情報ダウンロードサービスには、「基本項目」、「数値標高モデル」、「ジオイド・モデル」がある。また、数値標高モデルには、5ｍメッシュと10ｍメッシュがある。"},
+      {q:"GIS 及び地理空間情報の活用方法について地震による地盤の隆起によって海部が新たに陸地となった場合，隆起前の海岸線データと隆起後に取得した海岸線データを利用することで，陸化した範囲の面積を算出できる。",a:"〇",e:"正しい。問題文の通り。隆起前と隆起後のデータを重ね合わすことで、その差分を求めることができる。"},
+      {q:"基盤地図情報の整備には，都市計画基図，道路台帳図，河川基盤地図などが活用されている。",a:"〇",e:"正しい。問題文の通り。基盤地図情報を効率的に整備するために、既存の公共測量成果である都市計画基図や道路台帳図、河川基盤地図などを変換・活用している。"},
+      {q:"地理空間情報の製品仕様書に記述する標準的な項目は，国際標準化機構（ISO）の規格として定められている。",a:"〇",e:"正しい。製品仕様書は，地理情報の標準規格（地理情報標準規格群：ISO19100シリーズ）の動向を踏まえて，適宜改正が行われている。"},
+      {q:"正距図法で作成した地図は，世界全体や大陸規模のような広い範囲における植生，人口などの分布図・密度図を示す場合に用いられている。",a:"×",e:"間違い。正距図法とは地図上の任意の２点間を結ぶ距離が地球上の距離と正しい比率で表される図法である。飛行機の最短経路（大圏コース）や方位を見るために使われる。分布図や密度図に使用されるのは、面積が正しい比率で表される正積図法である。"},
+      {q:"地図投影法とは，立体である地球の表面を平面の地図に表すための方法のことを指すが，必ず何らかのひずみが生じるため，表現したい地図の目的に応じて投影法を選択する必要がある。",a:"〇",e:"正しい。問題文の通り。ひずみなく表現できる項目は大きく次の３つに分類される。正角図法、正距図法、正積図法、この３つを投影要素という。"},
+      {q:"地理空間情報の製品仕様書は，作り方や使用する機器の性能を規定した作業規程とは異なり，作成方法にとらわれない地理空間情報の作成を可能にしている。",a:"〇",e:"正しい。製品仕様という考え方（製品仕様書の利用）は，地理情報の内容，品質を明確にし、作成方法は特に指定していない。つまり，どのような作成方法によっても内容や品質が適合していれば良いという考えである。"},
+      {q:"基盤地図情報の項目は，国土交通省令で，測量の基準点，海岸線，道路縁，建築物の外周線など， 13 項目が定められている。",a:"〇",e:"正しい。基盤地図情報の項目としては、次の13項目が定められている。測量の基準点、海岸線、公共施設の境界線（道路区域界）、公共施設の境界線（河川区域界）、行政区画の境界線及び代表点、道路縁、河川堤防の表法肩の法線、軌道の中心線、標高点、水涯線、建築物の外周線、市町村の町若しくは字の境界線及び代表点、街区の境界線及び代表点。"},
+      {q:"ウェブ地図では，現在，地図表示のリクエストがある度に，その範囲のデータをサーバ側で切り抜いて配信する方式が多く採用されている。",a:"×",e:"間違い。現在はXYZ方式が主流である。問題文のWMS方式（リクエスト都度にその範囲をサーバーで切り抜いて配信する方法）は、以前は主流であったが、クライアント側で地図の表示に時間がかかるため、XYZ方式（あらかじめタイル状に分割したデータを配信する方式）が主流となっている。"},
+      {q:"基盤地図情報では，都市計画区域内の基盤地図情報を基図として，地図情報レベル 5000 のハザードマップを作成できる。",a:"〇",e:"正しい。問題文の通り。都市計画区域内の基盤地図情報は、通常レベル2500の精度で整備されている。これを利用して、それよりも精度大きいレベル5000のハザードマップを作成することは、精度上の問題がない。"},
+      {q:"ウェブ地図によっては，地図データを複製したり印刷して第三者に配布したりすることが利用規約によって規制されているので，使用する際には注意する必要がある。",a:"〇",e:"正しい。地理院地図では、「国土地理院コンテンツ利用規約」に従う必要がある。"},
+      {q:"GISの機能を使った地理空間情報の利用に関して, 航空レーザ測量で得た数値地形モデル（DTM）と基盤地図情報の建築物の外周線データのみを用いて，津波避難ビルの建物の高さを算出することができる。",a:"×",e:"間違い。DTMではなくDSMならばできる。DTM（数値標高モデル）は地表面の標高を三次元的に表したもので、純粋に地盤の高さだけを表したものである。DSM（数値表層モデル）は地表面の高さを表し、樹木や建物の高さを含んでいる。よって、DSMと建築物の外周線データで問題文のような作業ができる。"},
+      {q:"地理空間情報の製品仕様書には，地理空間情報の内容,構造，データ品質などが記述されている。",a:"〇",e:"正しい。地理空間データと言う製品に要求される種々の条件について，その要求仕様をまとめたものが製品仕様書である。"},
+      {q:"メタデータの作成に使用した原典データに関する情報は系譜である。",a:"〇",e:"正しい。原典データに関する情報は系譜である。"},
+      {q:"地図上において，正角図法と正積図法の性質を同時に満足させることは理論的に可能である。",a:"×",e:"間違い。同一図法の中で「正角」と「正距」、「正距」と「正積」は同時に満足することができるが、「正角」と「正積」は同時に満足することができない。"},
+      {q:"基盤地図情報には，海岸線，軌道の中心線，道路縁，建築物の外周線などの 13 項目がある。",a:"〇",e:"正しい。問題文の通り。基盤地図情報の項目は、測量法に基づき以下の13項目と定められている。測量標、建築物の外周線、道路縁、軌道の中心線、海岸線、水涯線、代表点（町字・行政区画）、小縮尺位置（標高点）、等高線、火山現象による変化の境界線、水域、水路、標高点。"},
+      {q:"都市計画区域外の基盤地図情報の平面位置の誤差は 25m 以内，高さの誤差は 5.0m 以内である。",a:"〇",e:"正しい。問題文の通り。都市計画区域内では、平面位置の誤差は2.5ｍ以内。高さの誤差は1.0ｍ以内としている（地理空間情報活用推進基本法 第2条3項 による国土交通省令で定める基準）。"},
+      {q:"24bitカラー画像データの画素値（RGB値）で地表面の標高値を表現したデータは，ラスタデータである。",a:"〇",e:"正しい。画素で表現されているため。"},
+      {q:"基盤地図情報の等高線から50 mメッシュの数値標高モデルを作成する際には，基盤地図情報のジオイド・モデルによる標高の補正は必要ない。",a:"〇",e:"正しい。基盤地図情報（ジオイド・モデル）は、「日本のジオイド2011」から作成した250mメッシュの情報である。"},
+      {q:"地図投影では地球上のあらゆる地点間の距離を同一の縮尺で一つの平面の地図上に正確に表示することは，理論上は可能である。",a:"×",e:"間違い。全地点間の距離の正確な表示はできない。"},
+      {q:"正積図法は，地球上の任意の範囲の面積が，縮尺に応じて地図上に正しく表示される図法である。",a:"〇",e:"正しい。問題文を言換えると、地図上の任意地点の面積と対応する地球上の面積を正しい比率で表す投影法である。"},
+      {q:"国土地理院では，基盤地図情報として数値標高モデルとジオイド・モデルを提供しており，数値標高モデルとジオイド・モデルを利用することで，数値表層モデルを作成することができる。",a:"×",e:"間違い。数値表層モデル（DSM）は地表面上にある建物や樹木の高さを含んだ標高からなる三次元データである。問題文のように数値標高モデル（DEM）とジオイド・モデルからDSMを作成することはできない。"},
+      {q:"メルカトル図法は、円錐図法の一種で、緯線と経線は常に赤道に対して水平と垂直の線で表される。",a:"×",e:"間違い。メルカトル図法は円筒図法である。円錐図法はランベルト図法がある。"},
+      {q:"公共測量において、航空レーザ測量により作成した5ｍメッシュのDTM を用いて、地図情報レベル5000の等高線（主曲線間隔5ｍ）を作成することができる。",a:"〇",e:"正しい。作業規程の準則によれば、等高線データは、地図情報レベル1000までは1ｍメッシュ、2500では1ｍ及び2ｍメッシュ、5000では1ｍ、2ｍ及び5ｍメッシュのグラウンドデータを用いて作成することができる。"},
+      {q:"UTM図法では，経度180度から東向きに経度幅 6度ずつの座標帯に分割し，順番に1から60の座標帯番号を付与しており，各座標帯の中央に位置する経線と赤道の交点を，各座標帯における原点としている。各座標帯の原点の座標値を（E，N）で表すと，北半球の地域を表すときは（E，N）＝（500km，0 km）， 南半球の地域を表すときは（E，N）＝（500km，10,000m）としており，各座標帯のすべての座標値に負の数が現れないようになっている。",a:"〇",e:"正しい。経度180°線を始発線として西から東に向かって第1帯（ゾーン）から第60帯と名付けられている。また西から東に向かって経度幅 6度ずつの座標帯に分割されている。北半球の座標原点は、N＝0.000㎞、E＝500㎞である。南半球の座標原点は、N＝10,000㎞、E＝500㎞である。"},
+      {q:"正積図法は、地球上の任意の範囲の面積が、縮尺に応じて地図上に正しく表示される図法である。",a:"〇",e:"正しい。等積図法とも呼ばれランベルト図法、モルワイデ図法がこれにあたる。"},
+      {q:"正距方位図法で作成された地図は，地図上で選んだ任意の点からの方位や距離が正しく表現されている。",a:"×",e:"間違い。正距方位図法は、円の中心からの距離と方位が正しく表され、地球全体を真円で表す投影法である。主に航空図として使用されるが、面積や角度が正確ではない。"},
+      {q:"UTM図法では，経度180度から西向きに経度幅 6度ずつの座標帯に分割し，順番に1から60の座標帯番号を付与しており，各座標帯の中央に位置する経線と赤道の交点を，各座標帯における原点としている。各座標帯の原点の座標値を（E，N）で表すと，北半球の地域を表すときは（E，N）＝（500km，0 km）， 南半球の地域を表すときは（E，N）＝（500km，10,000m）としており，各座標帯のすべての座標値に負の数が現れないようになっている。",a:"×",e:"間違い。西向きではなく東向きである。西から東に向かって第1帯（ゾーン）から第60帯と名付けられている。"},
+      {q:"正角図法は、地球上の任意の二方向に引いた方向線のなす角と、地図上のこれに対応する角とが等しくなる図法である。",a:"〇",e:"正しい。等角図法とも呼ばれ、メルカトル図法やガウス・クリューゲル図法がこれにあたる。"},
+      {q:"正距図法は，地球上の任意の2 地点間の距離が，同一の縮尺で地図上に表示される図法である。",a:"×",e:"間違い。正距図法とは任意の２点間の距離が地球上の距離と正しい比率で表される図法である。"},
+      {q:"平面直角座標系（平成14年国土交通省告示第9号）の一つの系について，原点より南，かつ西に位置する地点のＸ座標，Ｙ座標はともに正 (+) である。",a:"×",e:"間違い。平面直角座標系の符号について、我が国の平面直角座標系では、Ｘ軸が北方向、Ｙ軸が東方向を正としている。原点より南かつ西にある地点は、Ｘ座標・Ｙ座標ともに負の値となる。"},
+      {q:"地図投影法において，ユニバーサル横メルカトル図法（UTM 図法）は，地球全体を6 度ごとの経度帯に分けており，一つの経度帯における座標値は，原点より北に位置する地点のY 座標は全て正（+），西に位置する地点のX 座標は全て負（-）である。",a:"×",e:"間違い。全ての座標値において負の値が出ないよう、座標原点をN＝0.000㎞、E＝500㎞（北半球）としている。また、南半球では、N=10,000㎞、E=500㎞としている。"},
+      {q:"複数の点を結ぶ線で表現した道路の中心線データ。各線データには道路種別，路線名称の属性情報が付与されているデータは，ラスタデータである。",a:"×",e:"間違い。ベクタデータである。情報が付与されており、点とそれを結んだ線で表現されているため。"},
+      {q:"地図情報レベル 5000以下の数値地形図の調製において数値地形図データファイルでは，東西方向をＸ軸，南北方向をＹ軸とする数学座標系を用いる。",a:"×",e:"間違い。数値地形図データファイルの座標軸は，測量座標系（東西方向をＹ軸，南北方向をＸ軸）とし，原点は図郭左下である。（第83条）"},
+      {q:"ウェブ地図によっては，複数の種類の地図や空中写真などを選択して表示することができる。",a:"〇",e:"正しい。全国版では地形図、写真、色別標高図、陰影起伏図、アナグリフを見ることができる。"},
+      {q:"ユニバーサル横メルカトル座標系（UTM座標系）では，必ず地球全体を経度差10°の南北に長い座標帯に分割し，各座標帯の中央経線と赤道の交点を原点としている。",a:"×",e:"間違い。10°ではない。UTM座標系は、地球全体を経度差 6°ごとのゾーンに分割する。"},
+      {q:"地理空間情報のエラーで、面データとして取得する行政区画データが閉じていないのは、完全性がないためである。",a:"×",e:"間違い。論理一貫性。データが閉じていないという事は、定義域の一貫性がとれていない。"},
+      {q:"DTMを用いて、標高値の範囲ごとに彩色し、地形の陰影をつけた陰影段彩図を作成することができる。",a:"〇",e:"正しい。DTMは地表面の標高データである。このため問題文のような陰影段彩図を作成することができる。"},
+      {q:"地理空間情報のエラーで、一部の道路が鉄道として取得されているのは、主題正確度が不正確のためである。",a:"〇",e:"正しい。主題正確度。分類（鉄道と道路）が不正確である。"},
+      {q:"基盤地図情報における平面位置及び高さの精度は，都市計画区域内と都市計画区域外で同一である。",a:"×",e:"間違い。精度は、都市計画区域内と都市計画区域外で同一ではない。 基盤地図情報は、利用目的や地域の重要度に応じて地図情報レベルが設定されている。互いに許容される精度が異なる。"},
+      {q:"基盤地図情報に係る項目は，国土交通省令で，測量の基準点，海岸線，道路縁，建築物の外周線などの13 項目が定められている。",a:"〇",e:"正しい。問題文の通り。地理空間情報のうち基盤地図情報とは国土交通省令で定めるものの位置情報であり、13項目が定められている。"},
+      {q:"地理空間情報を地球上の位置と関連づけることを構造化といい，座標を直接用いて位置を参照する仕組みと郵便番号や行政コードなどから間接的に場所を特定する仕組みがある。このうち，後者を地理識別子による構造化という。",a:"×",e:"間違い。構造化ではなく空間参照である。問題文のように、地球上の座標と地理空間情報を関連付けることを空間参照と言い、空間参照には座標値と直接関連付ける方法と間接的に関連付ける方法がある。"},
+      {q:"地図情報レベル 5000以下の数値地形図の調製において数値地形図に表示する地物の水平位置の転位は，行わないことが原則である。",a:"〇",e:"正しい。数値データで表されるため，転位の必要が無く原則として行わない。出力図に限り図上0.7㎜まで許される。（第5条）"},
+      {q:"航空レーザ測量成果から作成した5 mメッシュの基盤地図情報の数値標高モデルを使用して，地図情報レベル5000の等高線（主曲線間隔：5 m）を作成した。",a:"〇",e:"正しい。地図情報レベル5,000の等高線データを作成する場合、グラウンドデータとして1m,2m,5mが利用できる。"},
+      {q:"地理院地図では，地球を回転楕円体ではなく，地球の長半径を半径とした真球で投影する図法が採用されている。",a:"〇",e:"正しい。問題文の通り。地理院地図では、ウェブメルカトル図法が用いられている。ウェブメルカトル図法は地球を球体として正方形に表現した図法で、地球の長半径を半径とした真球で投影する投影法で、これは地球を球体として定義している。このため、コンピュータで扱いやすい特徴を持っている。ウェブ地図のスタンダードな投影法である。"},
+      {q:"地図投影では平面の地図上において，正角図法と正積図法の性質を同時に満足させることは，理論上は可能である。",a:"×",e:"間違い。正角と正積の両立はできない。"},
+      {q:"地図投影とは，回転楕円体面上の経緯度を平面上の極座標値に変換する事である。",a:"〇",e:"正しい。問題文の通りである。"},
+      {q:"GIS 及び地理空間情報の活用方法について山林で発生した斜面崩壊の土砂量は，発災前の数値表層モデル（DSM）の高さ情報と発災直後に行った航空レーザ測量で作成した DEM との差分に崩壊範囲の面積を乗じて正確に求めることができる。",a:"×",e:"間違い。両方ともにDEMの比較が必要である。DSMは樹木や建物など、地表にあるすべての物体の高さを含むデータ。で、DEMは樹木や建物を取り除いた、地面の高さデータである。このため、発火前のDSMデータを用いると、焼失した樹木の体積まで土砂量に入ってしまう。"},
+      {q:"メタデータの更新頻度に関する情報は保守情報である。",a:"〇",e:"正しい。保守情報は空間データ製品の更新時期や頻度などを表す。"},
+      {q:"基盤地図情報の標高点として，国土地理院から1ｍメッシュの数値標高モデルのデータが提供されている。",a:"×",e:"間違い。数値標高モデルは，1ｍメッシュではなく5ｍメッシュである。"},
+      {q:"ウェブ地図には，国土地理院刊行の 1/25,000 地形図と同様，ユニバーサル横メルカトル図法が採用されている。",a:"×",e:"間違い。メルカトル図法（webメルカトル図法）が採用されている。Webメルカトル図法は、世界を正方形で表現し、これを分割した正方形の画像をブラウザで表示する手法である。"}
+    ]
+  }
+];
+
+// ===== STATE =====
+let mode = 'all';
+let qty = 0;
+let selCats = [];
+let activeQ = [];
+let cur = 0, corr = 0, wrong = 0;
+let answered = false;
+let wrongMap = {};
+let checkList = [];
+let seenList = {};
+let memoMap = {}; // 'cat__qi' -> string
+let lastScore = null;
+let extraData = {};
+
+function saveState() {
+  try { localStorage.setItem('sq_state', JSON.stringify({wrongMap, lastScore, checkList, seenList, comments})); } catch(e){}
+}
+function loadState() {
+  try {
+    const d = JSON.parse(localStorage.getItem('sq_state')||'{}');
+    if (d.wrongMap) wrongMap = d.wrongMap;
+    if (d.lastScore !== undefined) lastScore = d.lastScore;
+    if (d.checkList) checkList = d.checkList;
+    if (d.seenList) seenList = d.seenList;
+    if (d.memoMap) memoMap = d.memoMap;
+    if (d.comments) comments = d.comments;
+  } catch(e){}
+}
+function saveExtra() {
+  try { localStorage.setItem('sq_extra', JSON.stringify(extraData)); } catch(e){}
+}
+function loadExtra() {
+  try { extraData = JSON.parse(localStorage.getItem('sq_extra')||'{}'); } catch(e){ extraData={}; }
+}
+
+function getAllCats() {
+  const cats = BASE_DATA.map(c => ({name:c.name, icon:c.icon, questions:[...c.questions], base:true}));
+  Object.keys(extraData).forEach(name => {
+    const ex = extraData[name];
+    const found = cats.find(c => c.name === name);
+    if (found) {
+      found.questions = [...found.questions, ...ex.questions];
+    } else {
+      cats.push({name, icon: ex.icon||'📝', questions: ex.questions, base:false});
+    }
+  });
+  return cats;
+}
+
+function showScr(id) {
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+
+// ===== HOME =====
+function renderHome() {
+  const cats = getAllCats();
+  const grid = document.getElementById('catGrid');
+  grid.innerHTML = '';
+  cats.forEach((cat, i) => {
+    const wc = (wrongMap[cat.name]||[]).length;
+    const d = document.createElement('div');
+    d.className = 'cat-card sel';
+    const seen = (seenList[cat.name] || []).length;
+    const unseen = cat.questions.length - seen;
+    d.innerHTML =
+      '<div class="cat-l">' +
+        '<span class="cat-icon">' + cat.icon + '</span>' +
+        '<div><div class="cat-name">' + cat.name + '</div>' +
+        '<div class="cat-cnt">' + cat.questions.length + '問' +
+          (unseen < cat.questions.length ? ' · 未出題' + unseen + '問' : '') +
+          (wc > 0 ? ' · 要復習' + wc + '問' : '') + '</div></div>' +
+      '</div>' +
+      '<div class="cat-chk">✓</div>';
+    d.addEventListener('click', function() { toggleCat(i); });
+    grid.appendChild(d);
+  });
+  selCats = cats.map((_,i) => i);
+  updateHomeUI();
+}
+
+function toggleCat(idx) {
+  const cards = document.querySelectorAll('.cat-card');
+  const pos = selCats.indexOf(idx);
+  if (pos >= 0) {
+    if (selCats.length === 1) return;
+    selCats.splice(pos, 1);
+    cards[idx].classList.remove('sel');
+  } else {
+    selCats.push(idx);
+    cards[idx].classList.add('sel');
+  }
+  updateHomeUI();
+}
+
+function updateHomeUI() {
+  const cats = getAllCats();
+  const tw = selCats.reduce((s,i) => s + (wrongMap[cats[i].name]||[]).length, 0);
+  const badge = document.getElementById('wBadge');
+  badge.textContent = tw + '問';
+  badge.style.display = tw > 0 ? 'inline' : 'none';
+  if (lastScore !== null) {
+    document.getElementById('prevResult').classList.add('on');
+    document.getElementById('prevPct').textContent = lastScore.pct + '%';
+    document.getElementById('prevWrong').textContent = lastScore.wrong + '問';
+  }
+  const cl = checkList.length;
+  const cb = document.getElementById('checkBadge');
+  cb.textContent = cl + '問'; cb.style.display = cl > 0 ? 'inline' : 'none';
+  const ml = Object.keys(memoMap).length;
+  const mb = document.getElementById('memoBadge');
+  mb.textContent = ml + '問'; mb.style.display = ml > 0 ? 'inline' : 'none';
+  const btn = document.getElementById('btnStart');
+  if (mode === 'wrong' && tw === 0) {
+    btn.disabled = true; btn.textContent = '間違えた問題がありません';
+  } else if (mode === 'check' && cl === 0) {
+    btn.disabled = true; btn.textContent = 'チェックした問題がありません';
+  } else if (mode === 'memo' && ml === 0) {
+    btn.disabled = true; btn.textContent = 'メモした問題がありません';
+  } else {
+    btn.disabled = false; btn.textContent = 'テスト開始';
+  }
+}
+
+// ===== QUIZ =====
+function startQuiz() {
+  const cats = getAllCats();
+  let pool = [];
+  if (mode === 'check') {
+    checkList.forEach(item => {
+      const cat = cats.find(c => c.name === item.cat);
+      if (cat && cat.questions[item.qi]) {
+        pool.push({...cat.questions[item.qi], _cat:item.cat, _qi:item.qi});
+      }
+    });
+  } else if (mode === 'memo') {
+    Object.keys(memoMap).forEach(key => {
+      const [catName, qi] = key.split('__');
+      const cat = cats.find(c => c.name === catName);
+      if (cat && cat.questions[+qi]) {
+        pool.push({...cat.questions[+qi], _cat:catName, _qi:+qi});
+      }
+    });
+  } else {
+    selCats.forEach(ci => {
+      const cat = cats[ci];
+      if (mode === 'wrong') {
+        (wrongMap[cat.name]||[]).forEach(qi => pool.push({...cat.questions[qi], _cat:cat.name, _qi:qi}));
+      } else {
+        // all mode: unseen first, if not enough add seen
+        const seen = seenList[cat.name] || [];
+        const unseen = [], seenQ = [];
+        cat.questions.forEach((q,qi) => {
+          if (seen.includes(qi)) seenQ.push({...q, _cat:cat.name, _qi:qi});
+          else unseen.push({...q, _cat:cat.name, _qi:qi});
+        });
+        pool.push(...unseen, ...seenQ);
+      }
+    });
+  }
+  shuffle(pool.slice(0, pool.findIndex(q => (seenList[q._cat]||[]).includes(q._qi)) === -1 ? pool.length : pool.findIndex(q => (seenList[q._cat]||[]).includes(q._qi))));
+  // Re-sort: unseen shuffled first, then seen shuffled
+  const unseenPool = pool.filter(q => !(seenList[q._cat]||[]).includes(q._qi));
+  const seenPool = pool.filter(q => (seenList[q._cat]||[]).includes(q._qi));
+  shuffle(unseenPool); shuffle(seenPool);
+  pool = [...unseenPool, ...seenPool];
+  if (qty > 0 && pool.length > qty) pool = pool.slice(0, qty);
+  activeQ = pool; cur = 0; corr = 0; wrong = 0;
+  showScr('scrQuiz');
+  renderQ();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+}
+
+function renderQ() {
+  answered = false;
+  const q = activeQ[cur], total = activeQ.length;
+  document.getElementById('qCtr').textContent = (cur+1) + ' / ' + total;
+  document.getElementById('qLbl').textContent = 'QUESTION ' + (cur+1);
+  document.getElementById('qTxt').textContent = q.q;
+  document.getElementById('progFill').style.width = (cur/total*100) + '%';
+  document.getElementById('fb').className = 'fb';
+  document.getElementById('fb').innerHTML = '';
+  document.getElementById('checkBtn').className = 'check-btn';
+  document.getElementById('memoWrap').className = 'memo-wrap';
+  document.getElementById('memoInput').value = '';
+  document.getElementById('memoSaved').className = 'memo-saved';
+  document.getElementById('commentWrap').className = 'comment-wrap';
+  document.getElementById('existingComment').style.display = 'none';
+  document.getElementById('btnNext').className = 'btn-next';
+  document.getElementById('btnMaru').className = 'ans-btn';
+  document.getElementById('btnBatsu').className = 'ans-btn';
+  document.getElementById('btnMaru').disabled = false;
+  document.getElementById('btnBatsu').disabled = false;
+  document.getElementById('liveC').textContent = corr;
+  document.getElementById('liveW').textContent = wrong;
+  document.getElementById('hdrScore').className = 'hdr-score on';
+  document.getElementById('hdrScore').innerHTML = '正解 <b>' + corr + '</b> / ' + total;
+}
+
+function doAnswer(choice) {
+  if (answered) return;
+  answered = true;
+  const q = activeQ[cur], ok = choice === q.a;
+  document.getElementById('btnMaru').disabled = true;
+  document.getElementById('btnBatsu').disabled = true;
+  if (choice === '〇') document.getElementById('btnMaru').className = 'ans-btn ' + (ok ? 'ok' : 'ng');
+  else document.getElementById('btnBatsu').className = 'ans-btn ' + (ok ? 'ok' : 'ng');
+  const fb = document.getElementById('fb');
+  if (ok) {
+    corr++;
+    fb.className = 'fb ok';
+    fb.innerHTML = '<strong>✓ 正解！</strong>' + q.e;
+    if (!wrongMap[q._cat]) wrongMap[q._cat] = [];
+    wrongMap[q._cat] = wrongMap[q._cat].filter(i => i !== q._qi);
+  } else {
+    wrong++;
+    fb.className = 'fb ng';
+    fb.innerHTML = '<strong>✗ 不正解。正解は「' + q.a + '」</strong>' + q.e;
+    if (!wrongMap[q._cat]) wrongMap[q._cat] = [];
+    if (!wrongMap[q._cat].includes(q._qi)) wrongMap[q._cat].push(q._qi);
+  }
+  // Record as seen
+  if (!seenList[q._cat]) seenList[q._cat] = [];
+  if (!seenList[q._cat].includes(q._qi)) seenList[q._cat].push(q._qi);
+  saveState();
+  document.getElementById('liveC').textContent = corr;
+  document.getElementById('liveW').textContent = wrong;
+  document.getElementById('hdrScore').innerHTML = '正解 <b>' + corr + '</b> / ' + activeQ.length;
+  // Check button
+  const cb = document.getElementById('checkBtn');
+  const isChecked = checkList.some(item => item.cat === q._cat && item.qi === q._qi);
+  cb.className = isChecked ? 'check-btn on checked' : 'check-btn on';
+  cb.textContent = isChecked ? '⭐ チェック済み（タップで解除）' : '⭐ あとでチェック';
+  // メモ欄表示・既存メモ復元
+  const memoKey = q._cat + '__' + q._qi;
+  document.getElementById('memoWrap').className = 'memo-wrap on';
+  document.getElementById('memoInput').value = memoMap[memoKey] || '';
+  document.getElementById('memoSaved').className = 'memo-saved';
+  // Show comment area
+  const commentKey = q._cat + ':' + q._qi;
+  const existingCmt = comments[commentKey] || '';
+  const ecEl = document.getElementById('existingComment');
+  if (existingCmt) {
+    ecEl.style.display = 'block';
+    ecEl.textContent = '📝 ' + existingCmt;
+  } else {
+    ecEl.style.display = 'none';
+  }
+  document.getElementById('commentArea').value = existingCmt;
+  document.getElementById('commentSaved').style.display = 'none';
+  document.getElementById('commentWrap').className = 'comment-wrap on';
+  const nb = document.getElementById('btnNext');
+  nb.className = 'btn-next on';
+  nb.textContent = cur < activeQ.length-1 ? '次の問題へ →' : '結果を見る →';
+}
+
+function nextQ() {
+  cur++;
+  if (cur >= activeQ.length) showResult();
+  else renderQ();
+}
+
+// ===== RESULT =====
+function showResult() {
+  const total = activeQ.length;
+  const pct = Math.round(corr/total*100);
+  lastScore = {pct, wrong};
+  saveState();
+  document.getElementById('progFill').style.width = '100%';
+  showScr('scrResult');
+  document.getElementById('hdrScore').className = 'hdr-score';
+  const deg = pct * 3.6;
+  document.getElementById('resRing').style.background =
+    'conic-gradient(var(--accent) ' + deg + 'deg, var(--surface2) ' + deg + 'deg)';
+  document.getElementById('resPct').textContent = pct + '%';
+  const msgs = pct >= 90 ? ['完璧です！','本番も余裕'] : pct >= 70 ? ['よくできました','合格ライン突破！'] : ['まだ伸びしろあり','解説を読んで復習を'];
+  document.getElementById('resMsg').textContent = msgs[0];
+  document.getElementById('resSub').textContent = corr + ' / ' + total + ' 問正解　' + msgs[1];
+  document.getElementById('rC').textContent = corr;
+  document.getElementById('rW').textContent = wrong;
+  document.getElementById('rT').textContent = total;
+  const allWrong = activeQ.filter(q => (wrongMap[q._cat]||[]).includes(q._qi));
+  const ws = document.getElementById('wrongSec');
+  const rb = document.getElementById('btnRetry');
+  if (allWrong.length > 0) {
+    ws.style.display = 'block';
+    rb.className = 'btn-retry on';
+    document.getElementById('wrongList').innerHTML = allWrong.map(q => {
+      const key = q._cat + ':' + q._qi;
+      const cmt = comments[key] ? '<div style="font-size:12px;color:var(--accent);margin-top:4px">📝 ' + comments[key] + '</div>' : '';
+      return '<div class="wrong-item"><div class="wrong-item-q">' + q.q + '</div><div class="wrong-item-a">正解: ' + q.a + '</div>' + cmt + '</div>';
+    }).join('');
+  } else {
+    ws.style.display = 'none';
+    rb.className = 'btn-retry';
+  }
+}
+
+function retryWrong() {
+  mode = 'wrong';
+  document.getElementById('modeAll').classList.remove('active');
+  document.getElementById('modeWrong').classList.add('active');
+  goHome();
+}
+
+function goHome() {
+  showScr('scrHome');
+  renderHome();
+  document.getElementById('hdrScore').className = 'hdr-score';
+}
+
+// ===== IMPORT =====
+function showImport() {
+  document.getElementById('impCatName').value = '';
+  document.getElementById('impText').value = '';
+  document.getElementById('impResult').className = 'imp-result';
+  switchTab('add');
+  showScr('scrImport');
+}
+
+function switchTab(tab) {
+  document.getElementById('tabAdd').classList.toggle('active', tab === 'add');
+  document.getElementById('tabManage').classList.toggle('active', tab === 'manage');
+  document.getElementById('paneAdd').style.display = tab === 'add' ? 'block' : 'none';
+  document.getElementById('paneManage').style.display = tab === 'manage' ? 'block' : 'none';
+  if (tab === 'manage') renderManage();
+}
+
+function renderManage() {
+  const cats = getAllCats();
+  const list = document.getElementById('catManageList');
+  if (cats.length === 0) { list.innerHTML = '<p style="font-size:13px;color:var(--text3)">まだ科目がありません</p>'; return; }
+  list.innerHTML = cats.map(c => {
+    const ex = extraData[c.name];
+    const exQ = ex ? ex.questions.length : 0;
+    const baseQ = c.base ? BASE_DATA.find(b => b.name === c.name).questions.length : 0;
+    const canDel = !c.base || exQ > 0;
+    return '<div class="cat-mi">' +
+      '<div><div style="font-size:14px">' + c.icon + ' ' + c.name + '</div>' +
+      '<div class="cat-mi-cnt">' + c.questions.length + '問' + (exQ > 0 ? '（うち追加'+exQ+'問）' : '') + '</div></div>' +
+      (canDel
+        ? '<button class="btn-del" data-cat="' + c.name + '" data-base="' + c.base + '">削除</button>'
+        : '<span style="font-size:11px;color:var(--text3)">組込</span>') +
+      '</div>';
+  }).join('');
+  document.querySelectorAll('.btn-del').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const name = this.getAttribute('data-cat');
+      if (confirm('「' + name + '」の追加データを削除しますか？')) {
+        delete extraData[name];
+        saveExtra();
+        renderManage();
+      }
+    });
+  });
+}
+
+function doImport() {
+  const catName = document.getElementById('impCatName').value.trim();
+  const text = document.getElementById('impText').value.trim();
+  const resEl = document.getElementById('impResult');
+  if (!catName) { resEl.className = 'imp-result ng'; resEl.textContent = '科目名を入力してください'; return; }
+  if (!text) { resEl.className = 'imp-result ng'; resEl.textContent = '問題データを貼り付けてください'; return; }
+  const blocks = text.split(/\n?---\n?/).map(b => b.trim()).filter(b => b.length > 0);
+  const parsed = [], errors = [];
+  blocks.forEach((block, i) => {
+    const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length < 2) { errors.push('ブロック' + (i+1) + ': 問題文と答えが必要'); return; }
+    const q = lines[0];
+    const raw = lines[1];
+    const a = raw.includes('〇') ? '〇' : (raw.includes('×') || raw.toLowerCase().includes('x')) ? '×' : null;
+    if (!a) { errors.push('ブロック' + (i+1) + ': 答えが不明「' + raw + '」'); return; }
+    const e = lines.slice(2).join('　') || '';
+    parsed.push({q, a, e});
+  });
+  if (parsed.length === 0) {
+    resEl.className = 'imp-result ng';
+    resEl.textContent = 'パースできた問題が0件です。\n' + errors.join('\n');
+    return;
+  }
+  if (!extraData[catName]) extraData[catName] = {icon:'📝', questions:[]};
+  extraData[catName].questions.push(...parsed);
+  saveExtra();
+  const warn = errors.length > 0 ? '\n⚠ スキップ: ' + errors.join(' / ') : '';
+  resEl.className = 'imp-result ok';
+  resEl.textContent = '✓ 「' + catName + '」に ' + parsed.length + '問 追加しました！' + warn;
+  document.getElementById('impText').value = '';
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', function() {
+  loadState();
+  loadExtra();
+  renderHome();
+
+  // mode buttons
+  document.getElementById('modeAll').addEventListener('click', function() {
+    mode = 'all';
+    document.querySelectorAll('.mode-pill').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    updateHomeUI();
+  });
+  document.getElementById('modeWrong').addEventListener('click', function() {
+    mode = 'wrong';
+    document.querySelectorAll('.mode-pill').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    updateHomeUI();
+  });
+
+  document.getElementById('btnStart').addEventListener('click', startQuiz);
+  document.getElementById('btnGoImport').addEventListener('click', showImport);
+  // qty buttons
+  [{id:'qty10',v:10},{id:'qty20',v:20},{id:'qty30',v:30},{id:'qtyAll',v:0}].forEach(({id,v}) => {
+    document.getElementById(id).addEventListener('click', function() {
+      qty = v;
+      document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+  // mode check
+  document.getElementById('modeCheck').addEventListener('click', function() {
+    mode = 'check';
+    document.querySelectorAll('.mode-pill').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    updateHomeUI();
+  });
+  document.getElementById('modeMemo').addEventListener('click', function() {
+    mode = 'memo';
+    document.querySelectorAll('.mode-pill').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    updateHomeUI();
+  });
+  document.getElementById('memoSaveBtn').addEventListener('click', function() {
+    const q = activeQ[cur];
+    if (!q) return;
+    const key = q._cat + '__' + q._qi;
+    const val = document.getElementById('memoInput').value.trim();
+    if (val) {
+      memoMap[key] = val;
+    } else {
+      delete memoMap[key];
+    }
+    saveState();
+    const saved = document.getElementById('memoSaved');
+    saved.className = 'memo-saved on';
+    setTimeout(() => { saved.className = 'memo-saved'; }, 1500);
+  });
+
+  document.getElementById('commentSave').addEventListener('click', function() {
+    const q = activeQ[cur];
+    if (!q) return;
+    const key = q._cat + ':' + q._qi;
+    const text = document.getElementById('commentArea').value.trim();
+    if (text) {
+      comments[key] = text;
+    } else {
+      delete comments[key];
+    }
+    saveState();
+    const saved = document.getElementById('commentSaved');
+    saved.style.display = 'inline';
+    const ecEl = document.getElementById('existingComment');
+    if (text) { ecEl.style.display = 'block'; ecEl.textContent = '📝 ' + text; }
+    else ecEl.style.display = 'none';
+    setTimeout(() => { saved.style.display = 'none'; }, 1500);
+  });
+  document.getElementById('btnMaru').addEventListener('click', function() { doAnswer('〇'); });
+  document.getElementById('btnBatsu').addEventListener('click', function() { doAnswer('×'); });
+  document.getElementById('btnHomeQuiz').addEventListener('click', function() {
+    document.getElementById('homeConfirm').classList.add('on');
+  });
+  document.getElementById('hcNo').addEventListener('click', function() {
+    document.getElementById('homeConfirm').classList.remove('on');
+  });
+  document.getElementById('hcYes').addEventListener('click', function() {
+    document.getElementById('homeConfirm').classList.remove('on');
+    goHome();
+  });
+  document.getElementById('checkBtn').addEventListener('click', function() {
+    const q = activeQ[cur];
+    if (!q) return;
+    const idx = checkList.findIndex(item => item.cat === q._cat && item.qi === q._qi);
+    if (idx >= 0) {
+      checkList.splice(idx, 1);
+      this.className = 'check-btn on';
+      this.textContent = '⭐ あとでチェック';
+    } else {
+      checkList.push({cat: q._cat, qi: q._qi});
+      this.className = 'check-btn on checked';
+      this.textContent = '⭐ チェック済み（タップで解除）';
+    }
+    saveState();
+  });
+  document.getElementById('btnNext').addEventListener('click', function() {
+    document.getElementById('homeConfirm').classList.remove('on');
+    nextQ();
+  });
+
+  document.getElementById('btnRetry').addEventListener('click', retryWrong);
+  document.getElementById('btnHome').addEventListener('click', goHome);
+
+  document.getElementById('tabAdd').addEventListener('click', function() { switchTab('add'); });
+  document.getElementById('tabManage').addEventListener('click', function() { switchTab('manage'); });
+  document.getElementById('btnImport').addEventListener('click', doImport);
+  document.getElementById('btnCancelImport').addEventListener('click', goHome);
+  document.getElementById('btnCancelManage').addEventListener('click', goHome);
+  document.getElementById('btnResetSeen').addEventListener('click', function() {
+    seenList = {};
+    saveState();
+    renderManage();
+    renderHome();
+    alert('出題履歴をリセットしました。全問が未出題になりました。');
+  });
+});
+</script>
+<div class="home-confirm" id="homeConfirm">
+  <p>テストを終了してホームへ戻りますか？</p>
+  <div class="home-confirm-btns">
+    <button class="hc-no" id="hcNo">キャンセル</button>
+    <button class="hc-yes" id="hcYes">ホームへ戻る</button>
+  </div>
+</div>
+</body>
+</html>
