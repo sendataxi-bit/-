@@ -1619,19 +1619,7 @@ function doAnswer(choice) {
   document.getElementById('memoWrap').className = 'memo-wrap on';
   document.getElementById('memoInput').value = memoMap[memoKey] || '';
   document.getElementById('memoSaved').className = 'memo-saved';
-  // Show comment area
-  const commentKey = q._cat + ':' + q._qi;
-  const existingCmt = comments[commentKey] || '';
-  const ecEl = document.getElementById('existingComment');
-  if (existingCmt) {
-    ecEl.style.display = 'block';
-    ecEl.textContent = '📝 ' + existingCmt;
-  } else {
-    ecEl.style.display = 'none';
-  }
-  document.getElementById('commentArea').value = existingCmt;
-  document.getElementById('commentSaved').style.display = 'none';
-  document.getElementById('commentWrap').className = 'comment-wrap on';
+
   const nb = document.getElementById('btnNext');
   nb.className = 'btn-next on';
   nb.textContent = cur < activeQ.length-1 ? '次の問題へ →' : '結果を見る →';
