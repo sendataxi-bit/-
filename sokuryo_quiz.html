@@ -145,6 +145,13 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .memo-save-btn{margin-top:6px;padding:7px 16px;font-size:12px;font-family:'Noto Sans JP',sans-serif;background:var(--adim);color:var(--accent);border:1px solid rgba(129,140,248,.3);border-radius:var(--rs);cursor:pointer}
 .memo-saved{font-size:11px;color:var(--text3);margin-left:8px;display:none}
 .memo-saved.on{display:inline}
+.export-area{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;padding:10px 12px;resize:none;height:80px;margin-bottom:8px}
+.export-area:focus{outline:none;border-color:var(--accent)}
+.btn-export{width:100%;padding:12px;font-size:14px;font-weight:500;font-family:'Noto Sans JP',sans-serif;background:var(--adim);color:var(--accent);border:1px solid rgba(129,140,248,.3);border-radius:var(--rs);cursor:pointer;margin-bottom:8px}
+.btn-import{width:100%;padding:12px;font-size:14px;font-weight:500;font-family:'Noto Sans JP',sans-serif;background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.2);border-radius:var(--rs);cursor:pointer;margin-bottom:8px}
+.io-msg{font-size:12px;padding:8px 12px;border-radius:var(--rs);display:none;margin-bottom:8px}
+.io-msg.ok{display:block;background:var(--gdim);color:#86efac}
+.io-msg.ng{display:block;background:var(--rdim);color:#fca5a5}
 .comment-wrap{display:none;margin-top:8px}
 .comment-wrap.on{display:block}
 .comment-area{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);
@@ -324,6 +331,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <div class="tab-row">
     <button class="tab-btn active" id="tabAdd">問題を追加</button>
     <button class="tab-btn" id="tabManage">科目を管理</button>
+    <button class="tab-btn" id="tabIO">データ管理</button>
   </div>
   <!-- 追加パネル -->
   <div id="paneAdd">
@@ -344,6 +352,22 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <button class="btn-primary" id="btnImport" style="margin-top:14px">追加する</button>
     <button class="btn-ghost" id="btnCancelImport">キャンセル</button>
   </div>
+  <!-- データ管理パネル -->
+  <div id="paneIO" style="display:none">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">ファイル更新時にデータをエクスポートして、新しいファイルでインポートすれば引き継げます。</p>
+
+    <p style="font-size:13px;font-weight:500;margin-bottom:8px">📤 エクスポート</p>
+    <textarea class="export-area" id="exportArea" readonly placeholder="エクスポートボタンを押すとデータが表示されます"></textarea>
+    <button class="btn-export" id="btnExport">データをエクスポート</button>
+    <button class="btn-ghost" id="btnCopyExport" style="margin-bottom:16px">クリップボードにコピー</button>
+
+    <p style="font-size:13px;font-weight:500;margin-bottom:8px">📥 インポート</p>
+    <textarea class="export-area" id="importArea" placeholder="エクスポートしたデータをここに貼り付け"></textarea>
+    <div class="io-msg" id="ioMsg"></div>
+    <button class="btn-import" id="btnImportData">データをインポート</button>
+    <button class="btn-ghost" id="btnCancelIO">ホームに戻る</button>
+  </div>
+
   <!-- 管理パネル -->
   <div id="paneManage" style="display:none">
     <p style="font-size:13px;color:var(--text2);margin-bottom:12px">登録済み科目</p>
@@ -1692,9 +1716,41 @@ function showImport() {
 function switchTab(tab) {
   document.getElementById('tabAdd').classList.toggle('active', tab === 'add');
   document.getElementById('tabManage').classList.toggle('active', tab === 'manage');
+  document.getElementById('tabIO').classList.toggle('active', tab === 'io');
   document.getElementById('paneAdd').style.display = tab === 'add' ? 'block' : 'none';
   document.getElementById('paneManage').style.display = tab === 'manage' ? 'block' : 'none';
+  document.getElementById('paneIO').style.display = tab === 'io' ? 'block' : 'none';
   if (tab === 'manage') renderManage();
+}
+
+function exportData() {
+  const data = {wrongMap, checkList, seenList, memoMap, extraData};
+  const json = JSON.stringify(data);
+  document.getElementById('exportArea').value = json;
+}
+
+function importData() {
+  const text = document.getElementById('importArea').value.trim();
+  const msg = document.getElementById('ioMsg');
+  if (!text) {
+    msg.className = 'io-msg ng'; msg.textContent = 'データを貼り付けてください'; return;
+  }
+  try {
+    const data = JSON.parse(text);
+    if (data.wrongMap) wrongMap = data.wrongMap;
+    if (data.checkList) checkList = data.checkList;
+    if (data.seenList) seenList = data.seenList;
+    if (data.memoMap) memoMap = data.memoMap;
+    if (data.extraData) extraData = data.extraData;
+    saveState();
+    saveExtra();
+    msg.className = 'io-msg ok';
+    msg.textContent = '✓ インポート完了！データを引き継ぎました。';
+    document.getElementById('importArea').value = '';
+  } catch(e) {
+    msg.className = 'io-msg ng';
+    msg.textContent = '❌ データの形式が正しくありません。';
+  }
 }
 
 function renderManage() {
@@ -1875,6 +1931,17 @@ window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btnImport').addEventListener('click', doImport);
   document.getElementById('btnCancelImport').addEventListener('click', goHome);
   document.getElementById('btnCancelManage').addEventListener('click', goHome);
+  document.getElementById('btnCancelIO').addEventListener('click', goHome);
+  document.getElementById('tabIO').addEventListener('click', function() { switchTab('io'); });
+  document.getElementById('btnExport').addEventListener('click', exportData);
+  document.getElementById('btnCopyExport').addEventListener('click', function() {
+    const text = document.getElementById('exportArea').value;
+    if (!text) { exportData(); }
+    navigator.clipboard.writeText(document.getElementById('exportArea').value)
+      .then(() => { this.textContent = '✓ コピーしました'; setTimeout(() => { this.textContent = 'クリップボードにコピー'; }, 2000); })
+      .catch(() => { this.textContent = '手動でコピーしてください'; });
+  });
+  document.getElementById('btnImportData').addEventListener('click', importData);
   document.getElementById('btnResetSeen').addEventListener('click', function() {
     seenList = {};
     saveState();
