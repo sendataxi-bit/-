@@ -276,7 +276,10 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
   </div>
   <div class="q-card">
-    <div class="q-lbl" id="qLbl">QUESTION 1</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="q-lbl" id="qLbl">QUESTION 1</div>
+      <div id="qCat" style="font-size:11px;color:var(--accent);background:var(--adim);padding:2px 8px;border-radius:99px;letter-spacing:0.03em"></div>
+    </div>
     <div class="q-txt" id="qTxt"></div>
   </div>
   <div class="ans-row">
@@ -1584,6 +1587,7 @@ function renderQ() {
   document.getElementById('qCtr').textContent = (cur+1) + ' / ' + total;
   document.getElementById('qLbl').textContent = 'QUESTION ' + (cur+1);
   document.getElementById('qTxt').textContent = q.q;
+  document.getElementById('qCat').textContent = q._cat || '';
   document.getElementById('progFill').style.width = (cur/total*100) + '%';
   document.getElementById('fb').className = 'fb';
   document.getElementById('fb').innerHTML = '';
