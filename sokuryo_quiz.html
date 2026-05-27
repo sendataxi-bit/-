@@ -21,9 +21,9 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .hdr{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.85);backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
   padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
-.hdr-title{font-size:15px;font-weight:700;letter-spacing:.02em}
+.hdr-title{font-size:18px;font-weight:700;letter-spacing:.02em}
 .hdr-title span{color:var(--accent)}
-.hdr-score{font-family:'DM Mono',monospace;font-size:13px;color:var(--text2);display:none}
+.hdr-score{font-family:'DM Mono',monospace;font-size:16px;color:var(--text2);display:none}
 .hdr-score.on{display:block}
 .hdr-score b{color:var(--green)}
 /* screens */
@@ -33,15 +33,15 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .hero{text-align:center;padding:28px 0 24px}
 .hero-icon{width:72px;height:72px;border-radius:22px;background:var(--adim);
   border:1px solid rgba(129,140,248,.3);display:flex;align-items:center;
-  justify-content:center;margin:0 auto 18px;font-size:32px}
-.hero h1{font-size:22px;font-weight:700;margin-bottom:8px}
-.hero p{font-size:14px;color:var(--text2);line-height:1.6}
+  justify-content:center;margin:0 auto 18px;font-size:35px}
+.hero h1{font-size:25px;font-weight:700;margin-bottom:8px}
+.hero p{font-size:17px;color:var(--text2);line-height:1.6}
 /* prev result */
 .prev{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);
   padding:12px 16px;margin-bottom:16px;display:none;justify-content:space-between;align-items:center}
 .prev.on{display:flex}
-.prev-lbl{font-size:12px;color:var(--text2)}
-.prev-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:500}
+.prev-lbl{font-size:15px;color:var(--text2)}
+.prev-val{font-family:'DM Mono',monospace;font-size:21px;font-weight:500}
 /* category */
 .cat-grid{display:grid;gap:10px;margin:16px 0}
 .cat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
@@ -50,32 +50,32 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 .cat-card.sel{border-color:var(--accent);background:var(--adim)}
 .cat-card:active{transform:scale(.98)}
 .cat-l{display:flex;align-items:center;gap:12px}
-.cat-icon{font-size:20px;width:36px;text-align:center}
-.cat-name{font-size:15px;font-weight:500}
-.cat-cnt{font-size:12px;color:var(--text2);margin-top:2px}
+.cat-icon{font-size:23px;width:36px;text-align:center}
+.cat-name{font-size:18px;font-weight:500}
+.cat-cnt{font-size:15px;color:var(--text2);margin-top:2px}
 .cat-chk{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--text3);
-  display:flex;align-items:center;justify-content:center;font-size:11px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
   color:transparent;transition:all .15s;flex-shrink:0}
 .cat-card.sel .cat-chk{background:var(--accent);border-color:var(--accent);color:#fff}
 /* mode pills */
 .mode-row{display:flex;gap:8px;margin:16px 0}
-.mode-pill{flex:1;padding:10px 8px;font-size:13px;font-family:'Noto Sans JP',sans-serif;
+.mode-pill{flex:1;padding:10px 8px;font-size:16px;font-family:'Noto Sans JP',sans-serif;
   border-radius:99px;border:1px solid var(--border);background:var(--surface);
   color:var(--text2);cursor:pointer;transition:all .15s;text-align:center}
 .mode-pill.active{background:var(--adim);border-color:var(--accent);color:var(--accent);font-weight:500}
 .wbadge{display:inline-block;background:rgba(248,113,113,.15);color:var(--red);
-  font-size:10px;padding:1px 7px;border-radius:99px;margin-left:5px}
+  font-size:13px;padding:1px 7px;border-radius:99px;margin-left:5px}
 /* buttons */
-.btn-primary{width:100%;padding:15px;font-size:16px;font-weight:700;
+.btn-primary{width:100%;padding:15px;font-size:19px;font-weight:700;
   font-family:'Noto Sans JP',sans-serif;background:var(--accent);color:#fff;
   border:none;border-radius:var(--r);cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.03em}
 .btn-primary:active{transform:scale(.98);opacity:.9}
 .btn-primary:disabled{opacity:.3;cursor:not-allowed}
-.btn-ghost{width:100%;padding:13px;font-size:14px;font-family:'Noto Sans JP',sans-serif;
+.btn-ghost{width:100%;padding:13px;font-size:17px;font-family:'Noto Sans JP',sans-serif;
   background:var(--surface);color:var(--text2);border:1px solid var(--border);
   border-radius:var(--r);cursor:pointer;transition:background .15s;margin-top:10px}
 .btn-ghost:active{background:var(--surface2)}
-.btn-dashed{width:100%;padding:13px;font-size:14px;font-weight:500;
+.btn-dashed{width:100%;padding:13px;font-size:17px;font-weight:500;
   font-family:'Noto Sans JP',sans-serif;background:transparent;color:var(--text2);
   border:1px dashed rgba(255,255,255,.15);border-radius:var(--r);
   cursor:pointer;margin-top:12px;transition:all .15s}
@@ -83,8 +83,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* progress */
 .prog-wrap{margin-bottom:20px}
 .prog-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.q-ctr{font-family:'DM Mono',monospace;font-size:13px;color:var(--text2)}
-.live{font-size:13px}
+.q-ctr{font-family:'DM Mono',monospace;font-size:16px;color:var(--text2)}
+.live{font-size:16px}
 .live .c{color:var(--green);font-weight:700}
 .live .w{color:var(--red);font-weight:700}
 .prog-track{height:4px;background:var(--surface2);border-radius:99px;overflow:hidden}
@@ -92,82 +92,82 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 /* question */
 .q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
   padding:20px 18px;margin-bottom:20px;min-height:120px}
-.q-lbl{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);
+.q-lbl{font-family:'DM Mono',monospace;font-size:14px;color:var(--text3);
   letter-spacing:.08em;margin-bottom:10px;text-transform:uppercase}
-.q-txt{font-size:15px;line-height:1.8}
+.q-txt{font-size:18px;line-height:1.8}
 /* answer buttons */
 .ans-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.ans-btn{padding:20px 12px;font-size:36px;border-radius:var(--r);
+.ans-btn{padding:20px 12px;font-size:39px;border-radius:var(--r);
   border:1.5px solid var(--border);background:var(--surface);cursor:pointer;
   transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.ans-lbl{font-size:13px;font-weight:500;color:var(--text2)}
+.ans-lbl{font-size:16px;font-weight:500;color:var(--text2)}
 .ans-btn:active:not(:disabled){transform:scale(.96)}
 .ans-btn.ok{background:var(--gdim);border-color:var(--green)}
 .ans-btn.ng{background:var(--rdim);border-color:var(--red)}
 /* feedback */
-.fb{border-radius:var(--rs);padding:14px 16px;font-size:13px;line-height:1.75;
+.fb{border-radius:var(--rs);padding:14px 16px;font-size:16px;line-height:1.75;
   display:none;margin-bottom:16px}
 .fb.ok{display:block;background:var(--gdim);border:1px solid rgba(74,222,128,.2);color:#86efac}
 .fb.ng{display:block;background:var(--rdim);border:1px solid rgba(248,113,113,.2);color:#fca5a5}
-.fb strong{display:block;font-size:14px;margin-bottom:6px}
-.btn-next{width:100%;padding:15px;font-size:15px;font-weight:700;
+.fb strong{display:block;font-size:17px;margin-bottom:6px}
+.btn-next{width:100%;padding:15px;font-size:18px;font-weight:700;
   font-family:'Noto Sans JP',sans-serif;background:var(--surface2);color:var(--text);
   border:1px solid var(--border);border-radius:var(--r);cursor:pointer;
   display:none;transition:background .15s,transform .1s}
 .btn-next.on{display:block}
 .btn-next:active{transform:scale(.98);background:var(--surface)}
-.btn-home-quiz{width:100%;padding:10px;font-size:13px;font-family:'Noto Sans JP',sans-serif;background:transparent;color:var(--text3);border:none;cursor:pointer;margin-top:4px;transition:color .15s}
+.btn-home-quiz{width:100%;padding:10px;font-size:16px;font-family:'Noto Sans JP',sans-serif;background:transparent;color:var(--text3);border:none;cursor:pointer;margin-top:4px;transition:color .15s}
 .btn-home-quiz:active{color:var(--text2)}
 .home-confirm{position:fixed;bottom:0;left:0;right:0;background:var(--surface);
   border-top:1px solid var(--border);padding:16px 20px;z-index:200;display:none;
   max-width:600px;margin:0 auto}
 .home-confirm.on{display:block}
-.home-confirm p{font-size:14px;color:var(--text);margin-bottom:12px;text-align:center}
+.home-confirm p{font-size:17px;color:var(--text);margin-bottom:12px;text-align:center}
 .home-confirm-btns{display:flex;gap:10px}
-.hc-yes{flex:1;padding:12px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;
+.hc-yes{flex:1;padding:12px;font-size:17px;font-weight:700;font-family:'Noto Sans JP',sans-serif;
   background:var(--rdim);color:var(--red);border:1px solid rgba(248,113,113,.3);
   border-radius:var(--rs);cursor:pointer}
-.hc-no{flex:1;padding:12px;font-size:14px;font-family:'Noto Sans JP',sans-serif;
+.hc-no{flex:1;padding:12px;font-size:17px;font-family:'Noto Sans JP',sans-serif;
   background:var(--surface2);color:var(--text2);border:1px solid var(--border);
   border-radius:var(--rs);cursor:pointer}
-.check-btn{width:100%;padding:10px 14px;font-size:13px;font-family:'Noto Sans JP',sans-serif;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;margin-top:8px;transition:all .15s;display:none}
+.check-btn{width:100%;padding:10px 14px;font-size:16px;font-family:'Noto Sans JP',sans-serif;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;margin-top:8px;transition:all .15s;display:none}
 .check-btn.on{display:block}
 .check-btn.checked{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4);color:#fbbf24}
 .qty-row{display:flex;gap:8px;margin:16px 0}
-.qty-btn{flex:1;padding:9px 6px;font-size:13px;font-family:'Noto Sans JP',sans-serif;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;text-align:center}
+.qty-btn{flex:1;padding:9px 6px;font-size:16px;font-family:'Noto Sans JP',sans-serif;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;text-align:center}
 .qty-btn.active{background:var(--adim);border-color:var(--accent);color:var(--accent);font-weight:500}
-.skip-badge{display:inline-block;background:rgba(251,191,36,.12);color:#fbbf24;font-size:10px;padding:1px 7px;border-radius:99px;margin-left:5px}
-.memo-badge{display:inline-block;background:rgba(129,140,248,.15);color:var(--accent);font-size:10px;padding:1px 7px;border-radius:99px;margin-left:5px}
+.skip-badge{display:inline-block;background:rgba(251,191,36,.12);color:#fbbf24;font-size:13px;padding:1px 7px;border-radius:99px;margin-left:5px}
+.memo-badge{display:inline-block;background:rgba(129,140,248,.15);color:var(--accent);font-size:13px;padding:1px 7px;border-radius:99px;margin-left:5px}
 .memo-wrap{display:none;margin-top:10px}
 .memo-wrap.on{display:block}
-.memo-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:13px;padding:10px 12px;resize:vertical;transition:border-color .15s;min-height:70px}
+.memo-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:16px;padding:10px 12px;resize:vertical;transition:border-color .15s;min-height:70px}
 .memo-input:focus{outline:none;border-color:var(--accent)}
-.memo-save-btn{margin-top:6px;padding:7px 16px;font-size:12px;font-family:'Noto Sans JP',sans-serif;background:var(--adim);color:var(--accent);border:1px solid rgba(129,140,248,.3);border-radius:var(--rs);cursor:pointer}
-.memo-saved{font-size:11px;color:var(--text3);margin-left:8px;display:none}
+.memo-save-btn{margin-top:6px;padding:7px 16px;font-size:15px;font-family:'Noto Sans JP',sans-serif;background:var(--adim);color:var(--accent);border:1px solid rgba(129,140,248,.3);border-radius:var(--rs);cursor:pointer}
+.memo-saved{font-size:14px;color:var(--text3);margin-left:8px;display:none}
 .memo-saved.on{display:inline}
-.export-area{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Mono',monospace;font-size:11px;padding:10px 12px;resize:none;height:80px;margin-bottom:8px}
+.export-area{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Mono',monospace;font-size:14px;padding:10px 12px;resize:none;height:80px;margin-bottom:8px}
 .export-area:focus{outline:none;border-color:var(--accent)}
-.btn-export{width:100%;padding:12px;font-size:14px;font-weight:500;font-family:'Noto Sans JP',sans-serif;background:var(--adim);color:var(--accent);border:1px solid rgba(129,140,248,.3);border-radius:var(--rs);cursor:pointer;margin-bottom:8px}
-.btn-import{width:100%;padding:12px;font-size:14px;font-weight:500;font-family:'Noto Sans JP',sans-serif;background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.2);border-radius:var(--rs);cursor:pointer;margin-bottom:8px}
-.io-msg{font-size:12px;padding:8px 12px;border-radius:var(--rs);display:none;margin-bottom:8px}
+.btn-export{width:100%;padding:12px;font-size:17px;font-weight:500;font-family:'Noto Sans JP',sans-serif;background:var(--adim);color:var(--accent);border:1px solid rgba(129,140,248,.3);border-radius:var(--rs);cursor:pointer;margin-bottom:8px}
+.btn-import{width:100%;padding:12px;font-size:17px;font-weight:500;font-family:'Noto Sans JP',sans-serif;background:var(--gdim);color:var(--green);border:1px solid rgba(74,222,128,.2);border-radius:var(--rs);cursor:pointer;margin-bottom:8px}
+.io-msg{font-size:15px;padding:8px 12px;border-radius:var(--rs);display:none;margin-bottom:8px}
 .io-msg.ok{display:block;background:var(--gdim);color:#86efac}
 .io-msg.ng{display:block;background:var(--rdim);color:#fca5a5}
 .comment-wrap{display:none;margin-top:8px}
 .comment-wrap.on{display:block}
 .comment-area{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);
-  color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:13px;
+  color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:16px;
   padding:10px 12px;resize:none;transition:border-color .15s;line-height:1.6}
 .comment-area:focus{outline:none;border-color:var(--accent)}
 .comment-area::placeholder{color:var(--text3)}
-.comment-save{padding:8px 16px;font-size:13px;font-family:'Noto Sans JP',sans-serif;
+.comment-save{padding:8px 16px;font-size:16px;font-family:'Noto Sans JP',sans-serif;
   background:var(--adim);color:var(--accent);border:1px solid rgba(129,140,248,.3);
   border-radius:var(--rs);cursor:pointer;margin-top:6px;transition:opacity .15s}
 .comment-save:active{opacity:.7}
-.comment-saved{font-size:12px;color:var(--text3);margin-left:8px;display:none}
+.comment-saved{font-size:15px;color:var(--text3);margin-left:8px;display:none}
 .comment-badge{display:inline-block;background:rgba(129,140,248,.15);color:var(--accent);
-  font-size:10px;padding:1px 7px;border-radius:99px;margin-left:5px}
+  font-size:13px;padding:1px 7px;border-radius:99px;margin-left:5px}
 .existing-comment{background:var(--surface2);border-radius:var(--rs);padding:8px 12px;
-  font-size:13px;color:var(--text2);line-height:1.65;margin-top:8px;display:none;
+  font-size:16px;color:var(--text2);line-height:1.65;margin-top:8px;display:none;
   border-left:2px solid var(--accent)}
 /* result */
 .res-hero{text-align:center;padding:28px 0 24px}
@@ -175,56 +175,56 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   justify-content:center;margin:0 auto 20px;position:relative}
 .res-inner{width:88px;height:88px;border-radius:50%;background:var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:center}
-.res-pct{font-family:'DM Mono',monospace;font-size:26px;font-weight:500}
-.res-msg{font-size:16px;font-weight:700;margin-bottom:6px}
-.res-sub{font-size:13px;color:var(--text2)}
+.res-pct{font-family:'DM Mono',monospace;font-size:29px;font-weight:500}
+.res-msg{font-size:19px;font-weight:700;margin-bottom:6px}
+.res-sub{font-size:16px;color:var(--text2)}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
 .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);
   padding:14px 10px;text-align:center}
-.stat-v{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;margin-bottom:4px}
+.stat-v{font-family:'DM Mono',monospace;font-size:27px;font-weight:500;margin-bottom:4px}
 .stat-v.g{color:var(--green)}
 .stat-v.r{color:var(--red)}
-.stat-l{font-size:11px;color:var(--text2)}
+.stat-l{font-size:14px;color:var(--text2)}
 .wrong-sec{margin:8px 0 20px}
-.wrong-sec h3{font-size:13px;color:var(--text2);margin-bottom:10px;font-weight:500}
+.wrong-sec h3{font-size:16px;color:var(--text2);margin-bottom:10px;font-weight:500}
 .wrong-item{background:var(--surface);border:1px solid var(--border);
   border-radius:var(--rs);padding:12px 14px;margin-bottom:8px}
-.wrong-item-q{font-size:13px;line-height:1.7;margin-bottom:6px}
-.wrong-item-a{font-size:12px;color:var(--green)}
-.btn-retry{width:100%;padding:14px;font-size:14px;font-weight:700;
+.wrong-item-q{font-size:16px;line-height:1.7;margin-bottom:6px}
+.wrong-item-a{font-size:15px;color:var(--green)}
+.btn-retry{width:100%;padding:14px;font-size:17px;font-weight:700;
   font-family:'Noto Sans JP',sans-serif;background:var(--rdim);color:var(--red);
   border:1px solid rgba(248,113,113,.3);border-radius:var(--r);
   cursor:pointer;display:none;transition:opacity .15s;margin-bottom:10px}
 .btn-retry.on{display:block}
 .btn-retry:active{opacity:.7}
 /* import screen */
-.imp-label{font-size:13px;color:var(--text2);margin-bottom:8px;display:block}
+.imp-label{font-size:16px;color:var(--text2);margin-bottom:8px;display:block}
 .imp-input{width:100%;background:var(--surface);border:1px solid var(--border);
   border-radius:var(--rs);color:var(--text);font-family:'Noto Sans JP',sans-serif;
-  font-size:13px;padding:12px 14px;resize:vertical;transition:border-color .15s}
+  font-size:16px;padding:12px 14px;resize:vertical;transition:border-color .15s}
 .imp-input:focus{outline:none;border-color:var(--accent)}
 .imp-catname{width:100%;background:var(--surface);border:1px solid var(--border);
   border-radius:var(--rs);color:var(--text);font-family:'Noto Sans JP',sans-serif;
-  font-size:14px;padding:12px 14px;margin-bottom:6px}
+  font-size:17px;padding:12px 14px;margin-bottom:6px}
 .imp-catname:focus{outline:none;border-color:var(--accent)}
 .imp-catname::placeholder,.imp-input::placeholder{color:var(--text3)}
 .fmt-hint{background:var(--surface2);border-radius:var(--rs);padding:12px 14px;
-  margin:16px 0;font-size:12px;color:var(--text2);line-height:2}
+  margin:16px 0;font-size:15px;color:var(--text2);line-height:2}
 .fmt-hint code{color:var(--accent);font-family:'DM Mono',monospace}
-.imp-result{border-radius:var(--rs);padding:12px 14px;font-size:13px;
+.imp-result{border-radius:var(--rs);padding:12px 14px;font-size:16px;
   line-height:1.6;display:none;margin-bottom:12px}
 .imp-result.ok{display:block;background:var(--gdim);border:1px solid rgba(74,222,128,.2);color:#86efac}
 .imp-result.ng{display:block;background:var(--rdim);border:1px solid rgba(248,113,113,.2);color:#fca5a5}
 .tab-row{display:flex;gap:8px;margin-bottom:20px}
-.tab-btn{flex:1;padding:10px;font-size:13px;font-family:'Noto Sans JP',sans-serif;
+.tab-btn{flex:1;padding:10px;font-size:16px;font-family:'Noto Sans JP',sans-serif;
   border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);
   color:var(--text2);cursor:pointer;transition:all .15s}
 .tab-btn.active{background:var(--adim);border-color:var(--accent);color:var(--accent);font-weight:500}
 .cat-mi{display:flex;align-items:center;justify-content:space-between;
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--rs);padding:11px 14px;margin-bottom:8px}
-.cat-mi-cnt{font-size:12px;color:var(--text2);margin-top:2px}
-.btn-del{padding:5px 12px;font-size:12px;font-family:'Noto Sans JP',sans-serif;
+.cat-mi-cnt{font-size:15px;color:var(--text2);margin-top:2px}
+.btn-del{padding:5px 12px;font-size:15px;font-family:'Noto Sans JP',sans-serif;
   background:var(--rdim);color:var(--red);border:1px solid rgba(248,113,113,.2);
   border-radius:6px;cursor:pointer}
 </style>
@@ -247,14 +247,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
     <div><div class="prev-lbl">前回のスコア</div><div class="prev-val" id="prevPct">-</div></div>
     <div style="text-align:right"><div class="prev-lbl">間違えた問題</div><div class="prev-val" id="prevWrong" style="color:var(--red)">-</div></div>
   </div>
-  <p style="font-size:13px;color:var(--text2);margin-bottom:10px">出題数</p>
+  <p style="font-size:16px;color:var(--text2);margin-bottom:10px">出題数</p>
   <div class="qty-row">
     <button class="qty-btn active" id="qty10">10問</button>
     <button class="qty-btn" id="qty20">20問</button>
     <button class="qty-btn" id="qty30">30問</button>
     <button class="qty-btn" id="qtyAll">全問</button>
   </div>
-  <p style="font-size:13px;color:var(--text2);margin-bottom:10px">科目を選ぶ</p>
+  <p style="font-size:16px;color:var(--text2);margin-bottom:10px">科目を選ぶ</p>
   <div class="cat-grid" id="catGrid"></div>
   <div class="mode-row">
     <button class="mode-pill active" id="modeAll">全問出題</button>
@@ -278,7 +278,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <div class="q-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div class="q-lbl" id="qLbl">QUESTION 1</div>
-      <div id="qCat" style="font-size:11px;color:var(--accent);background:var(--adim);padding:2px 8px;border-radius:99px;letter-spacing:0.03em"></div>
+      <div id="qCat" style="font-size:14px;color:var(--accent);background:var(--adim);padding:2px 8px;border-radius:99px;letter-spacing:0.03em"></div>
     </div>
     <div class="q-txt" id="qTxt"></div>
   </div>
@@ -329,8 +329,8 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
 <!-- データ追加 -->
 <div class="scr" id="scrImport">
-  <h2 style="font-size:17px;font-weight:700;margin-bottom:4px">問題データを追加</h2>
-  <p style="font-size:13px;color:var(--text2);margin-bottom:20px">コピペするだけで新しい科目・問題を追加できます</p>
+  <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">問題データを追加</h2>
+  <p style="font-size:16px;color:var(--text2);margin-bottom:20px">コピペするだけで新しい科目・問題を追加できます</p>
   <div class="tab-row">
     <button class="tab-btn active" id="tabAdd">問題を追加</button>
     <button class="tab-btn" id="tabManage">科目を管理</button>
@@ -340,7 +340,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   <div id="paneAdd">
     <label class="imp-label">科目名</label>
     <input class="imp-catname" id="impCatName" type="text" placeholder="例：基準点測量">
-    <p style="font-size:11px;color:var(--text3);margin-bottom:0">既存の科目名を入力すると問題を追記します</p>
+    <p style="font-size:14px;color:var(--text3);margin-bottom:0">既存の科目名を入力すると問題を追記します</p>
     <div class="fmt-hint">
       <b style="color:var(--text)">貼り付けフォーマット（1問ずつ --- で区切る）</b><br>
       <code>問題文</code><br>
@@ -357,14 +357,14 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
   </div>
   <!-- データ管理パネル -->
   <div id="paneIO" style="display:none">
-    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">ファイル更新時にデータをエクスポートして、新しいファイルでインポートすれば引き継げます。</p>
+    <p style="font-size:16px;color:var(--text2);margin-bottom:16px">ファイル更新時にデータをエクスポートして、新しいファイルでインポートすれば引き継げます。</p>
 
-    <p style="font-size:13px;font-weight:500;margin-bottom:8px">📤 エクスポート</p>
+    <p style="font-size:16px;font-weight:500;margin-bottom:8px">📤 エクスポート</p>
     <textarea class="export-area" id="exportArea" readonly placeholder="エクスポートボタンを押すとデータが表示されます"></textarea>
     <button class="btn-export" id="btnExport">データをエクスポート</button>
     <button class="btn-ghost" id="btnCopyExport" style="margin-bottom:16px">クリップボードにコピー</button>
 
-    <p style="font-size:13px;font-weight:500;margin-bottom:8px">📥 インポート</p>
+    <p style="font-size:16px;font-weight:500;margin-bottom:8px">📥 インポート</p>
     <textarea class="export-area" id="importArea" placeholder="エクスポートしたデータをここに貼り付け"></textarea>
     <div class="io-msg" id="ioMsg"></div>
     <button class="btn-import" id="btnImportData">データをインポート</button>
@@ -373,7 +373,7 @@ body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text
 
   <!-- 管理パネル -->
   <div id="paneManage" style="display:none">
-    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">登録済み科目</p>
+    <p style="font-size:16px;color:var(--text2);margin-bottom:12px">登録済み科目</p>
     <div id="catManageList"></div>
     <button class="btn-ghost" id="btnResetSeen" style="margin-bottom:8px;color:var(--red);border-color:rgba(248,113,113,.3)">出題履歴をリセット（全問を未出題に戻す）</button>
     <button class="btn-ghost" id="btnCancelManage">ホームに戻る</button>
@@ -1686,7 +1686,7 @@ function showResult() {
     rb.className = 'btn-retry on';
     document.getElementById('wrongList').innerHTML = allWrong.map(q => {
       const key = q._cat + ':' + q._qi;
-      const cmt = comments[key] ? '<div style="font-size:12px;color:var(--accent);margin-top:4px">📝 ' + comments[key] + '</div>' : '';
+      const cmt = comments[key] ? '<div style="font-size:15px;color:var(--accent);margin-top:4px">📝 ' + comments[key] + '</div>' : '';
       return '<div class="wrong-item"><div class="wrong-item-q">' + q.q + '</div><div class="wrong-item-a">正解: ' + q.a + '</div>' + cmt + '</div>';
     }).join('');
   } else {
@@ -1760,18 +1760,18 @@ function importData() {
 function renderManage() {
   const cats = getAllCats();
   const list = document.getElementById('catManageList');
-  if (cats.length === 0) { list.innerHTML = '<p style="font-size:13px;color:var(--text3)">まだ科目がありません</p>'; return; }
+  if (cats.length === 0) { list.innerHTML = '<p style="font-size:16px;color:var(--text3)">まだ科目がありません</p>'; return; }
   list.innerHTML = cats.map(c => {
     const ex = extraData[c.name];
     const exQ = ex ? ex.questions.length : 0;
     const baseQ = c.base ? BASE_DATA.find(b => b.name === c.name).questions.length : 0;
     const canDel = !c.base || exQ > 0;
     return '<div class="cat-mi">' +
-      '<div><div style="font-size:14px">' + c.icon + ' ' + c.name + '</div>' +
+      '<div><div style="font-size:17px">' + c.icon + ' ' + c.name + '</div>' +
       '<div class="cat-mi-cnt">' + c.questions.length + '問' + (exQ > 0 ? '（うち追加'+exQ+'問）' : '') + '</div></div>' +
       (canDel
         ? '<button class="btn-del" data-cat="' + c.name + '" data-base="' + c.base + '">削除</button>'
-        : '<span style="font-size:11px;color:var(--text3)">組込</span>') +
+        : '<span style="font-size:14px;color:var(--text3)">組込</span>') +
       '</div>';
   }).join('');
   document.querySelectorAll('.btn-del').forEach(btn => {
